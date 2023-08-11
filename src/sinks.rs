@@ -15,9 +15,10 @@ pub fn graph_out(clock: Clock, balance_changes: BalanceChanges) -> Result<Entity
         tables
             .create_row("Balance", id)
             // contract address
-            .set("address", balance_change.contract)
+            .set("contract", balance_change.contract)
             // balance change
             .set("owner", balance_change.owner)
+            .set("amount", balance_change.transfer_value)
             .set("old_balance", balance_change.old_balance)
             .set("new_balance", balance_change.new_balance)
             // trace information

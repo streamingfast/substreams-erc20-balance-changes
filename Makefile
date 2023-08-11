@@ -29,11 +29,11 @@ info:
 
 .PHONY: run
 run:
-	substreams run map_balance_changes -e mainnet.eth.streamingfast.io:443 -s -1000 -o jsonl
+	substreams run graph_out -e mainnet.eth.streamingfast.io:443 -s -1000
 
 .PHONY: gui
 gui: build
-	substreams gui map_balance_changes -e mainnet.eth.streamingfast.io:443 -s 17829400 -t 17829410
+	substreams gui graph_out -e mainnet.eth.streamingfast.io:443 -s 17829400 -t 17829410
 
 .PHONY: deploy
 deploy:

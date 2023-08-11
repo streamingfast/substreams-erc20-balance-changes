@@ -1,0 +1,15 @@
+# Log
+type BalanceChange @entity(immutable: true) {
+    id: ID!
+
+    contract: String!
+    owner: String!
+
+    amount: String!
+    old_balance: String!
+    new_balance: String!
+    transaction: String!
+
+    block_num: BigInt!
+    timestamp: BigInt!
+}
