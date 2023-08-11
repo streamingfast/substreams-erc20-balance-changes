@@ -12,7 +12,7 @@ use substreams_ethereum::Event;
 
 #[substreams::handlers::map]
 pub fn map_balance_changes(block: Block) -> Result<BalanceChanges, Error> {
-    let balance_changes = map_balance_change(block.clone());
+    let balance_changes = map_balance_change(block);
 
     Ok(BalanceChanges {
         balance_changes
@@ -83,7 +83,7 @@ fn find_erc20_balance_changes(tr: &TransactionTrace, call: &Call, holder: &[u8],
             let new_balance = BigInt::from_signed_bytes_be(&storage_change.new_value);
 
             // get absolute value of balance change
-            let balance_change = new_balance.clone() - old_balance.clone();
+            let balance_change = new_balance - old_balance;
             let balance_change_abs = if balance_change < BigInt::zero() {
                 balance_change * BigInt::from(-1)
             } else {
