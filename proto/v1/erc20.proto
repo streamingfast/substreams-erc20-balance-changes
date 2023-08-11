@@ -15,4 +15,6 @@ message BalanceChange {
   string transaction = 5; // 0xmytransaction
   string storage_key = 6; // 0xmykey
   string call_index = 7; // 0xmycallindex
+
+  string transfer_value = 8; // 0x1234
 }

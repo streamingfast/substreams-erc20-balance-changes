@@ -29,5 +29,8 @@ pub struct BalanceChange {
     /// 0xmycallindex
     #[prost(string, tag="7")]
     pub call_index: ::prost::alloc::string::String,
+    /// 0x1234
+    #[prost(string, tag="8")]
+    pub transfer_value: ::prost::alloc::string::String,
 }
 // @@protoc_insertion_point(module)

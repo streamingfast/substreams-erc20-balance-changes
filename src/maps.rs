@@ -38,6 +38,9 @@ pub fn map_balance_change(block: Block) -> Vec<BalanceChange> {
                     None => continue,
                 };
 
+                if transfer.value == BigInt::zero() {
+                    continue;
+                }
 
 
                 let balance_from = find_erc20_balance_changes(tr, call,  &transfer.from, transfer.value.clone());
@@ -64,6 +67,10 @@ fn find_erc20_balance_changes(tr: &TransactionTrace, call: &Call, holder: &[u8],
     for storage_key in storage_keys {
         let storage_key_bytes = hex::decode(&storage_key).expect("Failed to decode hex string");
         for storage_change in &call.storage_changes {
+            if value.is_zero() {
+                continue;
+            }
+
             if storage_change.key != storage_key_bytes {
                 continue;
             }
@@ -83,9 +90,7 @@ fn find_erc20_balance_changes(tr: &TransactionTrace, call: &Call, holder: &[u8],
                 balance_change
             };
 
-            //check that difference between old and new balance is equal to transfer value
-            if  balance_change_abs != value.clone() {
-                //panic!("Balance change is not equal to transfer value: {} {}", balance_change_abs.to_string(), value.to_string());
+            if balance_change_abs != value.clone() {
                 continue;
             }
 
@@ -97,6 +102,7 @@ fn find_erc20_balance_changes(tr: &TransactionTrace, call: &Call, holder: &[u8],
                 transaction: Hex::encode(&tr.hash).to_string(),
                 storage_key: Hex::encode(&storage_change.key).to_string(),
                 call_index: call.index.to_string(),
+                transfer_value: value.to_string(),
             };
 
             out.push(change);
