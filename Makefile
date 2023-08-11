@@ -35,6 +35,3 @@ run:
 gui: build
 	substreams gui graph_out -e mainnet.eth.streamingfast.io:443 -s 17829400 -t 17829410
 
-.PHONY: deploy
-deploy:
-	graph deploy --studio erc-20
