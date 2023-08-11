@@ -29,9 +29,9 @@ info:
 
 .PHONY: run
 run:
-	substreams run graph_out -e mainnet.eth.streamingfast.io:443 -s -1000
+	substreams run db_out -e mainnet.eth.streamingfast.io:443 -s -1000
 
 .PHONY: gui
 gui: build
-	substreams gui graph_out -e mainnet.eth.streamingfast.io:443 -s 17829400 -t 17829410
+	substreams gui db_out -e mainnet.eth.streamingfast.io:443 -s 17829400 -t 17829410
 

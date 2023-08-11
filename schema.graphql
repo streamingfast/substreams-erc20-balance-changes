@@ -8,8 +8,8 @@ type BalanceChange @entity(immutable: true) {
     amount: String!
     old_balance: String!
     new_balance: String!
-    transaction: String!
 
+    transaction_id: String!
     block_num: BigInt!
     timestamp: BigInt!
 }

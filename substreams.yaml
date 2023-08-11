@@ -7,6 +7,7 @@ package:
 
 imports:
   entities: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v1.3.0/substreams-sink-entity-changes-v1.3.0.spkg
+  database_change: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v1.2.0/substreams-database-change-v1.2.0.spkg
 
 binaries:
   default:
@@ -28,6 +29,14 @@ modules:
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:erc20.types.v1.BalanceChanges
+
+  - name: db_out
+    kind: map
+    inputs:
+      - source: sf.substreams.v1.Clock
+      - map: map_balance_changes
+    output:
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 
   - name: graph_out
     kind: map
