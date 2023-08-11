@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package erc20.types.v1;
+
+message BalanceChanges {
+  repeated BalanceChange balance_changes = 1;
+}
+
+message BalanceChange {
+  string contract = 1; // 0xmytokencontract
+  string owner = 2;  // 0xmyaddress
+  string old_balance = 3; // 0x1234
+  string new_balance = 4; // 0x1234
+
+  string transaction = 5; // 0xmytransaction
+  string storage_key = 6; // 0xmykey
+  string call_index = 7; // 0xmycallindex
+}

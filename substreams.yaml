@@ -1,0 +1,39 @@
+specVersion: v0.1.0
+package:
+  name: erc20_balance_changes
+  version: v0.0.1
+  url: https://github.com/streamingfast/erc20-balance-changes
+  doc: ERC-20
+
+imports:
+  entities: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v1.3.0/substreams-sink-entity-changes-v1.3.0.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: target/wasm32-unknown-unknown/release/erc20.wasm
+
+protobuf:
+  files:
+    - erc20.proto
+  importPaths:
+    - ./proto/v1
+
+modules:
+  - name: map_balance_changes
+    kind: map
+    doc: Extracts ERC20 balance changes
+    initialBlock: 1397553
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:erc20.types.v1.BalanceChanges
+
+  - name: graph_out
+    kind: map
+    initialBlock: 1397553
+    inputs:
+      - source: sf.substreams.v1.Clock
+      - map: map_balance_changes
+    output:
+      type: proto:sf.substreams.sink.entity.v1.EntityChanges
