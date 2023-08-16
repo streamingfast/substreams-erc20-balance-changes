@@ -10,6 +10,10 @@ pub fn graph_out(clock: Clock, balance_changes: BalanceChanges) -> Result<Entity
     let timestamp = clock.timestamp.unwrap().seconds.to_string();
 
     for balance_change in balance_changes.balance_changes {
+        if balance_change.change_type == 0 {
+            continue;
+        }
+
         let key = format!("{}:{}:{}", balance_change.contract, balance_change.owner, balance_change.transaction);
 
         tables
@@ -34,6 +38,10 @@ pub fn db_out(clock: Clock, balance_changes: BalanceChanges) -> Result<DatabaseC
     let timestamp = clock.timestamp.unwrap().seconds.to_string();
 
     for balance_change in balance_changes.balance_changes {
+        if balance_change.change_type == 0 {
+            continue;
+        }
+
         let key = format!("{}:{}:{}", balance_change.contract, balance_change.owner, balance_change.transaction);
 
         tables.create_row("balance_changes", key)

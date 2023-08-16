@@ -16,7 +16,7 @@ build: protogen
 
 
 .PHONY: pack
-pack:
+pack: build
 	substreams pack
 
 .PHONY: graph
@@ -29,9 +29,8 @@ info:
 
 .PHONY: run
 run:
-	substreams run db_out -e mainnet.eth.streamingfast.io:443 -s -1000
-
+	substreams run ./erc20-balance-changes-v0.0.2.spkg map_balance_changes -e mainnet.eth.streamingfast.io:443 -s 15000000 -t 16000000 --output jsonl
 .PHONY: gui
-gui: build
-	substreams gui db_out -e mainnet.eth.streamingfast.io:443 -s 17829400 -t 17829410
+gui:
+	substreams gui ./erc20-balance-changes-v0.0.2.spkg map_valid_changes -e mainnet.eth.streamingfast.io:443 -s 17920000 --production-mode
 

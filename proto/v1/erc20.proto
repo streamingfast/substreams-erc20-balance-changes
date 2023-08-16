@@ -6,6 +6,12 @@ message BalanceChanges {
   repeated BalanceChange balance_changes = 1;
 }
 
+enum BalanceChangeType {
+  TYPE_UNKNOWN = 0; // cannot determine balance change
+  TYPE_1 = 1; // easy case where storage change is in the same call as the Transfer call
+  TYPE_2 = 2; // storage change is in a different call than the Transfer call
+}
+
 message BalanceChange {
   string contract = 1; // 0xmytokencontract
   string owner = 2;  // 0xmyaddress
@@ -17,4 +23,6 @@ message BalanceChange {
   string call_index = 7; // 0xmycallindex
 
   string transfer_value = 8; // 0x1234
+
+  BalanceChangeType change_type = 9;
 }
