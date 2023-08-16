@@ -18,13 +18,15 @@ message BalanceChange {
 
   string transfer_value = 8; // 0x1234
 
-  bool is_valid = 9;
+  int64 type = 9;
 }
 
 message ValidBalanceChangeStats {
-  float total_balance_change_count = 1;
-  float valid_balance_change_count = 2;
-  float valid_ratio = 3;
+  uint64 type0_count = 1;
+  uint64 type1_count = 2;
+  uint64 type2_count = 3;
+  uint64 type66_count = 4;
 
-  uint64 block_number = 4;
+  uint64 total_count = 42;
+  uint64 block_number = 99;
 }

@@ -32,4 +32,5 @@ run: build
 	substreams run map_valid_changes -e mainnet.eth.streamingfast.io:443
 .PHONY: gui
 gui: build
-	substreams gui map_valid_changes -e mainnet.eth.streamingfast.io:443 -s 17900000 -t +10 --production-mode
+	substreams gui map_valid_changes -e mainnet.eth.streamingfast.io:443 -s 17920000 -t +10 --production-mode
+
