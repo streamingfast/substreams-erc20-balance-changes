@@ -167,6 +167,7 @@ dependencies = [
  "ethabi 18.0.0",
  "hex",
  "num-bigint",
+ "num-traits",
  "prost",
  "prost-build",
  "prost-types",

@@ -32,5 +32,19 @@ pub struct BalanceChange {
     /// 0x1234
     #[prost(string, tag="8")]
     pub transfer_value: ::prost::alloc::string::String,
+    #[prost(bool, tag="9")]
+    pub is_valid: bool,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ValidBalanceChangeStats {
+    #[prost(float, tag="1")]
+    pub total_balance_change_count: f32,
+    #[prost(float, tag="2")]
+    pub valid_balance_change_count: f32,
+    #[prost(float, tag="3")]
+    pub valid_ratio: f32,
+    #[prost(uint64, tag="4")]
+    pub block_number: u64,
 }
 // @@protoc_insertion_point(module)

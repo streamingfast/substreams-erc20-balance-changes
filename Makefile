@@ -16,7 +16,7 @@ build: protogen
 
 
 .PHONY: pack
-pack:
+pack: build
 	substreams pack
 
 .PHONY: graph
@@ -28,10 +28,8 @@ info:
 	substreams info
 
 .PHONY: run
-run:
-	substreams run db_out -e mainnet.eth.streamingfast.io:443 -s -1000
-
+run: build
+	substreams run map_valid_changes -e mainnet.eth.streamingfast.io:443
 .PHONY: gui
 gui: build
-	substreams gui db_out -e mainnet.eth.streamingfast.io:443 -s 17829400 -t 17829410
-
+	substreams gui map_valid_changes -e mainnet.eth.streamingfast.io:443 -s 17900000 -t +10 --production-mode

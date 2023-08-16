@@ -17,4 +17,14 @@ message BalanceChange {
   string call_index = 7; // 0xmycallindex
 
   string transfer_value = 8; // 0x1234
+
+  bool is_valid = 9;
+}
+
+message ValidBalanceChangeStats {
+  float total_balance_change_count = 1;
+  float valid_balance_change_count = 2;
+  float valid_ratio = 3;
+
+  uint64 block_number = 4;
 }
