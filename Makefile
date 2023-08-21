@@ -31,6 +31,8 @@ info:
 run: build
 	substreams run map_valid_changes -e mainnet.eth.streamingfast.io:443
 .PHONY: gui
-gui: build
-	substreams gui map_valid_changes -e mainnet.eth.streamingfast.io:443 -s 17920000 -t +10 --production-mode
+gui:
+	#substreams gui ./erc20-balance-changes-v0.0.1.spkg map_balance_changes -e mainnet.eth.streamingfast.io:443 -s 17920000 -t +10 --production-mode
+	#substreams gui ./erc20-balance-changes-v0.0.1.spkg map_valid_changes -e mainnet.eth.streamingfast.io:443 -s 13320000 --production-mode
+	substreams gui ./erc20-balance-changes-v0.0.1.spkg map_valid_changes -e mainnet.eth.streamingfast.io:443 -s 17920000 --production-mode
 

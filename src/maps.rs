@@ -107,6 +107,7 @@ pub fn map_balance_change(block: Block) -> Vec<BalanceChange> {
     balance_changes
 }
 
+/// normal case
 fn find_erc20_balance_changes_type0(trx: &TransactionTrace, call: &Call, transfer: &Transfer) -> Vec<BalanceChange> {
     let mut out = Vec::new();
 
@@ -199,6 +200,7 @@ fn erc20_addresses_for_storage_keys(call: &Call) -> HashMap<String, Vec<u8>> {
     out
 }
 
+// case where storage changes are not in the same call as the transfer event
 fn find_erc20_balance_changes_type1(transfer: &Transfer, trx: &TransactionTrace) -> Vec<BalanceChange> {
     let mut out = Vec::new();
 
