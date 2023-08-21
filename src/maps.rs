@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::ops::Div;
 use crate::abi::{self};
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChanges, ValidBalanceChangeStats};
 use abi::erc20::{
@@ -8,14 +7,12 @@ use abi::erc20::{
 use hex;
 use substreams::errors::Error;
 use substreams::Hex;
-use substreams::scalar::{BigDecimal, BigInt};
+use substreams::scalar::{BigInt};
 use substreams::store::{StoreGet, StoreGetBigInt};
 use substreams_ethereum::pb::eth::v2::{Block, Call, TransactionTrace};
 use substreams_ethereum::Event;
-use num_traits::cast::ToPrimitive;
 use substreams::log::info;
 use substreams::pb::substreams::Clock;
-use crate::pb::sf::substreams::sink::database::v1::table_change::PrimaryKey::Pk;
 
 #[substreams::handlers::map]
 pub fn map_balance_changes(block: Block) -> Result<BalanceChanges, Error> {
@@ -65,23 +62,23 @@ pub fn map_balance_change(block: Block) -> Vec<BalanceChange> {
                     continue;
                 }
 
-                let changes = find_erc20_balance_changes_type0(trx, call, &transfer);
-                if changes.is_empty() {
+                let type0_balance_changes = find_erc20_balance_changes_type0(trx, call, &transfer);
+                if type0_balance_changes.is_empty() {
                     info!("No balance changes found for transfer: from {:?}, to {:?}, trx {:?}",
                         Hex::encode(&transfer.from).to_string(),
                         Hex::encode(&transfer.to).to_string(),
                         Hex::encode(&trx.hash).to_string(),
                     );
 
-                    let brute_force_balance_changes = find_erc20_balance_changes_type1(&transfer, trx);
-                    if brute_force_balance_changes.is_empty() {
+                    let type1_balance_changes = find_erc20_balance_changes_type1(&transfer, trx);
+                    if type1_balance_changes.is_empty() {
                         info!("No balance changes found for transfer with brute force search: from {:?}, to {:?}, trx {:?}",
                             Hex::encode(&transfer.from).to_string(),
                             Hex::encode(&transfer.to).to_string(),
                             Hex::encode(&trx.hash).to_string(),
                         );
 
-                        let dummy_change = BalanceChange {
+                        let invalid_change = BalanceChange {
                             contract: Hex::encode(&call.address).to_string(),
                             owner: Hex::encode(&transfer.to).to_string(),
                             old_balance: BigInt::from(0).to_string(),
@@ -92,13 +89,13 @@ pub fn map_balance_change(block: Block) -> Vec<BalanceChange> {
                             transfer_value: transfer.value.to_string(),
                             r#type: 66,
                         };
-                        balance_changes.push(dummy_change);
+                        balance_changes.push(invalid_change);
 
                     } else {
-                        balance_changes.extend(brute_force_balance_changes);
+                        balance_changes.extend(type1_balance_changes);
                     }
                 } else {
-                    balance_changes.extend(changes);
+                    balance_changes.extend(type0_balance_changes);
                 }
             }
         }
