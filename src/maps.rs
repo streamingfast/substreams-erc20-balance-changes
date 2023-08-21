@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use crate::abi::{self};
-use crate::pb::erc20::types::v1::{BalanceChange, BalanceChanges, ValidBalanceChangeStats};
+use crate::pb::erc20::types::v1::{BalanceChange, BalanceChanges, BalanceChangeType, ValidBalanceChangeStats};
 use abi::erc20::{
     events::{Transfer},
 };
@@ -87,7 +87,7 @@ pub fn map_balance_change(block: Block) -> Vec<BalanceChange> {
                             storage_key: "".to_string(),
                             call_index: call.index.to_string(),
                             transfer_value: transfer.value.to_string(),
-                            r#type: 66,
+                            r#type: BalanceChangeType::TypeUnknown as i32,
                         };
                         balance_changes.push(invalid_change);
 
@@ -161,7 +161,7 @@ fn find_erc20_balance_changes_type0(trx: &TransactionTrace, call: &Call, transfe
             storage_key: Hex::encode(&storage_change.key).to_string(),
             call_index: call.index.to_string(),
             transfer_value: value.to_string(),
-            r#type: 0,
+            r#type: BalanceChangeType::Type0 as i32,
         };
 
         out.push(change);
@@ -234,7 +234,7 @@ fn find_erc20_balance_changes_type1(transfer: &Transfer, trx: &TransactionTrace)
                 storage_key: Hex::encode(&storage_change.key).to_string(),
                 call_index: call.index.to_string(),
                 transfer_value: transfer.value.to_string(),
-                r#type: 1,
+                r#type: BalanceChangeType::Type1 as i32,
             };
 
             out.push(change);

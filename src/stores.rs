@@ -1,6 +1,6 @@
 use substreams::scalar::BigInt;
 use substreams::store::{StoreAdd, StoreAddBigInt};
-use crate::pb::erc20::types::v1::BalanceChanges;
+use crate::pb::erc20::types::v1::{BalanceChanges};
 use substreams::store::StoreNew;
 
 #[substreams::handlers::store]
@@ -15,7 +15,11 @@ pub fn store_valid_balance_changes(balance_changes: BalanceChanges, store: Store
                 store.add(0, "type1", BigInt::from(1));
                 store.add(0, "total", BigInt::from(1));
             },
-            66 => {
+            2 => {
+                store.add(0, "type2", BigInt::from(1));
+                store.add(0, "total", BigInt::from(1));
+            },
+            99 => {
                 store.add(0, "type66", BigInt::from(1));
                 store.add(0, "total", BigInt::from(1));
             },
