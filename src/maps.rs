@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use crate::abi::{self};
-use crate::pb::erc20::types::v1::{BalanceChange, BalanceChanges, BalanceChangeType, ValidBalanceChangeStats};
+use crate::pb::erc20::types::v1::{BalanceChange, BalanceChanges, BalanceChangeType};
 use abi::erc20::{
     events::{Transfer},
 };
@@ -8,11 +8,9 @@ use hex;
 use substreams::errors::Error;
 use substreams::Hex;
 use substreams::scalar::{BigInt};
-use substreams::store::{StoreGet, StoreGetBigInt};
 use substreams_ethereum::pb::eth::v2::{Block, Call, TransactionTrace};
 use substreams_ethereum::Event;
 use substreams::log::info;
-use substreams::pb::substreams::Clock;
 
 #[substreams::handlers::map]
 pub fn map_balance_changes(block: Block) -> Result<BalanceChanges, Error> {
@@ -20,18 +18,6 @@ pub fn map_balance_changes(block: Block) -> Result<BalanceChanges, Error> {
 
     Ok(BalanceChanges {
         balance_changes
-    })
-}
-
-#[substreams::handlers::map]
-pub fn map_valid_changes(clock: Clock, store: StoreGetBigInt) -> Result<ValidBalanceChangeStats, Error> {
-    Ok(ValidBalanceChangeStats {
-        type0_count: store.get_last("type0").unwrap_or(BigInt::from(0)).to_u64(),
-        type1_count: store.get_last("type1").unwrap_or(BigInt::from(0)).to_u64(),
-        type2_count: store.get_last("type2").unwrap_or(BigInt::from(0)).to_u64(),
-        type66_count: store.get_last("type66").unwrap_or(BigInt::from(0)).to_u64(),
-        total_count: store.get_last("total").unwrap_or(BigInt::from(0)).to_u64(),
-        block_number: clock.number,
     })
 }
 

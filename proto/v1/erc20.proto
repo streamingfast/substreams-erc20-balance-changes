@@ -26,13 +26,3 @@ message BalanceChange {
 
   BalanceChangeType change_type = 9;
 }
-
-message ValidBalanceChangeStats {
-  uint64 type0_count = 1;
-  uint64 type1_count = 2;
-  uint64 type2_count = 3;
-  uint64 type66_count = 4;
-
-  uint64 total_count = 42;
-  uint64 block_number = 99;
-}
