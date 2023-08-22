@@ -28,8 +28,8 @@ info:
 	substreams info
 
 .PHONY: run
-run: build
-	substreams run map_valid_changes -e mainnet.eth.streamingfast.io:443
+run: pack
+	substreams run ./erc20-balance-changes-v0.0.1.spkg map_balance_changes -e mainnet.eth.streamingfast.io:443 -s 15000000 -t 16000000 --output jsonl
 .PHONY: gui
 gui:
 	substreams gui ./erc20-balance-changes-v0.0.1.spkg map_valid_changes -e mainnet.eth.streamingfast.io:443 -s 17920000 --production-mode

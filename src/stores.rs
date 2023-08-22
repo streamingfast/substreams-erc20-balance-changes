@@ -6,11 +6,7 @@ use substreams::store::StoreNew;
 #[substreams::handlers::store]
 pub fn store_valid_balance_changes(balance_changes: BalanceChanges, store: StoreAddBigInt) {
     for change in balance_changes.balance_changes {
-        match change.r#type {
-            0 => {
-                store.add(0, "type0", BigInt::from(1));
-                store.add(0, "total", BigInt::from(1));
-            },
+        match change.change_type {
             1 => {
                 store.add(0, "type1", BigInt::from(1));
                 store.add(0, "total", BigInt::from(1));
@@ -19,8 +15,8 @@ pub fn store_valid_balance_changes(balance_changes: BalanceChanges, store: Store
                 store.add(0, "type2", BigInt::from(1));
                 store.add(0, "total", BigInt::from(1));
             },
-            99 => {
-                store.add(0, "type66", BigInt::from(1));
+            0 => {
+                store.add(0, "type0", BigInt::from(1));
                 store.add(0, "total", BigInt::from(1));
             },
             _ => {}

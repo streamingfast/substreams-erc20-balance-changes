@@ -33,7 +33,7 @@ pub struct BalanceChange {
     #[prost(string, tag="8")]
     pub transfer_value: ::prost::alloc::string::String,
     #[prost(enumeration="BalanceChangeType", tag="9")]
-    pub r#type: i32,
+    pub change_type: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -54,14 +54,12 @@ pub struct ValidBalanceChangeStats {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum BalanceChangeType {
-    /// easy case where storage change is in the same call as the Transfer call
-    Type0 = 0,
-    /// storage change is in a different call than the Transfer call
-    Type1 = 1,
-    /// {unused}
-    Type2 = 2,
     /// cannot determine balance change
-    TypeUnknown = 99,
+    TypeUnknown = 0,
+    /// easy case where storage change is in the same call as the Transfer call
+    Type1 = 1,
+    /// storage change is in a different call than the Transfer call
+    Type2 = 2,
 }
 impl BalanceChangeType {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -70,19 +68,17 @@ impl BalanceChangeType {
     /// (if the ProtoBuf definition does not change) and safe for programmatic use.
     pub fn as_str_name(&self) -> &'static str {
         match self {
-            BalanceChangeType::Type0 => "TYPE_0",
+            BalanceChangeType::TypeUnknown => "TYPE_UNKNOWN",
             BalanceChangeType::Type1 => "TYPE_1",
             BalanceChangeType::Type2 => "TYPE_2",
-            BalanceChangeType::TypeUnknown => "TYPE_UNKNOWN",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
     pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
         match value {
-            "TYPE_0" => Some(Self::Type0),
+            "TYPE_UNKNOWN" => Some(Self::TypeUnknown),
             "TYPE_1" => Some(Self::Type1),
             "TYPE_2" => Some(Self::Type2),
-            "TYPE_UNKNOWN" => Some(Self::TypeUnknown),
             _ => None,
         }
     }

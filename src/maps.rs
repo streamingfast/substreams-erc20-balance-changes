@@ -62,22 +62,16 @@ pub fn map_balance_change(block: Block) -> Vec<BalanceChange> {
                     continue;
                 }
 
-                let type0_balance_changes = find_erc20_balance_changes_type0(trx, call, &transfer);
-                if type0_balance_changes.is_empty() {
-                    info!("No balance changes found for transfer: from {:?}, to {:?}, trx {:?}",
-                        Hex::encode(&transfer.from).to_string(),
-                        Hex::encode(&transfer.to).to_string(),
-                        Hex::encode(&trx.hash).to_string(),
-                    );
-
+                let type0_balance_changes = find_erc20_balance_changes_type_good(trx, call, &transfer);
+                if !type0_balance_changes.is_empty() {
+                    balance_changes.extend(type0_balance_changes);
+                    continue;
+                } else {
                     let type1_balance_changes = find_erc20_balance_changes_type1(&transfer, trx);
-                    if type1_balance_changes.is_empty() {
-                        info!("No balance changes found for transfer with brute force search: from {:?}, to {:?}, trx {:?}",
-                            Hex::encode(&transfer.from).to_string(),
-                            Hex::encode(&transfer.to).to_string(),
-                            Hex::encode(&trx.hash).to_string(),
-                        );
-
+                    if !type1_balance_changes.is_empty() {
+                        balance_changes.extend(type1_balance_changes);
+                        continue;
+                    } else {
                         let invalid_change = BalanceChange {
                             contract: Hex::encode(&call.address).to_string(),
                             owner: Hex::encode(&transfer.to).to_string(),
@@ -87,15 +81,10 @@ pub fn map_balance_change(block: Block) -> Vec<BalanceChange> {
                             storage_key: "".to_string(),
                             call_index: call.index.to_string(),
                             transfer_value: transfer.value.to_string(),
-                            r#type: BalanceChangeType::TypeUnknown as i32,
+                            change_type: BalanceChangeType::TypeUnknown as i32,
                         };
                         balance_changes.push(invalid_change);
-
-                    } else {
-                        balance_changes.extend(type1_balance_changes);
                     }
-                } else {
-                    balance_changes.extend(type0_balance_changes);
                 }
             }
         }
@@ -105,7 +94,7 @@ pub fn map_balance_change(block: Block) -> Vec<BalanceChange> {
 }
 
 /// normal case
-fn find_erc20_balance_changes_type0(trx: &TransactionTrace, call: &Call, transfer: &Transfer) -> Vec<BalanceChange> {
+fn find_erc20_balance_changes_type_good(trx: &TransactionTrace, call: &Call, transfer: &Transfer) -> Vec<BalanceChange> {
     let mut out = Vec::new();
 
     for storage_change in &call.storage_changes {
@@ -161,7 +150,7 @@ fn find_erc20_balance_changes_type0(trx: &TransactionTrace, call: &Call, transfe
             storage_key: Hex::encode(&storage_change.key).to_string(),
             call_index: call.index.to_string(),
             transfer_value: value.to_string(),
-            r#type: BalanceChangeType::Type0 as i32,
+            change_type: BalanceChangeType::Type1 as i32,
         };
 
         out.push(change);
@@ -170,32 +159,6 @@ fn find_erc20_balance_changes_type0(trx: &TransactionTrace, call: &Call, transfe
     out
 }
 
-fn erc20_is_valid_address(address: Vec<u8>, transfer: &Transfer) -> bool {
-    let address_as_hex = hex::encode(&address);
-    let transfer_from_as_hex = hex::encode(&transfer.from);
-    let transfer_to_as_hex = hex::encode(&transfer.to);
-
-    address_as_hex == transfer_from_as_hex || address_as_hex == transfer_to_as_hex
-}
-
-fn erc20_addresses_for_storage_keys(call: &Call) -> HashMap<String, Vec<u8>> {
-    let mut out = HashMap::new();
-
-    for (hash, preimage) in &call.keccak_preimages {
-        if preimage.len() != 128 {
-            continue;
-        }
-
-        if &preimage[64..126] != "00000000000000000000000000000000000000000000000000000000000000" {
-            continue;
-        }
-
-        let addr = &preimage[24..64];
-        out.insert(hash.clone(), hex::decode(addr).expect("Failed to decode hex string"));
-    }
-
-    out
-}
 
 // case where storage changes are not in the same call as the transfer event
 fn find_erc20_balance_changes_type1(transfer: &Transfer, trx: &TransactionTrace) -> Vec<BalanceChange> {
@@ -234,7 +197,7 @@ fn find_erc20_balance_changes_type1(transfer: &Transfer, trx: &TransactionTrace)
                 storage_key: Hex::encode(&storage_change.key).to_string(),
                 call_index: call.index.to_string(),
                 transfer_value: transfer.value.to_string(),
-                r#type: BalanceChangeType::Type1 as i32,
+                change_type: BalanceChangeType::Type2 as i32,
             };
 
             out.push(change);
@@ -243,3 +206,32 @@ fn find_erc20_balance_changes_type1(transfer: &Transfer, trx: &TransactionTrace)
 
     out
 }
+
+fn erc20_addresses_for_storage_keys(call: &Call) -> HashMap<String, Vec<u8>> {
+    let mut out = HashMap::new();
+
+    for (hash, preimage) in &call.keccak_preimages {
+        if preimage.len() != 128 {
+            continue;
+        }
+
+        if &preimage[64..126] != "00000000000000000000000000000000000000000000000000000000000000" {
+            continue;
+        }
+
+        let addr = &preimage[24..64];
+        out.insert(hash.clone(), hex::decode(addr).expect("Failed to decode hex string"));
+    }
+
+    out
+}
+
+fn erc20_is_valid_address(address: Vec<u8>, transfer: &Transfer) -> bool {
+    let address_as_hex = hex::encode(&address);
+    let transfer_from_as_hex = hex::encode(&transfer.from);
+    let transfer_to_as_hex = hex::encode(&transfer.to);
+
+    address_as_hex == transfer_from_as_hex || address_as_hex == transfer_to_as_hex
+}
+
+

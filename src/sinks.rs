@@ -10,7 +10,7 @@ pub fn graph_out(clock: Clock, balance_changes: BalanceChanges) -> Result<Entity
     let timestamp = clock.timestamp.unwrap().seconds.to_string();
 
     for balance_change in balance_changes.balance_changes {
-        if !balance_change.r#type > 42 {
+        if balance_change.change_type == 0 {
             continue;
         }
 
@@ -38,7 +38,7 @@ pub fn db_out(clock: Clock, balance_changes: BalanceChanges) -> Result<DatabaseC
     let timestamp = clock.timestamp.unwrap().seconds.to_string();
 
     for balance_change in balance_changes.balance_changes {
-        if !balance_change.r#type > 42 {
+        if balance_change.change_type == 0 {
             continue;
         }
 
