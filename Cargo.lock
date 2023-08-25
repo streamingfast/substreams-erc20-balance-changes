@@ -166,6 +166,7 @@ dependencies = [
  "anyhow",
  "ethabi 18.0.0",
  "hex",
+ "hex-literal",
  "num-bigint",
  "num-traits",
  "prost",
