@@ -27,8 +27,8 @@ pub struct BalanceChange {
     #[prost(string, tag="6")]
     pub storage_key: ::prost::alloc::string::String,
     /// 0xmycallindex
-    #[prost(string, tag="7")]
-    pub call_index: ::prost::alloc::string::String,
+    #[prost(uint32, tag="7")]
+    pub call_index: u32,
     /// 0x1234
     #[prost(string, tag="8")]
     pub transfer_value: ::prost::alloc::string::String,
