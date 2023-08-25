@@ -145,12 +145,12 @@ fn find_erc20_balance_changes_algorithm1(
         }
 
         let change = BalanceChange {
-            contract: Hex::encode(&call.address).to_string(),
-            owner: Hex::encode(keccak_address).to_string(),
+            contract: Hex::encode(&call.address),
+            owner: Hex::encode(keccak_address),
             old_balance: BigInt::from_signed_bytes_be(&storage_change.old_value).to_string(),
             new_balance: BigInt::from_signed_bytes_be(&storage_change.new_value).to_string(),
-            transaction: Hex::encode(&trx.hash).to_string(),
-            storage_key: Hex::encode(&storage_change.key).to_string(),
+            transaction: Hex::encode(&trx.hash),
+            storage_key: Hex::encode(&storage_change.key),
             call_index: call.index,
             transfer_value: value.to_string(),
             change_type: BalanceChangeType::Type1 as i32,
