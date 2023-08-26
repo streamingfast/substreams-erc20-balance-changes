@@ -11,7 +11,7 @@ protogen:
 	substreams protogen --exclude-paths sf/substreams,google
 
 .PHONY: build
-build:
+build: protogen
 	cargo build --target wasm32-unknown-unknown --release
 
 .PHONY: pack
@@ -32,5 +32,5 @@ run: build
 
 .PHONY: gui
 gui: build
-	substreams gui ./erc20-balance-changes-v0.0.2.spkg map_valid_changes -e mainnet.eth.streamingfast.io:443 -s 17920000 --production-mode
+	substreams gui substreams.yaml map_balance_changes -e mainnet.eth.streamingfast.io:443 -s 17000000 -t +1000 --production-mode
 

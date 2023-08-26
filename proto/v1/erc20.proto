@@ -26,3 +26,10 @@ message BalanceChange {
 
   BalanceChangeType change_type = 9;
 }
+
+message BalanceChangeStats {
+  uint32 total_changes = 1;
+  uint32 type_1_changes = 2;
+  uint32 type_2_changes = 3;
+  uint32 unknown_changes = 4;
+}

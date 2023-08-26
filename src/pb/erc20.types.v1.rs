@@ -35,6 +35,18 @@ pub struct BalanceChange {
     #[prost(enumeration="BalanceChangeType", tag="9")]
     pub change_type: i32,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BalanceChangeStats {
+    #[prost(uint32, tag="1")]
+    pub total_changes: u32,
+    #[prost(uint32, tag="2")]
+    pub type_1_changes: u32,
+    #[prost(uint32, tag="3")]
+    pub type_2_changes: u32,
+    #[prost(uint32, tag="4")]
+    pub unknown_changes: u32,
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum BalanceChangeType {
