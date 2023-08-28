@@ -88,10 +88,10 @@ These types of transfers will result in a BalanceChange message with `change_typ
 
 ### Type 2: Storage change is in a different call than the transfer
 
+In this case, the Transfer but this results in storage changes in different child calls, where often the amount sent will be split to multiple accounts.
+
 example:
 https://etherscan.io/tx/0x5a31fb5d3f5bbb95023438f017ad6cd501ce70e445f31c2660c784e5a7eb5d83#eventlog
-
-In this case, the Transfer is done in call index 4, but the storage change is actually recorded in call index 10.  Here is the relevant section from the Firehose block for this transaction:
 
 ```json
 {
@@ -128,9 +128,7 @@ In this case, the Transfer is done in call index 4, but the storage change is ac
 }
 ```
 
-So some logic is required to track the storage change to the transfer.
-
-The correctness of the `old_balance` and `new_balance` values in this case is not as easily determined.  It is an open question at this point as to whether the values given in the `oldValue` and `newValue` fields always correspond to the correct balance values.
+In this example, the Transfer call is made in call index 4.  Then in the subsequent child calls, the transfer of 4,530,000 tokens is split into transfers by the contract:  One transfer of 4,500,000 to the original receiver and a transfer of 30,000 to another address.  Some work is required to track the balance changes in this case.
 
 These types of transfers will result in a BalanceChange message with `change_type` set to `TYPE_2`.
 
@@ -144,3 +142,18 @@ https://etherscan.io/tx/0x5a31fb5d3f5bbb95023438f017ad6cd501ce70e445f31c2660c784
 These transfers will result in a BalanceChange message with `change_type` set to `null`.
 
 These should currently be discarded by the consumer of the substream as they are guaranteed to be incorrect.
+
+### Notes
+
+As of block 18005744, the sum of type 1 and type 2 matches accounts for approximately 96.7% of the total balance changes.
+
+```json
+{
+  "type0Count": "88809770",
+  "type1Count": "2608546600",
+  "type2Count": "5195308",
+  "totalCount": "2702551678",
+  "validRate": "0.9671385488303694890529305171717793142603506581308747872905614795055919001005685856860791544131205324",
+  "blockNumber": "18005744"
+}
+```

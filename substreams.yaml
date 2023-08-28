@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: erc20_balance_changes
-  version: v0.0.2
+  version: v0.0.3
   url: https://github.com/streamingfast/erc20-balance-changes
   doc: ERC-20
 
@@ -46,3 +46,18 @@ modules:
       - map: map_balance_changes
     output:
       type: proto:sf.substreams.sink.entity.v1.EntityChanges
+
+  - name: store_valid_balance_changes
+    kind: store
+    updatePolicy: add
+    valueType: bigint
+    inputs:
+      - map: map_balance_changes
+
+  - name: balance_change_stats
+    kind: map
+    inputs:
+      - source: sf.substreams.v1.Clock
+      - store: store_valid_balance_changes
+    output:
+      type: proto:erc20.types.v1.BalanceChangeStats

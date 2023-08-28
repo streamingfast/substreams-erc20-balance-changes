@@ -38,14 +38,18 @@ pub struct BalanceChange {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BalanceChangeStats {
-    #[prost(uint32, tag="1")]
-    pub total_changes: u32,
-    #[prost(uint32, tag="2")]
-    pub type_1_changes: u32,
-    #[prost(uint32, tag="3")]
-    pub type_2_changes: u32,
-    #[prost(uint32, tag="4")]
-    pub unknown_changes: u32,
+    #[prost(uint64, tag="1")]
+    pub type0_count: u64,
+    #[prost(uint64, tag="2")]
+    pub type1_count: u64,
+    #[prost(uint64, tag="3")]
+    pub type2_count: u64,
+    #[prost(uint64, tag="42")]
+    pub total_count: u64,
+    #[prost(string, tag="43")]
+    pub valid_rate: ::prost::alloc::string::String,
+    #[prost(uint64, tag="99")]
+    pub block_number: u64,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

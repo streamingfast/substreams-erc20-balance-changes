@@ -28,8 +28,11 @@ message BalanceChange {
 }
 
 message BalanceChangeStats {
-  uint32 total_changes = 1;
-  uint32 type_1_changes = 2;
-  uint32 type_2_changes = 3;
-  uint32 unknown_changes = 4;
+  uint64 type0_count = 1;
+  uint64 type1_count = 2;
+  uint64 type2_count = 3;
+
+  uint64 total_count = 42;
+  string valid_rate = 43;
+  uint64 block_number = 99;
 }

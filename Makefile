@@ -32,5 +32,5 @@ run: build
 
 .PHONY: gui
 gui: build
-	substreams gui substreams.yaml map_balance_changes -e mainnet.eth.streamingfast.io:443 -s 17000000 -t +1000 --production-mode
+	substreams gui substreams.yaml balance_change_stats -e mainnet.eth.streamingfast.io:443 --production-mode
 

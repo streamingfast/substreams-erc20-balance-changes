@@ -1,12 +1,14 @@
 use crate::abi::{self};
-use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, BalanceChanges};
+use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, BalanceChanges, BalanceChangeStats};
 use abi::erc20::events::Transfer;
 use hex_literal::hex;
 use std::collections::HashMap;
 use substreams::errors::Error;
 use substreams::log::info;
-use substreams::scalar::BigInt;
+use substreams::scalar::{BigDecimal, BigInt};
 use substreams::Hex;
+use substreams::pb::substreams::Clock;
+use substreams::store::{StoreGet, StoreGetBigInt};
 use substreams_ethereum::pb::eth::v2::{Block, Call, TransactionTrace, TransactionTraceStatus};
 use substreams_ethereum::Event;
 
@@ -17,6 +19,28 @@ const ZERO_STORAGE_PREFIX: [u8; 16] = hex!("00000000000000000000000000000000");
 pub fn map_balance_changes(block: Block) -> Result<BalanceChanges, Error> {
     Ok(BalanceChanges {
         balance_changes: map_balance_change(block),
+    })
+}
+
+#[substreams::handlers::map]
+pub fn balance_change_stats(clock: Clock, store: StoreGetBigInt) -> Result<BalanceChangeStats, Error> {
+
+
+    let type_1 = store.get_last("type1").unwrap_or(BigInt::from(0));
+    let type_2 = store.get_last("type2").unwrap_or(BigInt::from(0));
+    let total = store.get_last("total").unwrap_or(BigInt::from(0));
+    let mut valid_rate = BigDecimal::from(0);
+    if !total.is_zero() {
+        valid_rate = (BigDecimal::from(type_1.clone()) + BigDecimal::from(type_2.clone())) / BigDecimal::from(total.clone());
+    }
+
+    Ok(BalanceChangeStats {
+        type0_count: store.get_last("type0").unwrap_or(BigInt::from(0)).to_u64(),
+        type1_count: type_1.to_u64(),
+        type2_count: type_2.to_u64(),
+        total_count: total.to_u64(),
+        block_number: clock.number,
+        valid_rate: valid_rate.to_string(),
     })
 }
 
