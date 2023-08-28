@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: erc20_balance_changes
-  version: v0.0.3
+  version: v0.0.4
   url: https://github.com/streamingfast/erc20-balance-changes
   doc: ERC-20
 
@@ -29,6 +29,15 @@ modules:
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:erc20.types.v1.BalanceChanges
+
+  - name: map_valid_balance_changes
+    kind: map
+    doc: Extracts ERC20 balance changes
+    initialBlock: 1397553
+    inputs:
+      - map: map_balance_changes
+    output:
+      type: proto:erc20.types.v1.ValidBalanceChanges
 
   - name: db_out
     kind: map

@@ -1,5 +1,5 @@
 use crate::abi::{self};
-use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, BalanceChanges, BalanceChangeStats};
+use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, BalanceChanges, BalanceChangeStats, ValidBalanceChange, ValidBalanceChanges};
 use abi::erc20::events::Transfer;
 use hex_literal::hex;
 use std::collections::HashMap;
@@ -23,9 +23,29 @@ pub fn map_balance_changes(block: Block) -> Result<BalanceChanges, Error> {
 }
 
 #[substreams::handlers::map]
+pub fn map_valid_balance_changes(balance_changes: BalanceChanges) -> Result<ValidBalanceChanges, Error> {
+    let mut out = Vec::new();
+    for change in balance_changes.balance_changes {
+        if change.change_type == BalanceChangeType::TypeUnknown as i32 {
+            continue;
+        }
+
+        out.push(ValidBalanceChange{
+            contract: change.contract,
+            owner: change.owner,
+            old_balance: change.old_balance,
+            new_balance: change.new_balance,
+            transaction: change.transaction,
+        });
+    }
+
+    Ok(ValidBalanceChanges {
+        valid_balance_changes: out,
+    })
+}
+
+#[substreams::handlers::map]
 pub fn balance_change_stats(clock: Clock, store: StoreGetBigInt) -> Result<BalanceChangeStats, Error> {
-
-
     let type_1 = store.get_last("type1").unwrap_or(BigInt::from(0));
     let type_2 = store.get_last("type2").unwrap_or(BigInt::from(0));
     let total = store.get_last("total").unwrap_or(BigInt::from(0));

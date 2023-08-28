@@ -13,19 +13,34 @@ enum BalanceChangeType {
 }
 
 message BalanceChange {
-  string contract = 1; // 0xmytokencontract
-  string owner = 2;  // 0xmyaddress
-  string old_balance = 3; // 0x1234
-  string new_balance = 4; // 0x1234
+  string contract = 1;
+  string owner = 2;
+  string old_balance = 3;
+  string new_balance = 4;
 
-  string transaction = 5; // 0xmytransaction
-  string storage_key = 6; // 0xmykey
-  uint32 call_index = 7; // 0xmycallindex
+  string transaction = 5;
+  string storage_key = 6;
+  uint32 call_index = 7;
 
-  string transfer_value = 8; // 0x1234
+  string transfer_value = 8;
 
   BalanceChangeType change_type = 9;
 }
+
+message ValidBalanceChanges {
+  repeated ValidBalanceChange valid_balance_changes = 1;
+}
+
+message ValidBalanceChange {
+  string contract = 1;
+  string owner = 2;
+  string old_balance = 3;
+  string new_balance = 4;
+
+  string transaction = 5;
+}
+
+
 
 message BalanceChangeStats {
   uint64 type0_count = 1;
