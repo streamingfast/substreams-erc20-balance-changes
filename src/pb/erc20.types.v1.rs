@@ -49,6 +49,26 @@ pub struct ValidBalanceChange {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UnknownBalanceChanges {
+    #[prost(message, repeated, tag="1")]
+    pub unknown_balance_changes: ::prost::alloc::vec::Vec<UnknownBalanceChange>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UnknownBalanceChange {
+    #[prost(string, tag="1")]
+    pub contract: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub owner: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub transaction: ::prost::alloc::string::String,
+    #[prost(uint32, tag="4")]
+    pub call_index: u32,
+    #[prost(string, tag="5")]
+    pub transfer_value: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BalanceChangeStats {
     #[prost(uint64, tag="1")]
     pub type0_count: u64,

@@ -40,6 +40,17 @@ message ValidBalanceChange {
   string transaction = 5;
 }
 
+message UnknownBalanceChanges {
+  repeated UnknownBalanceChange unknown_balance_changes = 1;
+}
+
+message UnknownBalanceChange {
+  string contract = 1;
+  string owner = 2;
+  string transaction = 3;
+  uint32 call_index = 4;
+  string transfer_value = 5;
+}
 
 
 message BalanceChangeStats {

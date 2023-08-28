@@ -1,5 +1,5 @@
 use crate::abi::{self};
-use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, BalanceChanges, BalanceChangeStats, ValidBalanceChange, ValidBalanceChanges};
+use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, BalanceChanges, BalanceChangeStats, ValidBalanceChange, ValidBalanceChanges, UnknownBalanceChanges, UnknownBalanceChange};
 use abi::erc20::events::Transfer;
 use hex_literal::hex;
 use std::collections::HashMap;
@@ -19,6 +19,28 @@ const ZERO_STORAGE_PREFIX: [u8; 16] = hex!("00000000000000000000000000000000");
 pub fn map_balance_changes(block: Block) -> Result<BalanceChanges, Error> {
     Ok(BalanceChanges {
         balance_changes: map_balance_change(block),
+    })
+}
+
+#[substreams::handlers::map]
+pub fn map_unknown_balance_changes(balance_changes: BalanceChanges) -> Result<UnknownBalanceChanges, Error> {
+    let mut out = Vec::new();
+    for change in balance_changes.balance_changes {
+        if change.change_type != BalanceChangeType::TypeUnknown as i32 {
+            continue;
+        }
+
+        out.push(UnknownBalanceChange{
+            contract: change.contract,
+            owner: change.owner,
+            transaction: change.transaction,
+            call_index: change.call_index,
+            transfer_value: change.transfer_value,
+        })
+    }
+
+    Ok(UnknownBalanceChanges {
+        unknown_balance_changes: out,
     })
 }
 

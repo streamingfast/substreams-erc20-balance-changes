@@ -157,3 +157,29 @@ As of block 18005744, the sum of type 1 and type 2 matches accounts for approxim
   "blockNumber": "18005744"
 }
 ```
+
+## Running
+
+### Generate protos
+
+```bash
+make protogen
+```
+
+### Build substreams
+
+```bash
+make build
+```
+
+### Build spkg
+
+```bash
+make pack
+```
+
+### Example run
+
+```bash
+substreams gui ./erc20-balance-changes-v0.0.4.spkg map_valid_balance_changes -e mainnet.eth.streamingfast.io:443 -s 17000000 -t +10 --production-mode
+```
