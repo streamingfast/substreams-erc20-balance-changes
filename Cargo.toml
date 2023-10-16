@@ -1,6 +1,6 @@
 [package]
 name = "erc20"
-version = "0.3.0"
+version = "1.0.0"
 description = "ERC-20"
 edition = "2021"
 authors = [
