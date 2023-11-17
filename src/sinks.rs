@@ -17,13 +17,16 @@ pub fn graph_out(clock: Clock, balance_changes: BalanceChanges) -> Result<Entity
         let key = format!("{}:{}:{}", balance_change.contract, balance_change.owner, balance_change.transaction);
 
         tables
-            .create_row("balance_changes", key)
+            .create_row("balance_change", key)
             .set("contract", balance_change.contract)
             .set("owner", balance_change.owner)
-            .set("amount", balance_change.transfer_value)
+            .set("transfer_value", balance_change.transfer_value)
             .set("old_balance", balance_change.old_balance)
             .set("new_balance", balance_change.new_balance)
-            .set("transaction_id", balance_change.transaction)
+            .set("storage_key", balance_change.storage_key)
+            .set("call_index", balance_change.call_index)
+            .set("transaction", balance_change.transaction)
+            .set("change_type", balance_change.change_type)
             .set_bigint("block_num", &block_num)
             .set_bigint("timestamp", &timestamp);
     }
