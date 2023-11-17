@@ -1,12 +1,4 @@
-# Log
-
-enum BalanceChangeType {
-    TYPE_UNKNOWN
-    TYPE_1
-    TYPE_2
-}
-
-type BalanceChange @entity(immutable: true) {
+type BalanceChange @entity {
     id: ID!
 
     contract: String
@@ -15,7 +7,7 @@ type BalanceChange @entity(immutable: true) {
     newBalance: String
     transaction: String
     storageKey: String
-    callIndex: Int
+    callIndex: BigInt
     transferValue: String
-    changeType: BalanceChangeType
+    changeType: Int
 }

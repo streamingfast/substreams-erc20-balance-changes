@@ -6,8 +6,6 @@ use substreams_database_change::pb::database::DatabaseChanges;
 #[substreams::handlers::map]
 pub fn graph_out(clock: Clock, balance_changes: BalanceChanges) -> Result<EntityChanges, Error> {
     let mut tables = substreams_entity_change::tables::Tables::new();
-    let block_num = clock.number.to_string();
-    let timestamp = clock.timestamp.unwrap().seconds.to_string();
 
     for balance_change in balance_changes.balance_changes {
         if balance_change.change_type == 0 {
@@ -17,18 +15,16 @@ pub fn graph_out(clock: Clock, balance_changes: BalanceChanges) -> Result<Entity
         let key = format!("{}:{}:{}", balance_change.contract, balance_change.owner, balance_change.transaction);
 
         tables
-            .create_row("balance_change", key)
+            .create_row("BalanceChange", key)
             .set("contract", balance_change.contract)
             .set("owner", balance_change.owner)
-            .set("transfer_value", balance_change.transfer_value)
-            .set("old_balance", balance_change.old_balance)
-            .set("new_balance", balance_change.new_balance)
-            .set("storage_key", balance_change.storage_key)
-            .set("call_index", balance_change.call_index)
+            .set("transferValue", balance_change.transfer_value)
+            .set("oldBalance", balance_change.old_balance)
+            .set("newBalance", balance_change.new_balance)
+            .set("storageKey", balance_change.storage_key)
+            .set("callIndex", balance_change.call_index)
             .set("transaction", balance_change.transaction)
-            .set("change_type", balance_change.change_type)
-            .set_bigint("block_num", &block_num)
-            .set_bigint("timestamp", &timestamp);
+            .set("changeType", balance_change.change_type);
     }
 
     Ok(tables.to_entity_changes())
