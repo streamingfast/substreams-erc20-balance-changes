@@ -1,11 +1,11 @@
-create table if not exists balance_changes {
-    id text not null constraint balance_changes_pk primary key,
-    contract text not null,
-    owner text not null,
-    amount int not null,
-    old_balance int not null,
-    new_balance int not null,
-    transaction_id text not null,
-    block_num int not null,
-    timestamp text not null,
-}
+CREATE TABLE IF NOT EXISTS balance_changes (
+   `contract` TEXT NOT NULL,
+   `owner` TEXT NOT NULL,
+   `amount` INT NOT NULL,
+   `old_balance` INT NOT NULL,
+   `new_balance` INT NOT NULL,
+   `transaction_id` TEXT NOT NULL,
+   `block_num` INT NOT NULL,
+   `timestamp` TEXT NOT NULL,
+   `change_type` INT NOT NULL,
+);

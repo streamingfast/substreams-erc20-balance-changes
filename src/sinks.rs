@@ -51,7 +51,8 @@ pub fn db_out(clock: Clock, balance_changes: BalanceChanges) -> Result<DatabaseC
             .set("new_balance", balance_change.new_balance)
             .set("transaction_id", balance_change.transaction)
             .set("block_num", &block_num)
-            .set("timestamp", &timestamp);
+            .set("timestamp", &timestamp)
+            .set("change_type", balance_change.change_type);
     }
 
     Ok(tables.to_database_changes())
