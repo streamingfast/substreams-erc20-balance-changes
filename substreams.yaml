@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: erc20_balance_changes
-  version: v1.1.0
+  version: v1.2.0
   url: https://github.com/streamingfast/erc20-balance-changes
   image: logo.png
   doc: |

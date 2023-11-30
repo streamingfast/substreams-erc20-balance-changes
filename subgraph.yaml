@@ -11,7 +11,7 @@ dataSources:
     source:
       package:
         moduleName: graph_out
-        file: ./erc20-balance-changes-v1.1.0.spkg
+        file: ./erc20-balance-changes-v1.2.0.spkg
     mapping:
       kind: substreams/graph-entities
       apiVersion: 0.0.7

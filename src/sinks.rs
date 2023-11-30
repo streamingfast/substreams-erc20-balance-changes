@@ -4,7 +4,7 @@ use substreams_entity_change::pb::entity::EntityChanges;
 use substreams_database_change::pb::database::DatabaseChanges;
 
 #[substreams::handlers::map]
-pub fn graph_out(clock: Clock, balance_changes: BalanceChanges) -> Result<EntityChanges, Error> {
+pub fn graph_out(_clock: Clock, balance_changes: BalanceChanges) -> Result<EntityChanges, Error> {
     let mut tables = substreams_entity_change::tables::Tables::new();
 
     for balance_change in balance_changes.balance_changes {

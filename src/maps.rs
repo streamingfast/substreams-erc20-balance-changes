@@ -213,8 +213,8 @@ fn find_erc20_balance_changes_algorithm1(
         let change = BalanceChange {
             contract: Hex::encode(&call.address),
             owner: Hex::encode(keccak_address),
-            old_balance: BigInt::from_signed_bytes_be(&storage_change.old_value).to_string(),
-            new_balance: BigInt::from_signed_bytes_be(&storage_change.new_value).to_string(),
+            old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
+            new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
             transaction: Hex::encode(&trx.hash),
             storage_key: Hex::encode(&storage_change.key),
             call_index: call.index,
@@ -266,8 +266,8 @@ fn find_erc20_balance_changes_algorithm2(
             continue;
         }
 
-        let old_balance = BigInt::from_signed_bytes_be(&storage_change.old_value);
-        let new_balance = BigInt::from_signed_bytes_be(&storage_change.new_value);
+        let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
+        let new_balance = BigInt::from_unsigned_bytes_be(&storage_change.new_value);
 
         let balance_change = new_balance - old_balance;
         if balance_change < BigInt::zero() {
@@ -279,8 +279,8 @@ fn find_erc20_balance_changes_algorithm2(
         let change = BalanceChange {
             contract: Hex::encode(&original_call.address),
             owner: Hex::encode(keccak_address),
-            old_balance: BigInt::from_signed_bytes_be(&storage_change.old_value).to_string(),
-            new_balance: BigInt::from_signed_bytes_be(&storage_change.new_value).to_string(),
+            old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
+            new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
             transaction: Hex::encode(&trx.hash),
             storage_key: Hex::encode(&storage_change.key),
             call_index: original_call.index,
@@ -307,8 +307,8 @@ fn find_erc20_balance_changes_algorithm2(
             None => continue,
         };
 
-        let old_balance = BigInt::from_signed_bytes_be(&storage_change.old_value);
-        let new_balance = BigInt::from_signed_bytes_be(&storage_change.new_value);
+        let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
+        let new_balance = BigInt::from_unsigned_bytes_be(&storage_change.new_value);
 
         let mut balance_change = new_balance - old_balance;
         if balance_change < BigInt::zero() {
@@ -322,8 +322,8 @@ fn find_erc20_balance_changes_algorithm2(
         let change = BalanceChange {
             contract: Hex::encode(&original_call.address),
             owner: Hex::encode(keccak_address),
-            old_balance: BigInt::from_signed_bytes_be(&storage_change.old_value).to_string(),
-            new_balance: BigInt::from_signed_bytes_be(&storage_change.new_value).to_string(),
+            old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
+            new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
             transaction: Hex::encode(&trx.hash),
             storage_key: Hex::encode(&storage_change.key),
             call_index: original_call.index,
