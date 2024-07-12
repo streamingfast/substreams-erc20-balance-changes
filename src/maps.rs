@@ -211,7 +211,12 @@ fn find_erc20_balance_changes_algorithm1(
         }
 
         let change = BalanceChange {
-            contract: Hex::encode(&call.address),
+            // Using `storage_change.address` is the correct way to get the contract address here
+            // as it handles delegate calls correctly, for contract Proxy support.
+            //
+            // Indeed, the storage change holds the address of the contract that is actually holding
+            // the real state of the storage slot, the proxy contract when the call is a delegate call.
+            contract: Hex::encode(&storage_change.address),
             owner: Hex::encode(keccak_address),
             old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
             new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
@@ -277,7 +282,12 @@ fn find_erc20_balance_changes_algorithm2(
         };
 
         let change = BalanceChange {
-            contract: Hex::encode(&original_call.address),
+            // Using `storage_change.address` is the correct way to get the contract address here
+            // as it handles delegate calls correctly, for contract Proxy support.
+            //
+            // Indeed, the storage change holds the address of the contract that is actually holding
+            // the real state of the storage slot, the proxy contract when the call is a delegate call.
+            contract: Hex::encode(&storage_change.address),
             owner: Hex::encode(keccak_address),
             old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
             new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
@@ -320,7 +330,12 @@ fn find_erc20_balance_changes_algorithm2(
         }
 
         let change = BalanceChange {
-            contract: Hex::encode(&original_call.address),
+            // Using `storage_change.address` is the correct way to get the contract address here
+            // as it handles delegate calls correctly, for contract Proxy support.
+            //
+            // Indeed, the storage change holds the address of the contract that is actually holding
+            // the real state of the storage slot, the proxy contract when the call is a delegate call.
+            contract: Hex::encode(&storage_change.address),
             owner: Hex::encode(keccak_address),
             old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
             new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
