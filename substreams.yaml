@@ -1,14 +1,14 @@
 specVersion: v0.1.0
 package:
   name: erc20_balance_changes
-  version: v1.2.0
+  version: v1.3.0
   url: https://github.com/streamingfast/erc20-balance-changes
-  image: logo.png
   doc: |
     This Substreams extracts all ERC20/ERC721 transfers from Ethereum events for the full chain.
 
 imports:
-  entities: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v1.3.0/substreams-sink-entity-changes-v1.3.0.spkg
+  sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
+  entity: https://github.com/streamingfast/substreams-entity-change/releases/download/v1.1.0/substreams-entity-change-v1.1.0.spkg
   database_change: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v1.2.0/substreams-database-change-v1.2.0.spkg
 
 binaries:
@@ -80,3 +80,14 @@ modules:
       - store: store_valid_balance_changes
     output:
       type: proto:erc20.types.v1.BalanceChangeStats
+
+network: mainnet
+
+sink:
+  module: db_out
+  type: sf.substreams.sink.sql.v1.Service
+  config:
+    schema: "./schema.sql"
+    engine: postgres
+    postgraphile_frontend:
+      enabled: true

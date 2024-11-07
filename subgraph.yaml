@@ -3,6 +3,7 @@ description: ERC20 Ethereum Balance Changes (powered by Substreams)
 repository: https://github.com/streamingfast/substreams-erc20-balanace-changes.git
 schema:
   file: ./schema.graphql
+image: logo.png
 
 dataSources:
   - kind: substreams
