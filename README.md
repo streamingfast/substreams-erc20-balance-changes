@@ -3,7 +3,7 @@
 
 The goal of this Substreams project is to extract all ERC20 transfers from Ethereum events for the full chain.
 
-The `map_balance_changes` module will output messages of type `erc20.types.v1.BalanceChange` defined by: 
+The `map_balance_changes` module will output messages of type [erc20.types.v1.BalanceChange](./proto/v1/erc20.proto#L15) defined by: 
 
 ```proto
 message BalanceChange {
@@ -22,13 +22,11 @@ BalanceChangeType change_type = 9;
 }
 ```
 
-## Known issues:
+## Tracking Strategies
 
-Tracking balance changes requires tracking state changes on chain.  However, different contracts have different ways of storing balances.  
+Tracking balance changes requires tracking state changes on chain. However, different contracts have different ways of storing balances. We have implemented the following strategies for tracking ERC20 balance changes.
 
-We have implemented the following strategies for tracking balance changes:
-
-### Type 1: Storage change is in the same call as the transfer
+### Strategy 1: Storage change is in the same call as the transfer
 
 example:
 https://etherscan.io/tx/0xf490320cff087d82747fcb0e6ed797f899ff887bcd15162933ea051c94c596ea#eventlog
@@ -86,7 +84,7 @@ The correctness of the `old_balance` and `new_balance` values in this case is ea
 
 These types of transfers will result in a BalanceChange message with `change_type` set to `TYPE_1`.
 
-### Type 2: Storage change is in a different call than the transfer
+### Strategy 2: Storage change is in a different call than the transfer
 
 In this case, the Transfer but this results in storage changes in different child calls, where often the amount sent will be split to multiple accounts.
 
@@ -160,22 +158,8 @@ As of block 18005744, the sum of type 1 and type 2 matches accounts for approxim
 
 ## Running
 
-### Generate protos
-
-```bash
-make protogen
 ```
-
-### Build substreams
-
-```bash
-make build
-```
-
-### Build spkg
-
-```bash
-make pack
+substreams build
 ```
 
 ### Example run
