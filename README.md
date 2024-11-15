@@ -7,18 +7,17 @@ The `map_balance_changes` module will output messages of type [erc20.types.v1.Ba
 
 ```proto
 message BalanceChange {
-string contract = 1;
-string owner = 2;
-string old_balance = 3;
-string new_balance = 4;
+  string contract = 1;
+  string owner = 2;
+  string old_balance = 3;
+  string new_balance = 4;
 
-string transaction = 5;
-string storage_key = 6;
-string call_index = 7;
+  string transaction = 5;
+  string storage_key = 6;
+  string call_index = 7;
 
-string transfer_value = 8;
-
-BalanceChangeType change_type = 9;
+  string transfer_value = 8;
+  BalanceChangeType change_type = 9;
 }
 ```
 
