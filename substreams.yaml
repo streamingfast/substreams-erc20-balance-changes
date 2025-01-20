@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: erc20_balance_changes
-  version: v1.3.1
+  version: v1.4.0
   url: https://github.com/streamingfast/substreams-erc20-balance-changes
   doc: |
     This Substreams extracts all ERC20/ERC721 transfers from Ethereum events for the full chain.
@@ -21,6 +21,10 @@ protobuf:
     - erc20.proto
   importPaths:
     - ./proto/v1
+  excludePaths:
+    - sf/substreams
+    - google
+
 
 modules:
   - name: map_balance_changes
