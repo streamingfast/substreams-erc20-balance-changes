@@ -1,6 +1,6 @@
 use substreams::scalar::BigInt;
 use substreams::store::{StoreAdd, StoreAddBigInt};
-use crate::pb::erc20::types::v1::{BalanceChanges};
+use crate::pb::erc20::types::v1::BalanceChanges;
 use substreams::store::StoreNew;
 
 #[substreams::handlers::store]

@@ -1,13 +1,26 @@
 type BalanceChange @entity {
     id: ID!
 
-    contract: String
-    owner: String
-    oldBalance: String
-    newBalance: String
-    transaction: String
-    storageKey: String
-    callIndex: BigInt
-    transferValue: String
-    changeType: Int
+    # -- block --
+    timestamp: Timestamp!
+    block_num: Int!
+    block_hash: String!
+    date: String!
+
+    # -- transaction --
+    transaction_id: String!
+    call_index: Int!
+
+    # -- storage --
+    index: Int!
+    version: Int!
+    storage_key: String!
+
+    # -- balance change --
+    contract: String!
+    owner: String!
+    old_balance: String!
+    new_balance: String!
+    amount: String!
+    change_type: Int!
 }

@@ -2,56 +2,78 @@ syntax = "proto3";
 
 package erc20.types.v1;
 
-message BalanceChanges {
-  repeated BalanceChange balance_changes = 1;
+import "google/protobuf/timestamp.proto";
+
+message Events {
+  repeated Transfer transfers = 1;
+  repeated BalanceChange balance_changes = 2;
 }
 
 enum BalanceChangeType {
-  TYPE_UNKNOWN = 0; // cannot determine balance change
-  TYPE_1 = 1; // easy case where storage change is in the same call as the Transfer call
-  TYPE_2 = 2; // storage change is in a different call than the Transfer call
+  BALANCE_CHANGE_TYPE_UNSPECIFIED = 0; // cannot determine balance change
+  BALANCE_CHANGE_TYPE_1 = 1; // easy case where storage change is in the same call as the Transfer call
+  BALANCE_CHANGE_TYPE_2 = 2; // storage change is in a different call than the Transfer call
 }
 
 message BalanceChange {
-  string contract = 1;
-  string owner = 2;
-  string old_balance = 3;
-  string new_balance = 4;
+  // -- block --
+  uint64 block_num = 1;
+  string block_hash = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  string date = 4;
 
-  string transaction = 5;
-  string storage_key = 6;
-  uint32 call_index = 7;
+  // -- transaction --
+  string transaction_id = 5;
 
-  string transfer_value = 8;
+  // -- call --
+  uint32 call_index = 6;
 
-  BalanceChangeType change_type = 9;
+  // -- log --
+  uint32 log_index = 7; // Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
+  uint32 log_block_index = 8; // BlockIndex represents the index of the log relative to the Block.
+  uint64 log_ordinal = 9; // the block's global ordinal when the transfer was recorded.
+
+  // -- storage change --
+  string storage_key = 10;
+  uint64 storage_ordinal = 11;
+
+  // -- indexing --
+  uint32 index = 12; // incrementing index for ordering
+  uint64 version = 13; // version used as “ordering” argument (block_num << 32 + index)
+
+  // -- balance change --
+  string contract = 14;
+  string owner = 15;
+  string old_balance = 16;
+  string new_balance = 17;
+  string amount = 18; // difference between old_balance and new_balance
+  BalanceChangeType change_type = 19;
 }
 
-message ValidBalanceChanges {
-  repeated ValidBalanceChange valid_balance_changes = 1;
+message Transfer {
+  // -- block --
+  uint64 block_num = 1;
+  string block_hash = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  string date = 4;
+
+  // -- transaction --
+  string transaction_id = 5;
+
+  // -- call --
+  uint32 call_index = 6;
+
+  // -- log --
+  uint32 log_index = 7; // Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
+  uint32 log_block_index = 8; // BlockIndex represents the index of the log relative to the Block.
+  uint64 log_ordinal = 9; // the block's global ordinal when the transfer was recorded.
+
+  // -- transfer --
+  string contract = 10;
+  string from = 11;
+  string to = 12;
+  string value = 13;
 }
-
-message ValidBalanceChange {
-  string contract = 1;
-  string owner = 2;
-  string old_balance = 3;
-  string new_balance = 4;
-
-  string transaction = 5;
-}
-
-message UnknownBalanceChanges {
-  repeated UnknownBalanceChange unknown_balance_changes = 1;
-}
-
-message UnknownBalanceChange {
-  string contract = 1;
-  string owner = 2;
-  string transaction = 3;
-  uint32 call_index = 4;
-  string transfer_value = 5;
-}
-
 
 message BalanceChangeStats {
   uint64 type0_count = 1;

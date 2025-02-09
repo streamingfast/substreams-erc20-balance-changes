@@ -1,160 +1,170 @@
 use crate::abi::{self};
-use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, BalanceChanges, BalanceChangeStats, ValidBalanceChange, ValidBalanceChanges, UnknownBalanceChanges, UnknownBalanceChange};
-use abi::erc20::events::Transfer;
+use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
+use crate::utils::{addresses_for_storage_keys, clock_to_date, erc20_is_valid_address, get_all_child_calls, index_to_version, StorageKeyToAddressMap};
+use abi::erc20::events::Transfer as TransferAbi;
 use hex_literal::hex;
 use std::collections::HashMap;
 use substreams::errors::Error;
 use substreams::log::info;
-use substreams::scalar::{BigDecimal, BigInt};
+use substreams::scalar::BigInt;
 use substreams::Hex;
 use substreams::pb::substreams::Clock;
-use substreams::store::{StoreGet, StoreGetBigInt};
-use substreams_ethereum::pb::eth::v2::{Block, Call, TransactionTrace, TransactionTraceStatus};
+use substreams_ethereum::pb::eth::v2::{Block, Call, Log, StorageChange, TransactionTrace, TransactionTraceStatus};
 use substreams_ethereum::Event;
 
-const NULL_ADDRESS: [u8; 20] = hex!("0000000000000000000000000000000000000000");
+// const NULL_ADDRESS: [u8; 20] = hex!("0000000000000000000000000000000000000000");
 const ZERO_STORAGE_PREFIX: [u8; 16] = hex!("00000000000000000000000000000000");
 
 #[substreams::handlers::map]
-pub fn map_balance_changes(block: Block) -> Result<BalanceChanges, Error> {
-    Ok(BalanceChanges {
-        balance_changes: map_balance_change(block),
+pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
+    let transfers = iter_transfers(block);
+    let balance_changes = iter_balance_changes(transfers.clone());
+
+    Ok(Events {
+        transfers: map_transfers(&clock, transfers),
+        balance_changes: map_balance_changes(&clock, balance_changes),
     })
 }
 
-#[substreams::handlers::map]
-pub fn map_unknown_balance_changes(balance_changes: BalanceChanges) -> Result<UnknownBalanceChanges, Error> {
+pub fn iter_transfers(block: Block) -> Vec<(TransactionTrace, Call, Log, TransferAbi)> {
     let mut out = Vec::new();
-    for change in balance_changes.balance_changes {
-        if change.change_type != BalanceChangeType::TypeUnknown as i32 {
-            continue;
-        }
-
-        out.push(UnknownBalanceChange{
-            contract: change.contract,
-            owner: change.owner,
-            transaction: change.transaction,
-            call_index: change.call_index,
-            transfer_value: change.transfer_value,
-        })
-    }
-
-    Ok(UnknownBalanceChanges {
-        unknown_balance_changes: out,
-    })
-}
-
-#[substreams::handlers::map]
-pub fn map_valid_balance_changes(balance_changes: BalanceChanges) -> Result<ValidBalanceChanges, Error> {
-    let mut out = Vec::new();
-    for change in balance_changes.balance_changes {
-        if change.change_type == BalanceChangeType::TypeUnknown as i32 {
-            continue;
-        }
-
-        out.push(ValidBalanceChange{
-            contract: change.contract,
-            owner: change.owner,
-            old_balance: change.old_balance,
-            new_balance: change.new_balance,
-            transaction: change.transaction,
-        });
-    }
-
-    Ok(ValidBalanceChanges {
-        valid_balance_changes: out,
-    })
-}
-
-#[substreams::handlers::map]
-pub fn balance_change_stats(clock: Clock, store: StoreGetBigInt) -> Result<BalanceChangeStats, Error> {
-    let type_1 = store.get_last("type1").unwrap_or(BigInt::from(0));
-    let type_2 = store.get_last("type2").unwrap_or(BigInt::from(0));
-    let total = store.get_last("total").unwrap_or(BigInt::from(0));
-    let mut valid_rate = BigDecimal::from(0);
-    if !total.is_zero() {
-        valid_rate = (BigDecimal::from(type_1.clone()) + BigDecimal::from(type_2.clone())) / BigDecimal::from(total.clone());
-    }
-
-    Ok(BalanceChangeStats {
-        type0_count: store.get_last("type0").unwrap_or(BigInt::from(0)).to_u64(),
-        type1_count: type_1.to_u64(),
-        type2_count: type_2.to_u64(),
-        total_count: total.to_u64(),
-        block_number: clock.number,
-        valid_rate: valid_rate.to_string(),
-    })
-}
-
-pub fn map_balance_change(block: Block) -> Vec<BalanceChange> {
-    let mut balance_changes = Vec::new();
 
     for trx in block.transaction_traces.iter() {
         if trx.status != TransactionTraceStatus::Succeeded as i32 {
             continue;
         }
-
         for call in trx.calls.iter() {
             if call.state_reverted {
                 continue;
             }
 
             for log in call.logs.iter() {
-                let transfer = match Transfer::match_and_decode(log) {
+                let transfer = match TransferAbi::match_and_decode(log) {
                     Some(transfer) => transfer,
                     None => continue,
                 };
-
                 if transfer.value.is_zero() {
                     continue;
                 }
-
-                if transfer.from == NULL_ADDRESS {
-                    continue;
-                }
-
-                // Trying with algorithm #1
-                let mut found_balance_changes =
-                    find_erc20_balance_changes_algorithm1(trx, call, &transfer);
-                if !found_balance_changes.is_empty() {
-                    balance_changes.extend(found_balance_changes);
-                    continue;
-                }
-
-                // No balance changes found using algorithm #1, trying with algorithm #2
-                found_balance_changes = find_erc20_balance_changes_algorithm2(&transfer, &call, trx);
-                if !found_balance_changes.is_empty() {
-                    balance_changes.extend(found_balance_changes);
-                    continue;
-                }
-
-                // No algorithm could extract the balance change, old/new balance is fixed at 0
-                balance_changes.push(BalanceChange {
-                    contract: Hex::encode(&call.address),
-                    owner: Hex::encode(&transfer.to),
-                    old_balance: "0".to_string(),
-                    new_balance: "0".to_string(),
-                    transaction: Hex::encode(&trx.hash),
-                    storage_key: "".to_string(),
-                    call_index: call.index,
-                    transfer_value: transfer.value.to_string(),
-                    change_type: BalanceChangeType::TypeUnknown as i32,
-                });
+                out.push((trx.clone(), call.clone(), log.clone(), transfer));
             }
         }
     }
-
-    balance_changes
+    out
 }
 
-/// normal case
-fn find_erc20_balance_changes_algorithm1(
-    trx: &TransactionTrace,
-    call: &Call,
-    transfer: &Transfer,
-) -> Vec<BalanceChange> {
+pub fn map_transfers(clock: &Clock, transfers: Vec<(TransactionTrace, Call, Log, TransferAbi)>) -> Vec<Transfer> {
+    let mut events = Vec::new();
+
+    for (trx, call, log, transfer) in transfers {
+        events.push(Transfer {
+            // -- block --
+            block_num: clock.number,
+            block_hash: clock.id.clone(),
+            date: clock_to_date(&clock),
+            timestamp: clock.timestamp,
+
+            // -- transaction --
+            transaction_id: Hex::encode(&trx.hash),
+
+            // -- call --
+            call_index: call.index,
+
+            // -- log --
+            log_index: log.index,
+            log_block_index: log.block_index,
+            log_ordinal: log.ordinal,
+
+            // -- transfer --
+            contract: Hex::encode(&call.address),
+            from: Hex::encode(&transfer.from),
+            to: Hex::encode(&transfer.to),
+            value: transfer.value.to_string(),
+        });
+    }
+    events
+}
+
+pub fn map_balance_changes(clock: &Clock, balance_changes: Vec<(TransactionTrace, Call, Log, TransferAbi, StorageChange, BalanceChangeType)>) -> Vec<BalanceChange> {
+    let mut events = Vec::new();
+    let mut index = 0; // incrementing index for each balance change
+
+    for (trx, call, log, transfer, storage_change, change_type) in balance_changes {
+        events.push(BalanceChange {
+            // -- block --
+            block_num: clock.number,
+            block_hash: clock.id.clone(),
+            date: clock_to_date(&clock),
+            timestamp: clock.timestamp,
+
+            // -- transaction
+            transaction_id: Hex::encode(&trx.hash),
+
+            // -- call --
+            call_index: call.index,
+
+            // -- log --
+            log_index: log.index,
+            log_block_index: log.block_index,
+            log_ordinal: log.ordinal,
+
+            // -- storage change --
+            storage_key: Hex::encode(&storage_change.key),
+            storage_ordinal: storage_change.ordinal,
+
+            // -- indexing --
+            index,
+            version: index_to_version(&clock, index),
+
+            // -- balance change --
+            contract: Hex::encode(&call.address),
+            owner: Hex::encode(storage_change.key),
+            old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
+            new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
+            amount: transfer.value.to_string(),
+            change_type: change_type as i32,
+        });
+        index += 1;
+    }
+    events
+}
+
+pub fn compute_keccak_address_map(transfers: Vec<(TransactionTrace, Call, Log, TransferAbi)>) -> StorageKeyToAddressMap {
+    let mut keccak_address_map = HashMap::new();
+
+    for (_, call, _, _) in transfers {
+        keccak_address_map.extend(addresses_for_storage_keys(&call));
+    }
+    keccak_address_map
+}
+
+pub fn iter_balance_changes(transfers: Vec<(TransactionTrace, Call, Log, TransferAbi)>) -> Vec<(TransactionTrace, Call, Log, TransferAbi, StorageChange, BalanceChangeType)> {
     let mut out = Vec::new();
-    let mut keccak_address_map: Option<StorageKeyToAddressMap> = None;
+
+    // We memoize the keccak address map by call because it is expensive to compute
+    let keccak_address_map = compute_keccak_address_map(transfers.clone());
+
+    for (trx, call, log, transfer) in transfers {
+        // algorithm #1 (normal case)
+        for storage_changes in find_erc20_balance_changes_algorithm1(&call, &transfer, &keccak_address_map) {
+            out.push((trx.clone(), call.clone(), log.clone(), transfer.clone(), storage_changes, BalanceChangeType::BalanceChangeType1));
+        }
+
+        // algorithm #2 (case where storage changes are not in the same call as the transfer event)
+        for storage_changes in find_erc20_balance_changes_algorithm2(&call, &transfer, &trx, &keccak_address_map) {
+            out.push((trx.clone(), call.clone(), log.clone(), transfer.clone(), storage_changes, BalanceChangeType::BalanceChangeType2));
+        }
+    }
+    out
+}
+
+// algorithm #1 (normal case)
+fn find_erc20_balance_changes_algorithm1(
+    call: &Call,
+    transfer: &TransferAbi,
+    keccak_address_map: &StorageKeyToAddressMap,
+) -> Vec<StorageChange> {
+    let mut out = Vec::new();
 
     for storage_change in &call.storage_changes {
         let old_balance = BigInt::from_signed_bytes_be(&storage_change.old_value);
@@ -179,14 +189,7 @@ fn find_erc20_balance_changes_algorithm1(
             continue;
         }
 
-        // We memoize the keccak address map by call because it is expensive to compute
-        if keccak_address_map.is_none() {
-            keccak_address_map = Some(erc20_addresses_for_storage_keys(call));
-        }
-
         let keccak_address = match keccak_address_map
-            .as_ref()
-            .unwrap()
             .get(&storage_change.key)
         {
             Some(address) => address,
@@ -197,57 +200,32 @@ fn find_erc20_balance_changes_algorithm1(
                 }
 
                 info!(
-                    "No keccak address found for key: {}, trx {}",
+                    "No keccak address found for key: {}, address {}",
                     Hex(&storage_change.key),
-                    Hex(&trx.hash)
+                    Hex(&call.address)
                 );
                 continue;
             }
         };
 
         if !erc20_is_valid_address(keccak_address, transfer) {
-            info!("Keccak address does not match transfer address. Keccak address: {}, sender address: {}, receiver address: {}, trx {}", Hex(keccak_address), Hex(&transfer.from), Hex(&transfer.to), Hex(&trx.hash));
+            info!("Keccak address does not match transfer address. Keccak address: {}, sender address: {}, receiver address: {}", Hex(keccak_address), Hex(&transfer.from), Hex(&transfer.to));
             continue;
         }
-
-        let change = BalanceChange {
-            // Using `storage_change.address` is the correct way to get the contract address here
-            // as it handles delegate calls correctly, for contract Proxy support.
-            //
-            // Indeed, the storage change holds the address of the contract that is actually holding
-            // the real state of the storage slot, the proxy contract when the call is a delegate call.
-            contract: Hex::encode(&storage_change.address),
-            owner: Hex::encode(keccak_address),
-            old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
-            new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
-            transaction: Hex::encode(&trx.hash),
-            storage_key: Hex::encode(&storage_change.key),
-            call_index: call.index,
-            transfer_value: value.to_string(),
-            change_type: BalanceChangeType::Type1 as i32,
-        };
-
-        out.push(change);
+        out.push(storage_change.clone());
     }
-
     out
 }
 
-// case where storage changes are not in the same call as the transfer event
+
+// algorithm #2 (case where storage changes are not in the same call as the transfer event)
 fn find_erc20_balance_changes_algorithm2(
-    transfer: &Transfer,
     original_call: &Call,
+    transfer: &TransferAbi,
     trx: &TransactionTrace,
-) -> Vec<BalanceChange> {
+    keccak_address_map: &StorageKeyToAddressMap,
+) -> Vec<StorageChange> {
     let mut out = Vec::new();
-
-    //get all keccak keys for transfer.to and transfer.from
-
-    let mut keys = HashMap::new();
-    for call in trx.calls.iter() {
-        let keccak_address_map = erc20_addresses_for_storage_keys(call);
-        keys.extend(keccak_address_map);
-    }
 
     let child_calls = get_all_child_calls(original_call, trx);
 
@@ -262,7 +240,7 @@ fn find_erc20_balance_changes_algorithm2(
 
     //check if any of the storage changes match the transfer.to or transfer.from
     for storage_change in storage_changes.clone().iter() {
-        let keccak_address = match keys.get(&storage_change.key) {
+        let keccak_address = match keccak_address_map.get(&storage_change.key) {
             Some(address) => address,
             None => continue,
         };
@@ -281,24 +259,7 @@ fn find_erc20_balance_changes_algorithm2(
             total_received = total_received + balance_change;
         };
 
-        let change = BalanceChange {
-            // Using `storage_change.address` is the correct way to get the contract address here
-            // as it handles delegate calls correctly, for contract Proxy support.
-            //
-            // Indeed, the storage change holds the address of the contract that is actually holding
-            // the real state of the storage slot, the proxy contract when the call is a delegate call.
-            contract: Hex::encode(&storage_change.address),
-            owner: Hex::encode(keccak_address),
-            old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
-            new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
-            transaction: Hex::encode(&trx.hash),
-            storage_key: Hex::encode(&storage_change.key),
-            call_index: original_call.index,
-            transfer_value: transfer.value.to_string(),
-            change_type: BalanceChangeType::Type2 as i32,
-        };
-
-        out.push(change);
+        out.push(storage_change.clone());
     }
 
     if total_sent == transfer.value {
@@ -310,11 +271,10 @@ fn find_erc20_balance_changes_algorithm2(
         diff = diff.neg();
     }
 
-    //look for a storage change that matches the diff
+    // look for a storage change that matches the diff
     for storage_change in storage_changes.iter() {
-        let keccak_address = match keys.get(&storage_change.key) {
-            Some(address) => address,
-            None => continue,
+        if keccak_address_map.get(&storage_change.key).is_none() {
+            continue;
         };
 
         let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
@@ -329,67 +289,8 @@ fn find_erc20_balance_changes_algorithm2(
             continue;
         }
 
-        let change = BalanceChange {
-            // Using `storage_change.address` is the correct way to get the contract address here
-            // as it handles delegate calls correctly, for contract Proxy support.
-            //
-            // Indeed, the storage change holds the address of the contract that is actually holding
-            // the real state of the storage slot, the proxy contract when the call is a delegate call.
-            contract: Hex::encode(&storage_change.address),
-            owner: Hex::encode(keccak_address),
-            old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
-            new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
-            transaction: Hex::encode(&trx.hash),
-            storage_key: Hex::encode(&storage_change.key),
-            call_index: original_call.index,
-            transfer_value: transfer.value.to_string(),
-            change_type: BalanceChangeType::Type2 as i32,
-        };
-
-        out.push(change);
+        out.push(storage_change.clone());
     }
 
     out
 }
-
-type StorageKeyToAddressMap = HashMap<Vec<u8>, Vec<u8>>;
-
-fn erc20_addresses_for_storage_keys(call: &Call) -> StorageKeyToAddressMap {
-    let mut out = HashMap::new();
-
-    for (hash, preimage) in &call.keccak_preimages {
-        if preimage.len() != 128 {
-            continue;
-        }
-
-        if &preimage[64..126] != "00000000000000000000000000000000000000000000000000000000000000" {
-            continue;
-        }
-
-        let addr = &preimage[24..64];
-        out.insert(
-            hex::decode(hash).expect("Failed to decode hash hex string"),
-            hex::decode(addr).expect("Failed to decode address hex string"),
-        );
-    }
-
-    out
-}
-
-fn erc20_is_valid_address(address: &Vec<u8>, transfer: &Transfer) -> bool {
-    address == &transfer.from || address == &transfer.to
-}
-
-fn get_all_child_calls(original: &Call, trx: &TransactionTrace) -> Vec<Call> {
-    let mut out = Vec::new();
-
-    for call in trx.calls.iter() {
-        if call.parent_index == original.index {
-            out.push(call.clone());
-        }
-    }
-
-    out
-}
-
-
