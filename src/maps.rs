@@ -142,7 +142,8 @@ pub fn iter_balance_changes(transfers: Vec<(TransactionTrace, Call, Log, Transfe
         }
 
         // algorithm #2 (case where storage changes are not in the same call as the transfer event)
-        for storage_changes in find_erc20_balance_changes_algorithm2(&call, &transfer, &trx, &keccak_address_map) {
+        let child_calls = get_all_child_calls(&call, &trx);
+        for storage_changes in find_erc20_balance_changes_algorithm2(child_calls, &transfer, &keccak_address_map) {
             out.push((trx.clone(), call.clone(), log.clone(), transfer.clone(), storage_changes, BalanceChangeType::BalanceChangeType2));
         }
     }
@@ -175,32 +176,28 @@ fn find_erc20_balance_changes_algorithm1(
             value.clone()
         };
 
-        if balance_change_abs != transfer_value_abs {
-            info!("Balance change does not match transfer value. Balance change: {}, transfer value: {}", balance_change_abs, transfer_value_abs);
+        // balance change matches transfer value
+        // allow 1 wei difference
+        // https://github.com/streamingfast/substreams-erc20-balance-changes/issues/14
+        if balance_change_abs != transfer_value_abs && balance_change_abs != &transfer_value_abs - BigInt::one() && balance_change_abs != &transfer_value_abs + BigInt::one() {
+            info!("Algo1: Balance change does not match transfer value. Balance change: {}, transfer value: {}", balance_change_abs, transfer_value_abs);
             continue;
         }
 
-        let keccak_address = match keccak_address_map
-            .get(&storage_change.key)
-        {
+        let keccak_address = match keccak_address_map.get(&storage_change.key) {
             Some(address) => address,
             None => {
                 if storage_change.key[0..16] == ZERO_STORAGE_PREFIX {
-                    info!("Skipping balance change for zero key");
+                    info!("Algo1: Skipping balance change for zero key");
                     continue;
                 }
-
-                info!(
-                    "No keccak address found for key: {}, address {}",
-                    Hex(&storage_change.key),
-                    Hex(&call.address)
-                );
+                info!("Algo1: No keccak address found for key: {}, address {}", Hex(&storage_change.key), Hex(&call.address));
                 continue;
             }
         };
 
         if !erc20_is_valid_address(keccak_address, transfer) {
-            info!("Keccak address does not match transfer address. Keccak address: {}, sender address: {}, receiver address: {}", Hex(keccak_address), Hex(&transfer.from), Hex(&transfer.to));
+            info!("Algo1: Keccak address does not match transfer address. Keccak address: {}, sender address: {}, receiver address: {}", Hex(keccak_address), Hex(&transfer.from), Hex(&transfer.to));
             continue;
         }
         out.push(storage_change.clone());
@@ -211,20 +208,18 @@ fn find_erc20_balance_changes_algorithm1(
 
 // algorithm #2 (case where storage changes are not in the same call as the transfer event)
 fn find_erc20_balance_changes_algorithm2(
-    original_call: &Call,
+    child_calls: Vec<Call>,
     transfer: &TransferAbi,
-    trx: &TransactionTrace,
     keccak_address_map: &StorageKeyToAddressMap,
 ) -> Vec<StorageChange> {
     let mut out = Vec::new();
-
-    let child_calls = get_all_child_calls(original_call, trx);
 
     //get all storage changes for these calls:
     let mut storage_changes = Vec::new();
     for call in child_calls.iter() {
         storage_changes.extend(call.storage_changes.clone());
     }
+    info!("Algo2: Found {} storage changes. from={} to={} value={}", storage_changes.len(), Hex(&transfer.from), Hex(&transfer.to), transfer.value);
 
     let mut total_sent = BigInt::zero();
     let mut total_received = BigInt::zero();
@@ -264,9 +259,22 @@ fn find_erc20_balance_changes_algorithm2(
 
     // look for a storage change that matches the diff
     for storage_change in storage_changes.iter() {
-        if keccak_address_map.get(&storage_change.key).is_none() {
-            continue;
+        let keccak_address = match keccak_address_map.get(&storage_change.key) {
+            Some(address) => address,
+            None => {
+                if storage_change.key[0..16] == ZERO_STORAGE_PREFIX {
+                    info!("Algo2: Skipping balance change for zero key");
+                    continue;
+                }
+                info!("Algo2: No keccak address found for key={}, from={} to={} value={}", Hex(&storage_change.key), Hex(&transfer.from), Hex(&transfer.to), transfer.value);
+                continue;
+            }
         };
+
+        if !erc20_is_valid_address(keccak_address, transfer) {
+            info!("Algo2: Keccak address does not match transfer address. keccak_address={} from={} to={} value={}", Hex(keccak_address), Hex(&transfer.from), Hex(&transfer.to), transfer.value);
+            continue;
+        }
 
         let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
         let new_balance = BigInt::from_unsigned_bytes_be(&storage_change.new_value);
@@ -277,6 +285,7 @@ fn find_erc20_balance_changes_algorithm2(
         }
 
         if balance_change != diff {
+            info!("Algo2: Balance change does not match transfer value. Balance change: {}, transfer value: {}", balance_change, transfer.value);
             continue;
         }
 

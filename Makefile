@@ -34,3 +34,6 @@ run: build
 gui: build
 	substreams gui substreams.yaml balance_change_stats -e mainnet.eth.streamingfast.io:443 --production-mode
 
+.PHONY: parquet
+parquet:
+	substreams-sink-files run eth.substreams.pinax.network:443 substreams.yaml map_events "./out" 18005700:18005800 --encoder parquet --file-block-count 100 --development-mode

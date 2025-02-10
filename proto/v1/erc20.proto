@@ -47,7 +47,7 @@ message BalanceChange {
   string old_balance = 16;
   string new_balance = 17;
   string amount = 18; // difference between old_balance and new_balance
-  BalanceChangeType change_type = 19;
+  int32 change_type = 19; // type enum isn't supported yet as a leaf node
 }
 
 message Transfer {

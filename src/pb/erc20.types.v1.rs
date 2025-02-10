@@ -61,7 +61,8 @@ pub struct BalanceChange {
     /// difference between old_balance and new_balance
     #[prost(string, tag="18")]
     pub amount: ::prost::alloc::string::String,
-    #[prost(enumeration="BalanceChangeType", tag="19")]
+    /// type enum isn't supported yet as a leaf node
+    #[prost(int32, tag="19")]
     pub change_type: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
