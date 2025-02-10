@@ -1,9 +1,8 @@
 use crate::abi::{self};
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
-use crate::utils::{addresses_for_storage_keys, clock_to_date, erc20_is_valid_address, get_all_child_calls, index_to_version, StorageKeyToAddressMap};
+use crate::utils::{clock_to_date, compute_keccak_address_map, erc20_is_valid_address, get_all_child_calls, index_to_version, StorageKeyToAddressMap};
 use abi::erc20::events::Transfer as TransferAbi;
 use hex_literal::hex;
-use std::collections::HashMap;
 use substreams::errors::Error;
 use substreams::log::info;
 use substreams::scalar::BigInt;
@@ -24,33 +23,6 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
         transfers: map_transfers(&clock, transfers),
         balance_changes: map_balance_changes(&clock, balance_changes),
     })
-}
-
-pub fn iter_transfers(block: Block) -> Vec<(TransactionTrace, Call, Log, TransferAbi)> {
-    let mut out = Vec::new();
-
-    for trx in block.transaction_traces.iter() {
-        if trx.status != TransactionTraceStatus::Succeeded as i32 {
-            continue;
-        }
-        for call in trx.calls.iter() {
-            if call.state_reverted {
-                continue;
-            }
-
-            for log in call.logs.iter() {
-                let transfer = match TransferAbi::match_and_decode(log) {
-                    Some(transfer) => transfer,
-                    None => continue,
-                };
-                if transfer.value.is_zero() {
-                    continue;
-                }
-                out.push((trx.clone(), call.clone(), log.clone(), transfer));
-            }
-        }
-    }
-    out
 }
 
 pub fn map_transfers(clock: &Clock, transfers: Vec<(TransactionTrace, Call, Log, TransferAbi)>) -> Vec<Transfer> {
@@ -129,20 +101,39 @@ pub fn map_balance_changes(clock: &Clock, balance_changes: Vec<(TransactionTrace
     events
 }
 
-pub fn compute_keccak_address_map(transfers: Vec<(TransactionTrace, Call, Log, TransferAbi)>) -> StorageKeyToAddressMap {
-    let mut keccak_address_map = HashMap::new();
+pub fn iter_transfers(block: Block) -> Vec<(TransactionTrace, Call, Log, TransferAbi)> {
+    let mut out = Vec::new();
 
-    for (_, call, _, _) in transfers {
-        keccak_address_map.extend(addresses_for_storage_keys(&call));
+    for trx in block.transaction_traces.iter() {
+        if trx.status != TransactionTraceStatus::Succeeded as i32 {
+            continue;
+        }
+        for call in trx.calls.iter() {
+            if call.state_reverted {
+                continue;
+            }
+
+            for log in call.logs.iter() {
+                let transfer = match TransferAbi::match_and_decode(log) {
+                    Some(transfer) => transfer,
+                    None => continue,
+                };
+                if transfer.value.is_zero() {
+                    continue;
+                }
+                out.push((trx.clone(), call.clone(), log.clone(), transfer));
+            }
+        }
     }
-    keccak_address_map
+    out
 }
 
 pub fn iter_balance_changes(transfers: Vec<(TransactionTrace, Call, Log, TransferAbi)>) -> Vec<(TransactionTrace, Call, Log, TransferAbi, StorageChange, BalanceChangeType)> {
     let mut out = Vec::new();
 
     // We memoize the keccak address map by call because it is expensive to compute
-    let keccak_address_map = compute_keccak_address_map(transfers.clone());
+    let calls = transfers.iter().map(|(trx, _, _, _)| trx.calls.clone()).flatten().collect::<Vec<Call>>();
+    let keccak_address_map = compute_keccak_address_map(calls);
 
     for (trx, call, log, transfer) in transfers {
         // algorithm #1 (normal case)

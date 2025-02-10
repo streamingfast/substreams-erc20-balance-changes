@@ -9,7 +9,14 @@ type BalanceChange @entity {
 
     # -- transaction --
     transaction_id: String!
+
+    # -- call --
     call_index: Int!
+
+    # -- log --
+    log_index: Int!
+    log_block_index: Int!
+    log_ordinal: Int!
 
     # -- storage --
     index: Int!

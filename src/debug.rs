@@ -1,17 +1,6 @@
-use substreams::store::{StoreGet, StoreGetBigInt};
+use substreams::{errors::Error, pb::substreams::Clock, scalar::{BigDecimal, BigInt}, store::{StoreGet, StoreGetBigInt}};
 
-#[substreams::handlers::map]
-pub fn map_unknown_balance_changes(balance_changes: BalanceChanges) -> Result<BalanceChanges, Error> {
-    let unknown_balance_changes: Vec<BalanceChange> = balance_changes.balance_changes
-        .iter()
-        .filter(|change| change.change_type == BalanceChangeType::Unspecified as i32)
-        .cloned()
-        .collect();
-
-    Ok(BalanceChanges {
-        balance_changes: unknown_balance_changes,
-    })
-}
+use crate::pb::erc20::types::v1::BalanceChangeStats;
 
 #[substreams::handlers::map]
 pub fn balance_change_stats(clock: Clock, store: StoreGetBigInt) -> Result<BalanceChangeStats, Error> {

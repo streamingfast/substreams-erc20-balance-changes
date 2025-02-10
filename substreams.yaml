@@ -27,15 +27,7 @@ modules:
   - name: map_events
     kind: map
     doc: Extracts ERC20 balance changes & transfers
-    inputs:
-      - source: sf.substreams.v1.Clock
-      - source: sf.ethereum.type.v2.Block
-    output:
-      type: proto:erc20.types.v1.Events
-
-  - name: map_events_unknown
-    kind: map
-    doc: Extracts ERC20 balance changes & transfers (used for debugging purposes)
+    initialBlock: 18005744
     inputs:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
@@ -52,7 +44,6 @@ modules:
 
   - name: graph_out
     kind: map
-    initialBlock: 1397553
     inputs:
       - source: sf.substreams.v1.Clock
       - map: map_events

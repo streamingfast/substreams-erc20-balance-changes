@@ -45,6 +45,15 @@ pub fn addresses_for_storage_keys(call: &Call) -> StorageKeyToAddressMap {
     out
 }
 
+pub fn compute_keccak_address_map(calls: Vec<Call>) -> StorageKeyToAddressMap {
+    let mut keccak_address_map = HashMap::new();
+
+    for call in calls {
+        keccak_address_map.extend(addresses_for_storage_keys(&call));
+    }
+    keccak_address_map
+}
+
 pub fn erc20_is_valid_address(address: &Vec<u8>, transfer: &Transfer) -> bool {
     address == &transfer.from || address == &transfer.to
 }
