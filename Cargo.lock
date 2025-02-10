@@ -145,8 +145,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
-name = "erc20"
-version = "1.0.0"
+name = "erc20-balance-changes"
+version = "0.0.0"
 dependencies = [
  "anyhow",
  "ethabi 18.0.0",

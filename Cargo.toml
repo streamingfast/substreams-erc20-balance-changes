@@ -1,6 +1,6 @@
 [package]
-name = "erc20"
-version = "1.0.0"
+name = "erc20-balance-changes"
+version = "0.0.0"
 description = "ERC-20"
 edition = "2021"
 authors = [

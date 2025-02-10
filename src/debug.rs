@@ -1,23 +1,80 @@
-use substreams::{errors::Error, pb::substreams::Clock, scalar::{BigDecimal, BigInt}, store::{StoreGet, StoreGetBigInt}};
+use std::collections::HashSet;
 
-use crate::pb::erc20::types::v1::BalanceChangeStats;
+use substreams::{errors::Error, log, pb::substreams::Clock, scalar::{BigDecimal, BigInt}, store::{StoreGet, StoreGetBigInt}};
+
+use crate::pb::erc20::types::v1::{BalanceChangeStats, Events};
 
 #[substreams::handlers::map]
-pub fn balance_change_stats(clock: Clock, store: StoreGetBigInt) -> Result<BalanceChangeStats, Error> {
-    let type_1 = store.get_last("type1").unwrap_or(BigInt::from(0));
-    let type_2 = store.get_last("type2").unwrap_or(BigInt::from(0));
-    let total = store.get_last("total").unwrap_or(BigInt::from(0));
-    let mut valid_rate = BigDecimal::from(0);
-    if !total.is_zero() {
-        valid_rate = (BigDecimal::from(type_1.clone()) + BigDecimal::from(type_2.clone())) / BigDecimal::from(total.clone());
+pub fn balance_change_stats(clock: Clock, events: Events, store: StoreGetBigInt) -> Result<BalanceChangeStats, Error> {
+    let mut current_type1_balance_changes = 0;
+    let mut current_type2_balance_changes = 0;
+    let mut current_balance_changes = 0;
+    let mut current_transfers = 0;
+    let mut current_transfers_not_matched = 0;
+    let mut logs = HashSet::new();
+
+    // current
+    for balance_change in events.balance_changes {
+        let key = format!("{}:{}", balance_change.transaction_id, balance_change.log_index);
+        logs.insert(key);
+
+        match balance_change.change_type {
+            1 => {
+                current_type1_balance_changes += 1;
+                current_balance_changes += 1;
+            },
+            2 => {
+                current_type2_balance_changes += 1;
+                current_balance_changes += 1;
+            },
+            _ => {}
+        }
+    }
+    for transfer in events.transfers {
+        let key = format!("{}:{}", transfer.transaction_id, transfer.log_index);
+        if !logs.contains(&key) {
+            current_transfers_not_matched += 1;
+            log::info!("Transfer not matched: {:?} (log_index={:?})", transfer.transaction_id, transfer.log_index);
+        }
+        current_transfers += 1;
+    }
+
+    let mut current_valid_rate = BigDecimal::from(1);
+    if current_transfers > 0 {
+        current_valid_rate = current_valid_rate - BigDecimal::from(current_transfers_not_matched) / BigDecimal::from(current_transfers);
+    }
+
+    // total
+    let total_type1_balance_changes = store.get_last("balance_changes_type_1").unwrap_or(BigInt::from(0)).to_u64();
+    let total_type2_balance_changes = store.get_last("balance_changes_type_2").unwrap_or(BigInt::from(0)).to_u64();
+    let total_balance_changes = store.get_last("balance_changes").unwrap_or(BigInt::from(0)).to_u64();
+    let total_transfers = store.get_last("transfers").unwrap_or(BigInt::from(0)).to_u64();
+    let total_transfers_not_matched = store.get_last("transfers_not_matched").unwrap_or(BigInt::from(0)).to_u64();
+    let mut total_valid_rate = BigDecimal::from(1);
+
+    if total_transfers > 0 {
+        total_valid_rate = total_valid_rate - BigDecimal::from(total_transfers_not_matched) / BigDecimal::from(total_transfers);
     }
 
     Ok(BalanceChangeStats {
-        type0_count: store.get_last("type0").unwrap_or(BigInt::from(0)).to_u64(),
-        type1_count: type_1.to_u64(),
-        type2_count: type_2.to_u64(),
-        total_count: total.to_u64(),
+        // current
+        current_type1_balance_changes,
+        current_type2_balance_changes,
+        current_balance_changes,
+        current_transfers,
+        current_transfers_not_matched,
+        current_valid_rate: current_valid_rate.to_string(),
+
+        // total
+        total_type1_balance_changes,
+        total_type2_balance_changes,
+        total_balance_changes,
+        total_transfers,
+        total_transfers_not_matched,
+        total_valid_rate: total_valid_rate.to_string(),
+
+        // block
         block_number: clock.number,
-        valid_rate: valid_rate.to_string(),
+        timestamp: clock.timestamp,
     })
 }

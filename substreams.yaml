@@ -12,7 +12,7 @@ imports:
 binaries:
   default:
     type: wasm/rust-v1
-    file: target/wasm32-unknown-unknown/release/erc20.wasm
+    file: target/wasm32-unknown-unknown/release/erc20_balance_changes.wasm
 
 protobuf:
   files:
@@ -27,7 +27,6 @@ modules:
   - name: map_events
     kind: map
     doc: Extracts ERC20 balance changes & transfers
-    initialBlock: 18005744
     inputs:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
@@ -52,6 +51,7 @@ modules:
 
   - name: store_valid_balance_changes
     kind: store
+    initialBlock: 18005744
     updatePolicy: add
     valueType: bigint
     inputs:
@@ -59,8 +59,10 @@ modules:
 
   - name: balance_change_stats
     kind: map
+    initialBlock: 18005744
     inputs:
       - source: sf.substreams.v1.Clock
+      - map: map_events
       - store: store_valid_balance_changes
     output:
       type: proto:erc20.types.v1.BalanceChangeStats

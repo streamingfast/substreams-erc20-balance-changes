@@ -76,11 +76,23 @@ message Transfer {
 }
 
 message BalanceChangeStats {
-  uint64 type0_count = 1;
-  uint64 type1_count = 2;
-  uint64 type2_count = 3;
+  // current
+  uint64 current_type1_balance_changes = 1;
+  uint64 current_type2_balance_changes = 2;
+  uint64 current_balance_changes = 3;
+  uint64 current_transfers = 4;
+  uint64 current_transfers_not_matched = 5;
+  string current_valid_rate = 6;
 
-  uint64 total_count = 42;
-  string valid_rate = 43;
+  // total
+  uint64 total_type1_balance_changes = 10;
+  uint64 total_type2_balance_changes = 11;
+  uint64 total_balance_changes = 12;
+  uint64 total_transfers = 13;
+  uint64 total_transfers_not_matched = 14;
+  string total_valid_rate = 15;
+
+  // block
   uint64 block_number = 99;
+  google.protobuf.Timestamp timestamp = 100;
 }

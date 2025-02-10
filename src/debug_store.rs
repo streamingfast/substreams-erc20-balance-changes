@@ -7,38 +7,39 @@ use substreams::store::StoreNew;
 
 #[substreams::handlers::store]
 pub fn store_valid_balance_changes(events: Events, store: StoreAddBigInt) {
-    let mut type0_counter : u64 = 0;
-    let mut type1_counter : u64 = 0;
-    let mut type2_counter : u64 = 0;
-    let mut total_counter : u64 = 0;
+    let mut balance_changes_type_1 : u64 = 0;
+    let mut balance_changes_type_2 : u64 = 0;
+    let mut balance_changes: u64 = 0;
+    let mut transfers : u64 = 0;
+    let mut transfers_not_matched : u64 = 0;
 
-    let mut calls = HashSet::new();
+    let mut logs = HashSet::new();
     for change in events.balance_changes {
-        let key = format!("{}:{}", change.transaction_id, change.call_index);
-        calls.insert(key);
+        let key = format!("{}:{}", change.transaction_id, change.log_index);
+        logs.insert(key);
+        balance_changes += 1;
         match change.change_type {
             1 => {
-                type1_counter += 1;
-                total_counter += 1;
+                balance_changes_type_1 += 1;
             },
             2 => {
-                type2_counter += 1;
-                total_counter += 1;
+                balance_changes_type_2 += 1;
             },
             _ => {}
         }
     }
     // transfers that do not match any balance changes (type0)
     for transfer in events.transfers {
-        let key = format!("{}:{}", transfer.transaction_id, transfer.call_index);
-        if calls.contains(&key) {
-            type0_counter += 1;
-            total_counter += 1;
+        let key = format!("{}:{}", transfer.transaction_id, transfer.log_index);
+        if !logs.contains(&key) {
+            transfers_not_matched += 1;
         }
+        transfers += 1;
     }
 
-    store.add(0, "type1", BigInt::from(type1_counter));
-    store.add(0, "type2", BigInt::from(type2_counter));
-    store.add(0, "type0", BigInt::from(type0_counter));
-    store.add(0, "total", BigInt::from(total_counter));
+    store.add(0, "balance_changes_type_1", BigInt::from(balance_changes_type_1));
+    store.add(0, "balance_changes_type_2", BigInt::from(balance_changes_type_2));
+    store.add(0, "balance_changes", BigInt::from(balance_changes));
+    store.add(0, "transfers", BigInt::from(transfers));
+    store.add(0, "transfers_not_matched", BigInt::from(transfers_not_matched));
 }

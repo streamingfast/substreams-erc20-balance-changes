@@ -185,10 +185,10 @@ fn find_erc20_balance_changes_algorithm1(
         {
             Some(address) => address,
             None => {
-                if storage_change.key[0..16] == ZERO_STORAGE_PREFIX {
-                    info!("Skipping balance change for zero key");
-                    continue;
-                }
+                // if storage_change.key[0..16] == ZERO_STORAGE_PREFIX {
+                //     info!("Skipping balance change for zero key");
+                //     continue;
+                // }
 
                 info!(
                     "No keccak address found for key: {}, address {}",
