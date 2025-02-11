@@ -63,7 +63,7 @@ pub fn balance_change_stats(clock: Clock, events: Events, store: StoreGetBigInt)
         current_balance_changes,
         current_transfers,
         current_transfers_not_matched,
-        current_valid_rate: current_valid_rate.to_string(),
+        current_valid_rate: current_valid_rate.with_prec(4).to_string(),
 
         // total
         total_type1_balance_changes,
@@ -71,7 +71,7 @@ pub fn balance_change_stats(clock: Clock, events: Events, store: StoreGetBigInt)
         total_balance_changes,
         total_transfers,
         total_transfers_not_matched,
-        total_valid_rate: total_valid_rate.to_string(),
+        total_valid_rate: total_valid_rate.with_prec(4).to_string(),
 
         // block
         block_number: clock.number,
