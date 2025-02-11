@@ -1,8 +1,7 @@
 use crate::abi::{self};
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
-use crate::utils::{clock_to_date, compute_keccak_address_map, erc20_is_valid_address, get_all_child_calls, index_to_version, StorageKeyToAddressMap};
+use crate::utils::{clock_to_date, compute_keccak_address_map, get_all_child_calls, get_owner_from_keccak_address_map, index_to_version, is_erc20_valid_address, is_erc20_valid_balance, StorageKeyToAddressMap};
 use abi::erc20::events::Transfer as TransferAbi;
-use hex_literal::hex;
 use substreams::errors::Error;
 use substreams::log::info;
 use substreams::scalar::BigInt;
@@ -10,9 +9,6 @@ use substreams::Hex;
 use substreams::pb::substreams::Clock;
 use substreams_ethereum::pb::eth::v2::{Block, Call, Log, StorageChange, TransactionTrace, TransactionTraceStatus};
 use substreams_ethereum::Event;
-
-// const NULL_ADDRESS: [u8; 20] = hex!("0000000000000000000000000000000000000000");
-const ZERO_STORAGE_PREFIX: [u8; 16] = hex!("00000000000000000000000000000000");
 
 #[substreams::handlers::map]
 pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
@@ -112,7 +108,6 @@ pub fn iter_transfers(block: Block) -> Vec<(TransactionTrace, Call, Log, Transfe
             if call.state_reverted {
                 continue;
             }
-
             for log in call.logs.iter() {
                 let transfer = match TransferAbi::match_and_decode(log) {
                     Some(transfer) => transfer,
@@ -159,52 +154,26 @@ fn find_erc20_balance_changes_algorithm1(
     let mut out = Vec::new();
 
     for storage_change in &call.storage_changes {
-        let old_balance = BigInt::from_signed_bytes_be(&storage_change.old_value);
-        let new_balance = BigInt::from_signed_bytes_be(&storage_change.new_value);
-
-        let balance_change = new_balance - old_balance;
-        let balance_change_abs = if balance_change < BigInt::zero() {
-            balance_change.neg()
-        } else {
-            balance_change
-        };
-
-        let value = transfer.value.clone();
-        let transfer_value_abs = if value.clone() < BigInt::zero() {
-            value.neg()
-        } else {
-            value.clone()
-        };
-
-        // balance change matches transfer value
-        // allow 1 wei difference
-        // https://github.com/streamingfast/substreams-erc20-balance-changes/issues/14
-        if balance_change_abs != transfer_value_abs && balance_change_abs != &transfer_value_abs - BigInt::one() && balance_change_abs != &transfer_value_abs + BigInt::one() {
-            info!("Algo1: Balance change does not match transfer value. Balance change: {}, transfer value: {}", balance_change_abs, transfer_value_abs);
+        // Check if the transfer matches the storage change balance changes
+        if !is_erc20_valid_balance(transfer, storage_change) {
             continue;
         }
 
-        let keccak_address = match keccak_address_map.get(&storage_change.key) {
+        // extract the owner address
+        let owner = match get_owner_from_keccak_address_map(keccak_address_map, &storage_change) {
             Some(address) => address,
-            None => {
-                if storage_change.key[0..16] == ZERO_STORAGE_PREFIX {
-                    info!("Algo1: Skipping balance change for zero key");
-                    continue;
-                }
-                info!("Algo1: No keccak address found for key: {}, address {}", Hex(&storage_change.key), Hex(&call.address));
-                continue;
-            }
+            None => continue
         };
 
-        if !erc20_is_valid_address(keccak_address, transfer) {
-            info!("Algo1: Keccak address does not match transfer address. Keccak address: {}, sender address: {}, receiver address: {}", Hex(keccak_address), Hex(&transfer.from), Hex(&transfer.to));
+        // make sure owner is either the sender or receiver
+        if !is_erc20_valid_address(&owner, transfer) {
+            info!("owner={} does not match transfer from={} to={}", Hex(owner), Hex(&transfer.from), Hex(&transfer.to));
             continue;
         }
         out.push(storage_change.clone());
     }
     out
 }
-
 
 // algorithm #2 (case where storage changes are not in the same call as the transfer event)
 fn find_erc20_balance_changes_algorithm2(
@@ -219,19 +188,19 @@ fn find_erc20_balance_changes_algorithm2(
     for call in child_calls.iter() {
         storage_changes.extend(call.storage_changes.clone());
     }
-    info!("Algo2: Found {} storage changes. from={} to={} value={}", storage_changes.len(), Hex(&transfer.from), Hex(&transfer.to), transfer.value);
 
     let mut total_sent = BigInt::zero();
     let mut total_received = BigInt::zero();
 
     //check if any of the storage changes match the transfer.to or transfer.from
     for storage_change in storage_changes.clone().iter() {
-        let keccak_address = match keccak_address_map.get(&storage_change.key) {
+        let owner = match get_owner_from_keccak_address_map(keccak_address_map, &storage_change) {
             Some(address) => address,
-            None => continue,
+            None => continue
         };
 
-        if !erc20_is_valid_address(keccak_address, transfer) {
+        if !is_erc20_valid_address(&owner, transfer) {
+            info!("owner={} does not match transfer from={} to={}", Hex(owner), Hex(&transfer.from), Hex(&transfer.to));
             continue;
         }
 
@@ -259,20 +228,16 @@ fn find_erc20_balance_changes_algorithm2(
 
     // look for a storage change that matches the diff
     for storage_change in storage_changes.iter() {
-        let keccak_address = match keccak_address_map.get(&storage_change.key) {
+
+        // Check if the transfer matches the storage change balance changes
+        let owner = match get_owner_from_keccak_address_map(keccak_address_map, &storage_change) {
             Some(address) => address,
-            None => {
-                if storage_change.key[0..16] == ZERO_STORAGE_PREFIX {
-                    info!("Algo2: Skipping balance change for zero key");
-                    continue;
-                }
-                info!("Algo2: No keccak address found for key={}, from={} to={} value={}", Hex(&storage_change.key), Hex(&transfer.from), Hex(&transfer.to), transfer.value);
-                continue;
-            }
+            None => continue
         };
 
-        if !erc20_is_valid_address(keccak_address, transfer) {
-            info!("Algo2: Keccak address does not match transfer address. keccak_address={} from={} to={} value={}", Hex(keccak_address), Hex(&transfer.from), Hex(&transfer.to), transfer.value);
+        // make sure owner is either the sender or receiver
+        if !is_erc20_valid_address(&owner, transfer) {
+            info!("owner={} does not match transfer from={} to={}", Hex(owner), Hex(&transfer.from), Hex(&transfer.to));
             continue;
         }
 
