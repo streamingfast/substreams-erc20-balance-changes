@@ -93,7 +93,11 @@ pub fn map_balance_changes(clock: &Clock, balance_changes: Vec<(TransactionTrace
             owner: Hex::encode(owner),
             old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
             new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
-            amount: transfer.value.to_string(),
+
+            // -- transfer --
+            from: Hex::encode(&transfer.from),
+            to: Hex::encode(&transfer.to),
+            value: transfer.value.to_string(),
 
             // -- debug --
             change_type: change_type as i32,

@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use substreams::{errors::Error, log, pb::substreams::Clock, scalar::{BigDecimal, BigInt}, store::{StoreGet, StoreGetBigInt}};
 
-use crate::pb::erc20::types::v1::{BalanceChangeStats, Events};
+use crate::pb::erc20::types::v1::{BalanceChangeStat, BalanceChangeStats, Events};
 
 #[substreams::handlers::map]
 pub fn balance_change_stats(clock: Clock, events: Events, store: StoreGetBigInt) -> Result<BalanceChangeStats, Error> {
@@ -58,20 +58,24 @@ pub fn balance_change_stats(clock: Clock, events: Events, store: StoreGetBigInt)
 
     Ok(BalanceChangeStats {
         // current
-        current_type1_balance_changes,
-        current_type2_balance_changes,
-        current_balance_changes,
-        current_transfers,
-        current_transfers_not_matched,
-        current_valid_rate: current_valid_rate.with_prec(4).to_string(),
+        current: Some(BalanceChangeStat {
+            type1_balance_changes: current_type1_balance_changes,
+            type2_balance_changes: current_type2_balance_changes,
+            balance_changes: current_balance_changes,
+            transfers: current_transfers,
+            transfers_not_matched: current_transfers_not_matched,
+            valid_rate: current_valid_rate.with_prec(4).to_string(),
+        }),
 
         // total
-        total_type1_balance_changes,
-        total_type2_balance_changes,
-        total_balance_changes,
-        total_transfers,
-        total_transfers_not_matched,
-        total_valid_rate: total_valid_rate.with_prec(4).to_string(),
+        total: Some(BalanceChangeStat {
+            type1_balance_changes: total_type1_balance_changes,
+            type2_balance_changes: total_type2_balance_changes,
+            balance_changes: total_balance_changes,
+            transfers: total_transfers,
+            transfers_not_matched: total_transfers_not_matched,
+            valid_rate: total_valid_rate.with_prec(4).to_string(),
+        }),
 
         // block
         block_number: clock.number,

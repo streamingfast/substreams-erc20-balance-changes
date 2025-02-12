@@ -47,10 +47,14 @@ message BalanceChange {
   string owner = 21;
   string old_balance = 22;
   string new_balance = 23;
-  string amount = 24; // difference between old_balance and new_balance
+
+  // -- transfer --
+  string from = 25;
+  string to = 26;
+  string value = 27;
 
   // -- debug --
-  int32 change_type = 25; // type enum isn't supported yet as a leaf node
+  int32 change_type = 99; // type enum isn't supported yet as a leaf node
 }
 
 message Transfer {
@@ -81,23 +85,19 @@ message Transfer {
 }
 
 message BalanceChangeStats {
-  // current
-  uint64 current_type1_balance_changes = 1;
-  uint64 current_type2_balance_changes = 2;
-  uint64 current_balance_changes = 3;
-  uint64 current_transfers = 4;
-  uint64 current_transfers_not_matched = 5;
-  string current_valid_rate = 6;
-
-  // total
-  uint64 total_type1_balance_changes = 10;
-  uint64 total_type2_balance_changes = 11;
-  uint64 total_balance_changes = 12;
-  uint64 total_transfers = 13;
-  uint64 total_transfers_not_matched = 14;
-  string total_valid_rate = 15;
+  BalanceChangeStat current = 1;
+  BalanceChangeStat total = 2;
 
   // block
   uint64 block_number = 99;
   google.protobuf.Timestamp timestamp = 100;
+}
+
+message BalanceChangeStat {
+  uint64 type1_balance_changes = 1;
+  uint64 type2_balance_changes = 2;
+  uint64 balance_changes = 3;
+  uint64 transfers = 4;
+  uint64 transfers_not_matched = 5;
+  string valid_rate = 6;
 }

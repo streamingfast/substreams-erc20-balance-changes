@@ -29,5 +29,12 @@ type BalanceChange @entity {
     old_balance: String!
     new_balance: String!
     amount: String!
+
+    # -- transfer --
+    from: String!
+    to: String!
+    value: Int!
+
+    # -- debug --
     change_type: Int!
 }

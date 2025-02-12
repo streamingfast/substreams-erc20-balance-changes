@@ -60,13 +60,17 @@ pub struct BalanceChange {
     pub old_balance: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
-    /// difference between old_balance and new_balance
-    #[prost(string, tag="24")]
-    pub amount: ::prost::alloc::string::String,
+    /// -- transfer --
+    #[prost(string, tag="25")]
+    pub from: ::prost::alloc::string::String,
+    #[prost(string, tag="26")]
+    pub to: ::prost::alloc::string::String,
+    #[prost(string, tag="27")]
+    pub value: ::prost::alloc::string::String,
     /// -- debug --
     ///
     /// type enum isn't supported yet as a leaf node
-    #[prost(int32, tag="25")]
+    #[prost(int32, tag="99")]
     pub change_type: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -115,37 +119,31 @@ pub struct Transfer {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BalanceChangeStats {
-    /// current
-    #[prost(uint64, tag="1")]
-    pub current_type1_balance_changes: u64,
-    #[prost(uint64, tag="2")]
-    pub current_type2_balance_changes: u64,
-    #[prost(uint64, tag="3")]
-    pub current_balance_changes: u64,
-    #[prost(uint64, tag="4")]
-    pub current_transfers: u64,
-    #[prost(uint64, tag="5")]
-    pub current_transfers_not_matched: u64,
-    #[prost(string, tag="6")]
-    pub current_valid_rate: ::prost::alloc::string::String,
-    /// total
-    #[prost(uint64, tag="10")]
-    pub total_type1_balance_changes: u64,
-    #[prost(uint64, tag="11")]
-    pub total_type2_balance_changes: u64,
-    #[prost(uint64, tag="12")]
-    pub total_balance_changes: u64,
-    #[prost(uint64, tag="13")]
-    pub total_transfers: u64,
-    #[prost(uint64, tag="14")]
-    pub total_transfers_not_matched: u64,
-    #[prost(string, tag="15")]
-    pub total_valid_rate: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="1")]
+    pub current: ::core::option::Option<BalanceChangeStat>,
+    #[prost(message, optional, tag="2")]
+    pub total: ::core::option::Option<BalanceChangeStat>,
     /// block
     #[prost(uint64, tag="99")]
     pub block_number: u64,
     #[prost(message, optional, tag="100")]
     pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BalanceChangeStat {
+    #[prost(uint64, tag="1")]
+    pub type1_balance_changes: u64,
+    #[prost(uint64, tag="2")]
+    pub type2_balance_changes: u64,
+    #[prost(uint64, tag="3")]
+    pub balance_changes: u64,
+    #[prost(uint64, tag="4")]
+    pub transfers: u64,
+    #[prost(uint64, tag="5")]
+    pub transfers_not_matched: u64,
+    #[prost(string, tag="6")]
+    pub valid_rate: ::prost::alloc::string::String,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
