@@ -42,6 +42,8 @@ pub fn map_transfers(clock: &Clock, transfers: Vec<(TransactionTrace, Call, Log,
             log_index: log.index,
             log_block_index: log.block_index,
             log_ordinal: log.ordinal,
+            data: Hex::encode(&log.data),
+            topic0: Hex::encode(&log.topics[0]),
 
             // -- transfer --
             contract: Hex::encode(&call.address),
@@ -53,11 +55,11 @@ pub fn map_transfers(clock: &Clock, transfers: Vec<(TransactionTrace, Call, Log,
     events
 }
 
-pub fn map_balance_changes(clock: &Clock, balance_changes: Vec<(TransactionTrace, Call, Log, TransferAbi, StorageChange, BalanceChangeType)>) -> Vec<BalanceChange> {
+pub fn map_balance_changes(clock: &Clock, balance_changes: Vec<(TransactionTrace, Call, Log, TransferAbi, Vec<u8>, StorageChange, BalanceChangeType)>) -> Vec<BalanceChange> {
     let mut events = Vec::new();
     let mut index = 0; // incrementing index for each balance change
 
-    for (trx, call, log, transfer, storage_change, change_type) in balance_changes {
+    for (trx, call, log, transfer, owner, storage_change, change_type) in balance_changes {
         events.push(BalanceChange {
             // -- block --
             block_num: clock.number,
@@ -79,6 +81,7 @@ pub fn map_balance_changes(clock: &Clock, balance_changes: Vec<(TransactionTrace
             // -- storage change --
             storage_key: Hex::encode(&storage_change.key),
             storage_ordinal: storage_change.ordinal,
+            storage_address: Hex::encode(&storage_change.address),
 
             // -- indexing --
             index,
@@ -86,10 +89,12 @@ pub fn map_balance_changes(clock: &Clock, balance_changes: Vec<(TransactionTrace
 
             // -- balance change --
             contract: Hex::encode(&call.address),
-            owner: Hex::encode(storage_change.key),
+            owner: Hex::encode(owner),
             old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
             new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
             amount: transfer.value.to_string(),
+
+            // -- debug --
             change_type: change_type as i32,
         });
         index += 1;
@@ -123,7 +128,7 @@ pub fn iter_transfers(block: Block) -> Vec<(TransactionTrace, Call, Log, Transfe
     out
 }
 
-pub fn iter_balance_changes(transfers: Vec<(TransactionTrace, Call, Log, TransferAbi)>) -> Vec<(TransactionTrace, Call, Log, TransferAbi, StorageChange, BalanceChangeType)> {
+pub fn iter_balance_changes(transfers: Vec<(TransactionTrace, Call, Log, TransferAbi)>) -> Vec<(TransactionTrace, Call, Log, TransferAbi, Vec<u8>, StorageChange, BalanceChangeType)> {
     let mut out = Vec::new();
 
     // We memoize the keccak address map by call because it is expensive to compute
@@ -132,14 +137,14 @@ pub fn iter_balance_changes(transfers: Vec<(TransactionTrace, Call, Log, Transfe
 
     for (trx, call, log, transfer) in transfers {
         // algorithm #1 (normal case)
-        for storage_changes in find_erc20_balance_changes_algorithm1(&call, &transfer, &keccak_address_map) {
-            out.push((trx.clone(), call.clone(), log.clone(), transfer.clone(), storage_changes, BalanceChangeType::BalanceChangeType1));
+        for (owner, storage_changes) in find_erc20_balance_changes_algorithm1(&call, &transfer, &keccak_address_map) {
+            out.push((trx.clone(), call.clone(), log.clone(), transfer.clone(), owner, storage_changes, BalanceChangeType::BalanceChangeType1));
         }
 
         // algorithm #2 (case where storage changes are not in the same call as the transfer event)
         let child_calls = get_all_child_calls(&call, &trx);
-        for storage_changes in find_erc20_balance_changes_algorithm2(child_calls, &transfer, &keccak_address_map) {
-            out.push((trx.clone(), call.clone(), log.clone(), transfer.clone(), storage_changes, BalanceChangeType::BalanceChangeType2));
+        for (owner, storage_changes) in find_erc20_balance_changes_algorithm2(child_calls, &transfer, &keccak_address_map) {
+            out.push((trx.clone(), call.clone(), log.clone(), transfer.clone(), owner, storage_changes, BalanceChangeType::BalanceChangeType2));
         }
     }
     out
@@ -150,7 +155,7 @@ fn find_erc20_balance_changes_algorithm1(
     call: &Call,
     transfer: &TransferAbi,
     keccak_address_map: &StorageKeyToAddressMap,
-) -> Vec<StorageChange> {
+) -> Vec<(Vec<u8>, StorageChange)> {
     let mut out = Vec::new();
 
     for storage_change in &call.storage_changes {
@@ -170,7 +175,7 @@ fn find_erc20_balance_changes_algorithm1(
             info!("owner={} does not match transfer from={} to={}", Hex(owner), Hex(&transfer.from), Hex(&transfer.to));
             continue;
         }
-        out.push(storage_change.clone());
+        out.push((owner, storage_change.clone()));
     }
     out
 }
@@ -180,7 +185,7 @@ fn find_erc20_balance_changes_algorithm2(
     child_calls: Vec<Call>,
     transfer: &TransferAbi,
     keccak_address_map: &StorageKeyToAddressMap,
-) -> Vec<StorageChange> {
+) -> Vec<(Vec<u8>, StorageChange)> {
     let mut out = Vec::new();
 
     //get all storage changes for these calls:
@@ -214,7 +219,7 @@ fn find_erc20_balance_changes_algorithm2(
             total_received = total_received + balance_change;
         };
 
-        out.push(storage_change.clone());
+        out.push((owner, storage_change.clone()));
     }
 
     if total_sent == transfer.value {
@@ -254,7 +259,7 @@ fn find_erc20_balance_changes_algorithm2(
             continue;
         }
 
-        out.push(storage_change.clone());
+        out.push((owner, storage_change.clone()));
     }
 
     out

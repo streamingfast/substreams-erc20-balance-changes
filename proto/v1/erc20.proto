@@ -36,18 +36,21 @@ message BalanceChange {
   // -- storage change --
   string storage_key = 10;
   uint64 storage_ordinal = 11;
+  string storage_address = 12;
 
   // -- indexing --
-  uint32 index = 12; // incrementing index for ordering
-  uint64 version = 13; // version used as “ordering” argument (block_num << 32 + index)
+  uint32 index = 13; // incrementing index for ordering
+  uint64 version = 14; // version used as “ordering” argument (block_num << 32 + index)
 
   // -- balance change --
-  string contract = 14;
-  string owner = 15;
-  string old_balance = 16;
-  string new_balance = 17;
-  string amount = 18; // difference between old_balance and new_balance
-  int32 change_type = 19; // type enum isn't supported yet as a leaf node
+  string contract = 20;
+  string owner = 21;
+  string old_balance = 22;
+  string new_balance = 23;
+  string amount = 24; // difference between old_balance and new_balance
+
+  // -- debug --
+  int32 change_type = 25; // type enum isn't supported yet as a leaf node
 }
 
 message Transfer {
@@ -64,15 +67,17 @@ message Transfer {
   uint32 call_index = 6;
 
   // -- log --
-  uint32 log_index = 7; // Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
-  uint32 log_block_index = 8; // BlockIndex represents the index of the log relative to the Block.
-  uint64 log_ordinal = 9; // the block's global ordinal when the transfer was recorded.
+  uint32 log_index = 10; // Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
+  uint32 log_block_index = 11; // BlockIndex represents the index of the log relative to the Block.
+  uint64 log_ordinal = 12; // the block's global ordinal when the transfer was recorded.
+  string topic0 = 13;
+  string data = 14;
 
   // -- transfer --
-  string contract = 10;
-  string from = 11;
-  string to = 12;
-  string value = 13;
+  string contract = 20;
+  string from = 21;
+  string to = 22;
+  string value = 23;
 }
 
 message BalanceChangeStats {

@@ -41,28 +41,32 @@ pub struct BalanceChange {
     pub storage_key: ::prost::alloc::string::String,
     #[prost(uint64, tag="11")]
     pub storage_ordinal: u64,
+    #[prost(string, tag="12")]
+    pub storage_address: ::prost::alloc::string::String,
     /// -- indexing --
     ///
     /// incrementing index for ordering
-    #[prost(uint32, tag="12")]
+    #[prost(uint32, tag="13")]
     pub index: u32,
     /// version used as “ordering” argument (block_num << 32 + index)
-    #[prost(uint64, tag="13")]
+    #[prost(uint64, tag="14")]
     pub version: u64,
     /// -- balance change --
-    #[prost(string, tag="14")]
+    #[prost(string, tag="20")]
     pub contract: ::prost::alloc::string::String,
-    #[prost(string, tag="15")]
+    #[prost(string, tag="21")]
     pub owner: ::prost::alloc::string::String,
-    #[prost(string, tag="16")]
+    #[prost(string, tag="22")]
     pub old_balance: ::prost::alloc::string::String,
-    #[prost(string, tag="17")]
+    #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
     /// difference between old_balance and new_balance
-    #[prost(string, tag="18")]
+    #[prost(string, tag="24")]
     pub amount: ::prost::alloc::string::String,
+    /// -- debug --
+    ///
     /// type enum isn't supported yet as a leaf node
-    #[prost(int32, tag="19")]
+    #[prost(int32, tag="25")]
     pub change_type: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -86,22 +90,26 @@ pub struct Transfer {
     /// -- log --
     ///
     /// Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
-    #[prost(uint32, tag="7")]
+    #[prost(uint32, tag="10")]
     pub log_index: u32,
     /// BlockIndex represents the index of the log relative to the Block.
-    #[prost(uint32, tag="8")]
+    #[prost(uint32, tag="11")]
     pub log_block_index: u32,
     /// the block's global ordinal when the transfer was recorded.
-    #[prost(uint64, tag="9")]
+    #[prost(uint64, tag="12")]
     pub log_ordinal: u64,
-    /// -- transfer --
-    #[prost(string, tag="10")]
-    pub contract: ::prost::alloc::string::String,
-    #[prost(string, tag="11")]
-    pub from: ::prost::alloc::string::String,
-    #[prost(string, tag="12")]
-    pub to: ::prost::alloc::string::String,
     #[prost(string, tag="13")]
+    pub topic0: ::prost::alloc::string::String,
+    #[prost(string, tag="14")]
+    pub data: ::prost::alloc::string::String,
+    /// -- transfer --
+    #[prost(string, tag="20")]
+    pub contract: ::prost::alloc::string::String,
+    #[prost(string, tag="21")]
+    pub from: ::prost::alloc::string::String,
+    #[prost(string, tag="22")]
+    pub to: ::prost::alloc::string::String,
+    #[prost(string, tag="23")]
     pub value: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
