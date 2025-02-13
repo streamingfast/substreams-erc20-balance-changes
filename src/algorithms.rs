@@ -137,6 +137,16 @@ pub fn addresses_for_storage_keys(call: &Call) -> StorageKeyToAddressMap {
             continue;
         }
 
+        // Ignoring 0x000 null balance changes
+        //
+        // Burn Address:
+        // When tokens are “burned,” they are effectively sent to an address where no one has—or can ever have—the private key.
+        // By convention, the zero address is often used to signal “tokens have been removed from circulation.”
+        // ex: emit Transfer(holder, address(0), amount)
+        //
+        // Minting Source:
+        // Conversely, some implementations also use the zero address as the “source” when tokens are minted.
+        // ex: emit Transfer(address(0), recipient, amount);
         if &preimage[64..126] != "00000000000000000000000000000000000000000000000000000000000000" {
             log::info!("Skipping storage key {} with non-zero padding", storage_key);
             continue;
