@@ -60,7 +60,12 @@ pub fn map_balance_changes(clock: &Clock, balance_changes: Vec<(TransactionTrace
     let mut events = Vec::new();
     let mut index = 0; // incrementing index for each balance change
 
+
     for (trx, call, log, transfer, owner, storage_change, change_type) in balance_changes {
+        let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
+        let new_balance = BigInt::from_unsigned_bytes_be(&storage_change.new_value);
+        let amount = new_balance.clone() - old_balance.clone();
+
         events.push(BalanceChange {
             // -- block --
             block_num: clock.number,
@@ -91,8 +96,9 @@ pub fn map_balance_changes(clock: &Clock, balance_changes: Vec<(TransactionTrace
             // -- balance change --
             contract: Hex::encode(&call.address),
             owner: Hex::encode(owner),
-            old_balance: BigInt::from_unsigned_bytes_be(&storage_change.old_value).to_string(),
-            new_balance: BigInt::from_unsigned_bytes_be(&storage_change.new_value).to_string(),
+            old_balance: old_balance.to_string(),
+            new_balance: new_balance.to_string(),
+            amount: amount.to_string(),
 
             // -- transfer --
             from: Hex::encode(&transfer.from),

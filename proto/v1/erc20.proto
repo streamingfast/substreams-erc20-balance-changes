@@ -47,6 +47,7 @@ message BalanceChange {
   string owner = 21;
   string old_balance = 22;
   string new_balance = 23;
+  string amount = 24; // delta between old and new balance
 
   // -- transfer --
   string from = 25;
