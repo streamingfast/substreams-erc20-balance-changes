@@ -38,10 +38,6 @@ message BalanceChange {
   uint64 storage_ordinal = 11;
   string storage_address = 12;
 
-  // -- indexing --
-  uint32 index = 13; // incrementing index for ordering
-  uint64 version = 14; // version used as “ordering” argument (block_num << 32 + index)
-
   // -- balance change --
   string contract = 20;
   string owner = 21;

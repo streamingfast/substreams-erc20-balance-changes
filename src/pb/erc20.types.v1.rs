@@ -43,14 +43,6 @@ pub struct BalanceChange {
     pub storage_ordinal: u64,
     #[prost(string, tag="12")]
     pub storage_address: ::prost::alloc::string::String,
-    /// -- indexing --
-    ///
-    /// incrementing index for ordering
-    #[prost(uint32, tag="13")]
-    pub index: u32,
-    /// version used as “ordering” argument (block_num << 32 + index)
-    #[prost(uint64, tag="14")]
-    pub version: u64,
     /// -- balance change --
     #[prost(string, tag="20")]
     pub contract: ::prost::alloc::string::String,

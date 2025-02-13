@@ -8,7 +8,7 @@ pub fn graph_out(events: Events) -> Result<EntityChanges, Error> {
     let mut tables = substreams_entity_change::tables::Tables::new();
 
     for balance_change in events.balance_changes {
-        let key = format!("{}:{}", balance_change.transaction_id, balance_change.index);
+        let key = format!("{}:{}", balance_change.transaction_id, balance_change.storage_ordinal);
         tables.create_row("BalanceChange", key)
             // -- block --
             .set_bigint("block_num", &balance_change.block_num.to_string())
@@ -33,10 +33,6 @@ pub fn graph_out(events: Events) -> Result<EntityChanges, Error> {
             // -- storage --
             .set("storage_key", balance_change.storage_key)
             .set_bigint("storage_ordinal", &balance_change.storage_ordinal.to_string())
-
-            // -- indexing --
-            .set_bigint("index", &balance_change.index.to_string())
-            .set_bigint("version", &balance_change.version.to_string())
 
             // -- balance change --
             .set("contract", balance_change.contract)
@@ -91,7 +87,7 @@ pub fn db_out(events: Events) -> Result<DatabaseChanges, Error> {
     for balance_change in events.balance_changes {
         tables.create_row("balance_changes", [
             ("transaction_id", (&balance_change).transaction_id.to_string()),
-            ("index", (&balance_change).index.to_string())
+            ("storage_ordinal", (&balance_change).storage_ordinal.to_string())
         ])
             // -- block --
             .set("block_num", &balance_change.block_num.to_string())
@@ -113,10 +109,6 @@ pub fn db_out(events: Events) -> Result<DatabaseChanges, Error> {
             // -- storage --
             .set("storage_key", balance_change.storage_key)
             .set("storage_ordinal", balance_change.storage_ordinal)
-
-            // -- indexing --
-            .set("index", &balance_change.index.to_string())
-            .set("version", &balance_change.version.to_string())
 
             // -- balance change --
             .set("contract", balance_change.contract)
