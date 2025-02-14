@@ -1,20 +1,18 @@
 specVersion: v0.1.0
 package:
   name: erc20_balance_changes
-  version: v1.4.0
+  version: v1.5.0
   url: https://github.com/streamingfast/substreams-erc20-balance-changes
-  doc: |
-    This Substreams extracts all ERC20/ERC721 transfers from Ethereum events for the full chain.
 
 imports:
   sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
-  entity: https://github.com/streamingfast/substreams-entity-change/releases/download/v1.1.0/substreams-entity-change-v1.1.0.spkg
-  database_change: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v1.2.0/substreams-database-change-v1.2.0.spkg
+  entity: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v2.0.0/substreams-entity-change-v2.0.0.spkg
+  database_change: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v2.0.0/substreams-database-change-v2.0.0.spkg
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: target/wasm32-unknown-unknown/release/erc20.wasm
+    file: target/wasm32-unknown-unknown/release/erc20_balance_changes.wasm
 
 protobuf:
   files:
@@ -25,62 +23,46 @@ protobuf:
     - sf/substreams
     - google
 
-
 modules:
-  - name: map_balance_changes
+  - name: map_events
     kind: map
-    doc: Extracts ERC20 balance changes
-    initialBlock: 1397553
+    doc: Extracts ERC20 balance changes & transfers
     inputs:
+      - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:erc20.types.v1.BalanceChanges
-
-  - name: map_valid_balance_changes
-    kind: map
-    doc: Extracts ERC20 balance changes
-    initialBlock: 1397553
-    inputs:
-      - map: map_balance_changes
-    output:
-      type: proto:erc20.types.v1.ValidBalanceChanges
-
-  - name: map_unknown_balance_changes
-    kind: map
-    initialBlock: 1397553
-    inputs:
-      - map: map_balance_changes
-    output:
-      type: proto:erc20.types.v1.UnknownBalanceChanges
+      type: proto:erc20.types.v1.Events
 
   - name: db_out
     kind: map
     inputs:
       - source: sf.substreams.v1.Clock
-      - map: map_balance_changes
+      - map: map_events
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 
   - name: graph_out
     kind: map
-    initialBlock: 1397553
     inputs:
       - source: sf.substreams.v1.Clock
-      - map: map_balance_changes
+      - map: map_events
     output:
       type: proto:sf.substreams.sink.entity.v1.EntityChanges
 
   - name: store_valid_balance_changes
     kind: store
+    initialBlock: 21525891 # 2025-01-01:00:00Z
     updatePolicy: add
     valueType: bigint
     inputs:
-      - map: map_balance_changes
+      - map: map_events
 
   - name: balance_change_stats
     kind: map
+    initialBlock: 21525891 # 2025-01-01:00:00Z
     inputs:
       - source: sf.substreams.v1.Clock
+      - map: map_events
       - store: store_valid_balance_changes
     output:
       type: proto:erc20.types.v1.BalanceChangeStats
