@@ -36,10 +36,9 @@ message BalanceChange {
   // -- storage change --
   string storage_key = 10;
   uint64 storage_ordinal = 11;
-  string storage_address = 12;
 
   // -- balance change --
-  string contract = 20;
+  string contract = 20; // storage_change.address
   string owner = 21;
   string old_balance = 22;
   string new_balance = 23;
@@ -69,6 +68,7 @@ message Transfer {
 
   // -- call --
   uint32 call_index = 6;
+  string call_address = 7; // may indicate the “to” or “from” in a lower-level call context, but is not the address that emitted the event.
 
   // -- log --
   uint32 log_index = 10; // Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
@@ -78,7 +78,7 @@ message Transfer {
   string data = 14;
 
   // -- transfer --
-  string contract = 20;
+  string contract = 20; // log.address
   string from = 21;
   string to = 22;
   string value = 23;

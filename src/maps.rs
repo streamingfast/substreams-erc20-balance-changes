@@ -9,7 +9,7 @@ use substreams::errors::Error;
 use substreams::pb::substreams::Clock;
 use substreams::scalar::BigInt;
 use substreams::Hex;
-use substreams_ethereum::pb::eth::v2::{Block, Call, StorageChange, TransactionTrace};
+use substreams_ethereum::pb::eth::v2::{Block, Call, Log, StorageChange, TransactionTrace};
 use substreams_ethereum::Event;
 
 #[substreams::handlers::map]
@@ -32,6 +32,7 @@ pub fn to_transfer(clock: &Clock, trx: &TransactionTrace, call: &Call, log: &Log
 
         // -- call --
         call_index: call.index,
+        call_address: Hex::encode(&call.address),
 
         // -- log --
         log_index: log.index,
@@ -41,7 +42,7 @@ pub fn to_transfer(clock: &Clock, trx: &TransactionTrace, call: &Call, log: &Log
         topic0: Hex::encode(&log.topics[0]),
 
         // -- transfer --
-        contract: Hex::encode(&call.address),
+        contract: Hex::encode(&log.address),
         from: Hex::encode(&transfer.from),
         to: Hex::encode(&transfer.to),
         value: transfer.value.to_string(),
@@ -74,10 +75,9 @@ pub fn to_balance_change(clock: &Clock, trx: &TransactionTrace, call: &Call, log
         // -- storage change --
         storage_key: Hex::encode(&storage_change.key),
         storage_ordinal: storage_change.ordinal,
-        storage_address: Hex::encode(&storage_change.address),
 
         // -- balance change --
-        contract: Hex::encode(&call.address),
+        contract: Hex::encode(&storage_change.address),
         owner: Hex::encode(owner),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),

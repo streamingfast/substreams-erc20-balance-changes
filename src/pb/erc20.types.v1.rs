@@ -41,9 +41,9 @@ pub struct BalanceChange {
     pub storage_key: ::prost::alloc::string::String,
     #[prost(uint64, tag="11")]
     pub storage_ordinal: u64,
-    #[prost(string, tag="12")]
-    pub storage_address: ::prost::alloc::string::String,
     /// -- balance change --
+    ///
+    /// storage_change.address
     #[prost(string, tag="20")]
     pub contract: ::prost::alloc::string::String,
     #[prost(string, tag="21")]
@@ -91,6 +91,9 @@ pub struct Transfer {
     /// -- call --
     #[prost(uint32, tag="6")]
     pub call_index: u32,
+    /// may indicate the “to” or “from” in a lower-level call context, but is not the address that emitted the event.
+    #[prost(string, tag="7")]
+    pub call_address: ::prost::alloc::string::String,
     /// -- log --
     ///
     /// Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
@@ -107,6 +110,8 @@ pub struct Transfer {
     #[prost(string, tag="14")]
     pub data: ::prost::alloc::string::String,
     /// -- transfer --
+    ///
+    /// log.address
     #[prost(string, tag="20")]
     pub contract: ::prost::alloc::string::String,
     #[prost(string, tag="21")]
