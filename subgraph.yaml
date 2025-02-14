@@ -1,6 +1,6 @@
 specVersion: 0.0.6
 description: ERC20 Ethereum Balance Changes (powered by Substreams)
-repository: https://github.com/streamingfast/substreams-erc20-balanace-changes.git
+repository: https://github.com/streamingfast/substreams-erc20-balance-changes
 schema:
   file: ./schema.graphql
 image: logo.png
@@ -12,7 +12,7 @@ dataSources:
     source:
       package:
         moduleName: graph_out
-        file: ./erc20-balance-changes-v1.2.0.spkg
+        file: ./erc20-balance-changes-v1.5.0.spkg
     mapping:
       kind: substreams/graph-entities
       apiVersion: 0.0.7

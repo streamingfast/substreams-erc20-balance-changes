@@ -2,3 +2,5 @@ target/
 *.spkg
 replay.log
 /.idea
+out/
+state.yaml
