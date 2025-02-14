@@ -2,9 +2,9 @@ type BalanceChange @entity {
     id: ID!
 
     # -- block --
-    timestamp: Timestamp!
     block_num: Int!
     block_hash: String!
+    timestamp: Timestamp!
     date: String!
 
     # -- transaction --
@@ -19,16 +19,14 @@ type BalanceChange @entity {
     log_ordinal: Int!
 
     # -- storage --
-    index: Int!
-    version: Int!
     storage_key: String!
 
     # -- balance change --
     contract: String!
     owner: String!
-    old_balance: String!
-    new_balance: String!
-    amount: String!
+    old_balance: Int!
+    new_balance: Int!
+    amount: Int!
 
     # -- transfer --
     from: String!
@@ -37,4 +35,48 @@ type BalanceChange @entity {
 
     # -- debug --
     change_type: Int!
+}
+
+type Balance @entity {
+    id: ID!
+
+    # -- block --
+    block_num: Int!
+    block_hash: String!
+    timestamp: Timestamp!
+    date: String!
+
+    # -- current balance --
+    contract: String!
+    owner: String!
+    balance: Int!
+}
+
+type Transfer @entity {
+    id: ID!
+
+    # -- block --
+    block_num: Int!
+    block_hash: String!
+    timestamp: Timestamp!
+    date: String!
+
+    # -- transaction --
+    transaction_id: String!
+
+    # -- call --
+    call_index: Int!
+
+    # -- log --
+    log_index: Int!
+    log_block_index: Int!
+    log_ordinal: Int!
+    topic0: String!
+    data: String!
+
+    # -- transfer --
+    contract: String!
+    from: String!
+    to: String!
+    value: Int!
 }

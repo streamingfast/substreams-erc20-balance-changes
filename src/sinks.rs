@@ -8,19 +8,21 @@ pub fn graph_out(events: Events) -> Result<EntityChanges, Error> {
     let mut tables = substreams_entity_change::tables::Tables::new();
 
     for balance_change in events.balance_changes {
-        let key = format!("{}:{}", balance_change.transaction_id, balance_change.storage_ordinal);
-        tables.create_row("BalanceChange", key)
+        tables.create_row("BalanceChange", format!("{}:{}",
+            &balance_change.transaction_id,
+            &balance_change.storage_ordinal
+        ))
             // -- block --
             .set_bigint("block_num", &balance_change.block_num.to_string())
-            .set("block_hash", balance_change.block_hash)
+            .set("block_hash", &balance_change.block_hash)
 
             // Timestamp support has been added in v0.36.0
             // https://github.com/graphprotocol/graph-node/releases/tag/v0.36.0
             .set("timestamp", balance_change.timestamp.expect("missing timestamp"))
-            .set("date", balance_change.date)
+            .set("date", &balance_change.date)
 
             // -- transaction --
-            .set("transaction_id", balance_change.transaction_id)
+            .set("transaction_id", &balance_change.transaction_id)
 
             // -- call --
             .set_bigint("call_index", &balance_change.call_index.to_string())
@@ -35,10 +37,11 @@ pub fn graph_out(events: Events) -> Result<EntityChanges, Error> {
             .set_bigint("storage_ordinal", &balance_change.storage_ordinal.to_string())
 
             // -- balance change --
-            .set("contract", balance_change.contract)
-            .set("owner", balance_change.owner)
+            .set("contract", &balance_change.contract)
+            .set("owner", &balance_change.owner)
             .set_bigint("old_balance", &balance_change.old_balance)
             .set_bigint("new_balance", &balance_change.new_balance)
+            .set_bigint("amount", &balance_change.amount)
 
             // -- transfer --
             .set("from", balance_change.from)
@@ -47,12 +50,29 @@ pub fn graph_out(events: Events) -> Result<EntityChanges, Error> {
 
             // -- debug --
             .set_bigint("change_type", &balance_change.change_type.to_string());
+
+        tables.create_row("Balance", format!("{}:{}",
+            balance_change.contract,
+            balance_change.owner
+        ))
+            // -- block --
+            .set_bigint("block_num", &balance_change.block_num.to_string())
+            .set("block_hash", &balance_change.block_hash)
+            .set("timestamp", balance_change.timestamp.expect("missing timestamp"))
+            .set("date", balance_change.date)
+
+            // -- current balance --
+            .set("contract", balance_change.contract)
+            .set("owner", balance_change.owner)
+            .set_bigint("balance", &balance_change.new_balance);
     }
 
 
     for transfer in events.transfers {
-        let key = format!("{}:{}", transfer.transaction_id, transfer.call_index);
-        tables.create_row("Transfer", key)
+        tables.create_row("Transfer", format!("{}:{}",
+            transfer.transaction_id,
+            transfer.log_index
+        ))
             // -- block --
             .set_bigint("block_num", &transfer.block_num.to_string())
             .set("block_hash", transfer.block_hash)
@@ -128,7 +148,7 @@ pub fn db_out(events: Events) -> Result<DatabaseChanges, Error> {
     for transfer in events.transfers {
         tables.create_row("transfers", [
             ("transaction_id", (&transfer).transaction_id.to_string()),
-            ("index", (&transfer).call_index.to_string())
+            ("log_index", (&transfer).log_index.to_string())
         ])
             // -- block --
             .set("block_num", &transfer.block_num.to_string())
