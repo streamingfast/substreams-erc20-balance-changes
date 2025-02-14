@@ -1,5 +1,6 @@
 use crate::abi::{self};
 use crate::algorithms::{addresses_for_storage_keys, find_erc20_balance_changes_algorithm1, find_erc20_balance_changes_algorithm2, get_all_child_calls, StorageKeyToAddressMap};
+use crate::algorithms_fishing::ignore_fishing_transfers;
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
 use crate::utils::{clock_to_date, index_to_version};
 use abi::erc20::events::Transfer as TransferAbi;
@@ -8,7 +9,7 @@ use substreams::errors::Error;
 use substreams::pb::substreams::Clock;
 use substreams::scalar::BigInt;
 use substreams::Hex;
-use substreams_ethereum::pb::eth::v2::{Block, Call, Log, StorageChange, TransactionTrace};
+use substreams_ethereum::pb::eth::v2::{Block, Call, StorageChange, TransactionTrace};
 use substreams_ethereum::Event;
 
 #[substreams::handlers::map]
@@ -107,6 +108,9 @@ pub fn insert_events(clock: &Clock, block: &Block, events: &mut Events) {
             let call = call_view.as_ref();
 
             // -- Transfer --
+            if ignore_fishing_transfers(trx, call) {
+                continue;
+            }
             let transfer = match TransferAbi::match_and_decode(log) {
                 Some(transfer) => transfer,
                 None => continue,

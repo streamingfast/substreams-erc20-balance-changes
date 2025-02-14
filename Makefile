@@ -32,7 +32,7 @@ run: build
 
 .PHONY: gui
 gui: build
-	substreams gui substreams.yaml balance_change_stats -e mainnet.eth.streamingfast.io:443 --production-mode --network eth -s 21838688 -t +1
+	substreams gui substreams.yaml balance_change_stats -e mainnet.eth.streamingfast.io:443 --production-mode --network eth -s 21841000 -t +1
 
 .PHONY: parquet
 parquet:
