@@ -1,7 +1,7 @@
 use crate::abi::{self};
 use crate::algorithms::{addresses_for_storage_keys, find_erc20_balance_changes_algorithm1, find_erc20_balance_changes_algorithm2, get_all_child_calls, StorageKeyToAddressMap};
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
-use crate::utils::clock_to_date;
+use crate::utils::{clock_to_date, index_to_version};
 use abi::erc20::events::Transfer as TransferAbi;
 use substreams::errors::Error;
 
@@ -86,6 +86,9 @@ pub fn to_balance_change(clock: &Clock, trx: &TransactionTrace, call: &Call, log
         from: Hex::encode(&transfer.from),
         to: Hex::encode(&transfer.to),
         value: transfer.value.to_string(),
+
+        // -- indexing --
+        version: index_to_version(clock, &storage_change),
 
         // -- debug --
         change_type: change_type as i32,

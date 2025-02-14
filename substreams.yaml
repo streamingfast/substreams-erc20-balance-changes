@@ -51,7 +51,7 @@ modules:
 
   - name: store_valid_balance_changes
     kind: store
-    initialBlock: 21525891
+    initialBlock: 21525891 # 2025-01-01:00:00Z
     updatePolicy: add
     valueType: bigint
     inputs:
@@ -59,7 +59,7 @@ modules:
 
   - name: balance_change_stats
     kind: map
-    initialBlock: 21525891
+    initialBlock: 21525891 # 2025-01-01:00:00Z
     inputs:
       - source: sf.substreams.v1.Clock
       - map: map_events

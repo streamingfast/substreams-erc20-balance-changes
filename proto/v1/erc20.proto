@@ -50,6 +50,9 @@ message BalanceChange {
   string to = 26;
   string value = 27;
 
+  // -- indexing --
+  uint64 version = 30; // latest version of the balance change (block_num << 32 + storage_ordinal)
+
   // -- debug --
   int32 change_type = 99; // type enum isn't supported yet as a leaf node
 }
