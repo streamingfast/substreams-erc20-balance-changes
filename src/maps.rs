@@ -103,6 +103,7 @@ pub fn insert_events(clock: &Clock, block: &Block, events: &mut Events) {
         for (log, call_view) in trx.logs_with_calls() {
             let call = call_view.as_ref();
 
+            // -- Transfer --
             let transfer = match TransferAbi::match_and_decode(log) {
                 Some(transfer) => transfer,
                 None => continue,
@@ -111,11 +112,14 @@ pub fn insert_events(clock: &Clock, block: &Block, events: &mut Events) {
                 continue;
             }
             events.transfers.push(to_transfer(&clock, &trx, &call, &log, &transfer));
-            keccak_address_map.extend(addresses_for_storage_keys(&call)); // memoize
 
+            // -- Balance Changes --
+            keccak_address_map.extend(addresses_for_storage_keys(&call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
             for (owner, storage_change, change_type) in balance_changes {
                 let balance_change = to_balance_change(clock, trx, call, log, &transfer, owner, &storage_change, change_type);
+
+                // insert balance change event
                 events.balance_changes.push(balance_change);
             }
 
