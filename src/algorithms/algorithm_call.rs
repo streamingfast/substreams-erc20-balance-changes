@@ -15,11 +15,6 @@ pub fn find_erc20_balance_changes_algorithm1(
     let mut out = Vec::new();
 
     for storage_change in &call.storage_changes {
-        // Check if the transfer matches the storage change balance changes
-        if !is_erc20_valid_balance(transfer, storage_change) {
-            continue;
-        }
-
         // extract the owner address
         let owner = match get_owner_from_keccak_address_map(keccak_address_map, &storage_change) {
             Some(address) => address,
@@ -31,7 +26,16 @@ pub fn find_erc20_balance_changes_algorithm1(
             log::info!("owner={} does not match transfer from={} to={}", Hex(owner), Hex(&transfer.from), Hex(&transfer.to));
             continue;
         }
-        out.push((owner, storage_change.clone(), BalanceChangeType::BalanceChangeType1));
+
+        // Check if the transfer matches the storage change balance changes
+        if is_erc20_valid_balance(transfer, storage_change) {
+            out.push((owner, storage_change.clone(), BalanceChangeType::BalanceChangeType1));
+
+        // Storage Change does not match the transfer value, but does match owner address
+        // Could result as a Scaled Balance Change
+        } else {
+            out.push((owner, storage_change.clone(), BalanceChangeType::Unspecified));
+        }
     }
     out
 }
