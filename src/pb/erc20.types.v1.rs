@@ -105,10 +105,6 @@ pub struct Transfer {
     /// the block's global ordinal when the transfer was recorded.
     #[prost(uint64, tag="12")]
     pub log_ordinal: u64,
-    #[prost(string, tag="13")]
-    pub topic0: ::prost::alloc::string::String,
-    #[prost(string, tag="14")]
-    pub data: ::prost::alloc::string::String,
     /// -- transfer --
     ///
     /// log.address
@@ -149,6 +145,39 @@ pub struct BalanceChangeStat {
     pub transfers_not_matched: u64,
     #[prost(string, tag="6")]
     pub valid_rate: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct StorageChange {
+    /// -- block --
+    #[prost(uint64, tag="1")]
+    pub block_num: u64,
+    #[prost(string, tag="2")]
+    pub block_hash: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="3")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(string, tag="4")]
+    pub date: ::prost::alloc::string::String,
+    /// -- transaction --
+    #[prost(string, tag="5")]
+    pub transaction_id: ::prost::alloc::string::String,
+    /// -- call --
+    #[prost(uint32, tag="6")]
+    pub call_index: u32,
+    /// may indicate the “to” or “from” in a lower-level call context, but is not the address that emitted the event.
+    #[prost(string, tag="7")]
+    pub call_address: ::prost::alloc::string::String,
+    /// -- log --
+    ///
+    /// Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
+    #[prost(uint32, tag="10")]
+    pub log_index: u32,
+    /// BlockIndex represents the index of the log relative to the Block.
+    #[prost(uint32, tag="11")]
+    pub log_block_index: u32,
+    /// the block's global ordinal when the transfer was recorded.
+    #[prost(uint64, tag="12")]
+    pub log_ordinal: u64,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

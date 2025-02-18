@@ -1,6 +1,8 @@
 use crate::abi::{self};
-use crate::algorithms::{addresses_for_storage_keys, find_erc20_balance_changes_algorithm1, find_erc20_balance_changes_algorithm2, get_all_child_calls, StorageKeyToAddressMap};
-use crate::algorithms_fishing::ignore_fishing_transfers;
+use crate::algorithms::algorithm_call::find_erc20_balance_changes_algorithm1;
+use crate::algorithms::algorithm_child_calls::{find_erc20_balance_changes_algorithm2, get_all_child_calls};
+use crate::algorithms::fishing::ignore_fishing_transfers;
+use crate::algorithms::utils::{addresses_for_storage_keys, StorageKeyToAddressMap};
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
 use crate::utils::{clock_to_date, index_to_version};
 use abi::erc20::events::Transfer as TransferAbi;
@@ -38,8 +40,6 @@ pub fn to_transfer(clock: &Clock, trx: &TransactionTrace, call: &Call, log: &Log
         log_index: log.index,
         log_block_index: log.block_index,
         log_ordinal: log.ordinal,
-        data: Hex::encode(&log.data),
-        topic0: Hex::encode(&log.topics[0]),
 
         // -- transfer --
         contract: Hex::encode(&log.address),
@@ -138,14 +138,14 @@ pub fn iter_balance_changes_algorithms(trx: &TransactionTrace, call: &Call, tran
     let mut out = Vec::new();
 
     // algorithm #1 (normal case)
-    for (owner, storage_changes) in find_erc20_balance_changes_algorithm1(&call, &transfer, &keccak_address_map) {
-        out.push(( owner, storage_changes, BalanceChangeType::BalanceChangeType1));
+    for (owner, storage_changes, change_type) in find_erc20_balance_changes_algorithm1(&call, &transfer, &keccak_address_map) {
+        out.push(( owner, storage_changes, change_type));
     }
 
     // algorithm #2 (case where storage changes are not in the same call as the transfer event)
     let child_calls = get_all_child_calls(&call, &trx);
-    for (owner, storage_changes) in find_erc20_balance_changes_algorithm2(child_calls, &transfer, &keccak_address_map) {
-        out.push(( owner, storage_changes, BalanceChangeType::BalanceChangeType2));
+    for (owner, storage_changes, change_type) in find_erc20_balance_changes_algorithm2(child_calls, &transfer, &keccak_address_map) {
+        out.push(( owner, storage_changes, change_type));
     }
     out
 }

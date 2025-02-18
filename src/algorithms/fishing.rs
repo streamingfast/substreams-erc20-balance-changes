@@ -1,7 +1,7 @@
 use substreams::log::info;
 use substreams_ethereum::pb::eth::v2::{Call, TransactionTrace};
 
-use crate::algorithms::get_all_child_calls;
+use crate::algorithms::algorithm_child_calls::get_all_child_calls;
 
 // Ignore fishing token transfers, typically do not have any storage changes associated with them or child calls
 // https://github.com/streamingfast/substreams-erc20-balance-changes/issues/18

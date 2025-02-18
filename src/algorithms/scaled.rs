@@ -1,6 +1,7 @@
-use std::str::FromStr;
-
 use substreams::scalar::BigInt;
+
+// Aave
+// https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/tokenization/base/ScaledBalanceTokenBase.sol
 
 /// Compute the actual token balance from a scaled balance and the liquidity index.
 /// Both `scaled_balance` and `liquidity_index` are in RAY precision (1e27).
@@ -13,6 +14,7 @@ pub fn compute_balance(scaled_balance: BigInt, liquidity_index: BigInt) -> BigIn
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::str::FromStr;
 
     #[test]
     fn test_zero_balance() {
