@@ -49,7 +49,7 @@ pub fn graph_out(events: Events) -> Result<EntityChanges, Error> {
             .set_bigint("value", &balance_change.value)
 
             // -- debug --
-            .set_bigint("change_type", &balance_change.change_type.to_string());
+            .set_bigint("balance_change_type", &balance_change.balance_change_type.to_string());
 
         tables.create_row("Balance", format!("{}:{}",
             balance_change.contract,
@@ -142,7 +142,7 @@ pub fn db_out(events: Events) -> Result<DatabaseChanges, Error> {
             .set("value", &balance_change.value)
 
             // -- debug --
-            .set("change_type", &balance_change.change_type.to_string());
+            .set("balance_change_type", &balance_change.balance_change_type.to_string());
     }
 
     for transfer in events.transfers {

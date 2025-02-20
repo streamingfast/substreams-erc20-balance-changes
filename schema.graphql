@@ -34,7 +34,7 @@ type BalanceChange @entity {
     value: Int!
 
     # -- debug --
-    change_type: Int!
+    balance_change_type: Int!
 }
 
 type Balance @entity {

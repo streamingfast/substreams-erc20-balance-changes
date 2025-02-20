@@ -10,9 +10,16 @@ message Events {
 }
 
 enum BalanceChangeType {
-  BALANCE_CHANGE_TYPE_UNSPECIFIED = 0; // cannot determine balance change
+  BALANCE_CHANGE_TYPE_UNSPECIFIED = 0;
   BALANCE_CHANGE_TYPE_1 = 1; // easy case where storage change is in the same call as the Transfer call
   BALANCE_CHANGE_TYPE_2 = 2; // storage change is in a different call than the Transfer call
+}
+
+enum TransferType {
+  TRANSFER_TYPE_UNSPECIFIED = 0;
+  TRANSFER_TYPE_MINT = 1;
+  TRANSFER_TYPE_BURN = 2;
+  TRANSFER_TYPE_FISHING = 3;
 }
 
 message BalanceChange {
@@ -53,7 +60,7 @@ message BalanceChange {
   uint64 version = 30; // latest version of the balance change (block_num << 32 + storage_ordinal)
 
   // -- debug --
-  int32 change_type = 99; // type enum isn't supported yet as a leaf node
+  int32 balance_change_type = 99; // type enum isn't supported yet as a leaf node
 }
 
 message Transfer {
@@ -80,6 +87,9 @@ message Transfer {
   string from = 21;
   string to = 22;
   string value = 23;
+
+  // -- debug --
+  int32 transfer_type = 99; // type enum isn't supported yet as a leaf node
 }
 
 message BalanceChangeStats {
@@ -98,24 +108,4 @@ message BalanceChangeStat {
   uint64 transfers = 4;
   uint64 transfers_not_matched = 5;
   string valid_rate = 6;
-}
-
-message StorageChange {
-  // -- block --
-  uint64 block_num = 1;
-  string block_hash = 2;
-  google.protobuf.Timestamp timestamp = 3;
-  string date = 4;
-
-  // -- transaction --
-  string transaction_id = 5;
-
-  // -- call --
-  uint32 call_index = 6;
-  string call_address = 7; // may indicate the “to” or “from” in a lower-level call context, but is not the address that emitted the event.
-
-  // -- log --
-  uint32 log_index = 10; // Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
-  uint32 log_block_index = 11; // BlockIndex represents the index of the log relative to the Block.
-  uint64 log_ordinal = 12; // the block's global ordinal when the transfer was recorded.
 }

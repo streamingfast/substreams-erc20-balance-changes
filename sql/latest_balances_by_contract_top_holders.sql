@@ -1,4 +1,5 @@
 -- Latest balances by contract
+-- Top Holders of USDT
 WITH latest_rows AS (
     SELECT
         date,

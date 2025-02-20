@@ -18,7 +18,7 @@ pub fn balance_change_stats(clock: Clock, events: Events, store: StoreGetBigInt)
         let key = format!("{}:{}", balance_change.transaction_id, balance_change.log_index);
         logs.insert(key);
 
-        match balance_change.change_type {
+        match balance_change.balance_change_type {
             1 => {
                 current_type1_balance_changes += 1;
                 current_balance_changes += 1;

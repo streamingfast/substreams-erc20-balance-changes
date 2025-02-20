@@ -18,7 +18,7 @@ pub fn store_valid_balance_changes(events: Events, store: StoreAddBigInt) {
         let key = format!("{}:{}", change.transaction_id, change.log_index);
         logs.insert(key);
         balance_changes += 1;
-        match change.change_type {
+        match change.balance_change_type {
             1 => {
                 balance_changes_type_1 += 1;
             },

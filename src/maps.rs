@@ -1,6 +1,6 @@
 use crate::abi::{self};
-use crate::algorithms::algorithm_call::find_erc20_balance_changes_algorithm1;
-use crate::algorithms::algorithm_child_calls::{find_erc20_balance_changes_algorithm2, get_all_child_calls};
+use crate::algorithms::algorithm1_call::find_erc20_balance_changes_algorithm1;
+use crate::algorithms::algorithm2_child_calls::{find_erc20_balance_changes_algorithm2, get_all_child_calls};
 use crate::algorithms::fishing::ignore_fishing_transfers;
 use crate::algorithms::utils::{addresses_for_storage_keys, StorageKeyToAddressMap};
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
@@ -46,6 +46,9 @@ pub fn to_transfer(clock: &Clock, trx: &TransactionTrace, call: &Call, log: &Log
         from: Hex::encode(&transfer.from),
         to: Hex::encode(&transfer.to),
         value: transfer.value.to_string(),
+
+        // -- debug --
+        transfer_type: 1 as i32,
     }
 }
 
@@ -92,7 +95,7 @@ pub fn to_balance_change(clock: &Clock, trx: &TransactionTrace, call: &Call, log
         version: index_to_version(clock, &storage_change),
 
         // -- debug --
-        change_type: change_type as i32,
+        balance_change_type: change_type as i32,
     }
 }
 
