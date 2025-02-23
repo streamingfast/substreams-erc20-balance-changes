@@ -28,7 +28,7 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Ca
         // -- block --
         block_num: clock.number,
         block_hash: clock.id.clone(),
-        date: clock_to_date(&clock),
+        date: clock_to_date(clock),
         timestamp: clock.timestamp,
 
         // -- transaction --
@@ -50,12 +50,12 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Ca
         value: transfer.value.to_string(),
 
         // -- debug --
-        transfer_type: 1 as i32,
+        transfer_type: 1_i32,
     }
 }
 
 pub fn to_balance_change<'a>(
-    clock: &'a Clock,
+    clock: &Clock,
     trx: &'a TransactionTrace,
     call: &'a Call,
     log: &'a Log,
@@ -72,7 +72,7 @@ pub fn to_balance_change<'a>(
         // -- block --
         block_num: clock.number,
         block_hash: clock.id.clone(),
-        date: clock_to_date(&clock),
+        date: clock_to_date(clock),
         timestamp: clock.timestamp,
 
         // -- transaction
@@ -103,7 +103,7 @@ pub fn to_balance_change<'a>(
         value: transfer.value.to_string(),
 
         // -- indexing --
-        version: index_to_version(clock, &storage_change),
+        version: index_to_version(clock, storage_change),
 
         // -- debug --
         balance_change_type: change_type as i32,
@@ -135,7 +135,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             events.transfers.push(to_transfer(clock, trx, call, log, &transfer));
 
             // -- Balance Changes --
-            keccak_address_map.extend(addresses_for_storage_keys(&call)); // memoize
+            keccak_address_map.extend(addresses_for_storage_keys(call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
             for (owner, storage_change, change_type) in balance_changes {
                 let balance_change = to_balance_change(clock, trx, call, log, &transfer, owner, storage_change, change_type);

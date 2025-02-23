@@ -24,7 +24,7 @@ pub fn find_erc20_balance_changes_algorithm2<'a>(
 
     // check if any of the storage changes match the transfer.to or transfer.from
     for storage_change in get_all_child_call_storage_changes(original, trx) {
-        let owner = match get_keccak_address(keccak_address_map, &storage_change) {
+        let owner = match get_keccak_address(keccak_address_map, storage_change) {
             Some(address) => address,
             None => continue,
         };

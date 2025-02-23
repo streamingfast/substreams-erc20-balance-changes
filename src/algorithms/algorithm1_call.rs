@@ -14,7 +14,7 @@ pub fn find_erc20_balance_changes_algorithm1<'a>(call: &'a Call, transfer: &'a T
 
     for storage_change in &call.storage_changes {
         // extract the owner address
-        let owner = match get_keccak_address(keccak_address_map, &storage_change) {
+        let owner = match get_keccak_address(keccak_address_map, storage_change) {
             Some(address) => address,
             None => continue,
         };

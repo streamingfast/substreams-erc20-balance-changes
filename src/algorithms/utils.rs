@@ -9,7 +9,7 @@ use substreams_ethereum::pb::eth::v2::{Call, StorageChange};
 pub type Address = Vec<u8>;
 pub type Hash = Vec<u8>;
 
-pub fn addresses_for_storage_keys<'a>(call: &'a Call) -> HashMap<Hash, Address> {
+pub fn addresses_for_storage_keys(call: &Call) -> HashMap<Hash, Address> {
     let mut out = HashMap::new();
 
     for (storage_key, preimage) in &call.keccak_preimages {
@@ -45,7 +45,7 @@ pub fn get_keccak_address<'a>(keccak_address_map: &'a HashMap<Hash, Address>, st
     }
 }
 
-pub fn is_erc20_valid_address<'a>(address: &Address, transfer: &'a Transfer) -> bool {
+pub fn is_erc20_valid_address(address: &Address, transfer: &Transfer) -> bool {
     address == &transfer.from || address == &transfer.to
 }
 
@@ -71,7 +71,7 @@ pub fn is_erc20_valid_balance<'a>(transfer: &'a Transfer, storage_change: &'a St
         );
         return false;
     }
-    return true;
+    true
 }
 
 #[cfg(test)]

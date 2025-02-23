@@ -7,11 +7,11 @@ use crate::algorithms::algorithm2_child_calls::get_all_child_call_storage_change
 // https://github.com/streamingfast/substreams-erc20-balance-changes/issues/18
 pub fn is_fishing_transfers<'a>(trx: &'a TransactionTrace, call: &'a Call) -> bool {
     let mut count = call.storage_changes.len();
-    let storage_changes = get_all_child_call_storage_changes(&call, &trx);
+    let storage_changes = get_all_child_call_storage_changes(call, trx);
     count += storage_changes.count();
     if count == 0 {
         info!("ignoring fishing token transfer trx: {:?}", trx.hash);
         return false;
     }
-    return true;
+    true
 }
