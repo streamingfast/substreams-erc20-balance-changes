@@ -1,17 +1,15 @@
 use std::collections::HashMap;
 
 use crate::abi::erc20::events::Transfer;
-use hex_literal::hex;
 use substreams::log;
 use substreams::scalar::BigInt;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::{Call, StorageChange};
 
-const ZERO_STORAGE_PREFIX: [u8; 16] = hex!("00000000000000000000000000000000");
+pub type Address = Vec<u8>;
+pub type Hash = Vec<u8>;
 
-pub type StorageKeyToAddressMap = HashMap<Vec<u8>, Vec<u8>>;
-
-pub fn addresses_for_storage_keys(call: &Call) -> StorageKeyToAddressMap {
+pub fn addresses_for_storage_keys<'a>(call: &'a Call) -> HashMap<Hash, Address> {
     let mut out = HashMap::new();
 
     for (storage_key, preimage) in &call.keccak_preimages {
@@ -36,10 +34,10 @@ pub fn addresses_for_storage_keys(call: &Call) -> StorageKeyToAddressMap {
     out
 }
 
-pub fn get_keccak_address(
-    keccak_address_map: &StorageKeyToAddressMap,
-    storage_change: &StorageChange,
-) -> Option<Vec<u8>> {
+pub fn get_keccak_address<'a>(
+    keccak_address_map: &'a HashMap<Hash, Address>,
+    storage_change: &'a StorageChange,
+) -> Option<Address> {
     let keccak_address = keccak_address_map.get(&storage_change.key);
     match keccak_address {
         Some(address) => Some(address.clone()),
@@ -53,11 +51,11 @@ pub fn get_keccak_address(
     }
 }
 
-pub fn is_erc20_valid_address(address: &Vec<u8>, transfer: &Transfer) -> bool {
+pub fn is_erc20_valid_address<'a>(address: &Address, transfer: &'a Transfer) -> bool {
     address == &transfer.from || address == &transfer.to
 }
 
-pub fn is_erc20_valid_balance(transfer: &Transfer, storage_change: &StorageChange) -> bool {
+pub fn is_erc20_valid_balance<'a>(transfer: &'a Transfer, storage_change: &'a StorageChange) -> bool {
     let old_balance = BigInt::from_signed_bytes_be(&storage_change.old_value);
     let new_balance = BigInt::from_signed_bytes_be(&storage_change.new_value);
 
@@ -84,6 +82,8 @@ pub fn is_erc20_valid_balance(transfer: &Transfer, storage_change: &StorageChang
 
 #[cfg(test)]
 mod tests {
+    use substreams::hex;
+
     use super::*;
 
     const NULL_ADDRESS: [u8; 20] = hex!("0000000000000000000000000000000000000000");

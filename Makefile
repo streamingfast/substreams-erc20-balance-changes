@@ -1,30 +1,12 @@
 .PHONY: all
 all:
-	make build
-	make pack
-	make graph
-	make info
-
+	cargo build --target wasm32-unknown-unknown --release
+	substreams pack
+	substreams info
 
 .PHONY: protogen
 protogen:
 	substreams protogen --exclude-paths sf/substreams,google
-
-.PHONY: build
-build: protogen
-	cargo build --target wasm32-unknown-unknown --release
-
-.PHONY: pack
-pack: build
-	substreams pack
-
-.PHONY: graph
-graph:
-	substreams graph
-
-.PHONY: info
-info:
-	substreams info
 
 .PHONY: run
 run: build

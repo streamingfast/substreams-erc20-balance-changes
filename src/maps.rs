@@ -1,10 +1,12 @@
+use std::collections::HashMap;
+
 use crate::abi::{self};
 use crate::algorithms::algorithm1_call::find_erc20_balance_changes_algorithm1;
 use crate::algorithms::algorithm2_child_calls::{
     find_erc20_balance_changes_algorithm2, get_all_child_calls,
 };
 use crate::algorithms::fishing::ignore_fishing_transfers;
-use crate::algorithms::utils::{addresses_for_storage_keys, StorageKeyToAddressMap};
+use crate::algorithms::utils::{addresses_for_storage_keys, Hash, Address};
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
 use crate::utils::{clock_to_date, index_to_version};
 use abi::erc20::events::Transfer as TransferAbi;
@@ -23,12 +25,12 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
     Ok(events)
 }
 
-pub fn to_transfer(
-    clock: &Clock,
-    trx: &TransactionTrace,
-    call: &Call,
-    log: &Log,
-    transfer: &TransferAbi,
+pub fn to_transfer<'a>(
+    clock: &'a Clock,
+    trx: &'a TransactionTrace,
+    call: &'a Call,
+    log: &'a Log,
+    transfer: &'a TransferAbi,
 ) -> Transfer {
     Transfer {
         // -- block --
@@ -60,14 +62,14 @@ pub fn to_transfer(
     }
 }
 
-pub fn to_balance_change(
-    clock: &Clock,
-    trx: &TransactionTrace,
-    call: &Call,
-    log: &Log,
-    transfer: &TransferAbi,
+pub fn to_balance_change<'a>(
+    clock: &'a Clock,
+    trx: &'a TransactionTrace,
+    call: &'a Call,
+    log: &'a Log,
+    transfer: &'a TransferAbi,
     owner: Vec<u8>,
-    storage_change: &StorageChange,
+    storage_change: &'a StorageChange,
     change_type: BalanceChangeType,
 ) -> BalanceChange {
     let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
@@ -116,9 +118,9 @@ pub fn to_balance_change(
     }
 }
 
-pub fn insert_events(clock: &Clock, block: &Block, events: &mut Events) {
+pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events) {
     // We memoize the keccak address map by call because it is expensive to compute
-    let mut keccak_address_map = StorageKeyToAddressMap::new();
+    let mut keccak_address_map = HashMap::new();
 
     // Iterates over successful transactions
     for trx in block.transactions() {
@@ -140,7 +142,7 @@ pub fn insert_events(clock: &Clock, block: &Block, events: &mut Events) {
             }
             events
                 .transfers
-                .push(to_transfer(&clock, &trx, &call, &log, &transfer));
+                .push(to_transfer(clock, trx, call, log, &transfer));
 
             // -- Balance Changes --
             keccak_address_map.extend(addresses_for_storage_keys(&call)); // memoize
@@ -165,12 +167,12 @@ pub fn insert_events(clock: &Clock, block: &Block, events: &mut Events) {
     }
 }
 
-pub fn iter_balance_changes_algorithms(
-    trx: &TransactionTrace,
-    call: &Call,
-    transfer: &TransferAbi,
-    keccak_address_map: &StorageKeyToAddressMap,
-) -> Vec<(Vec<u8>, StorageChange, BalanceChangeType)> {
+pub fn iter_balance_changes_algorithms<'a>(
+    trx: &'a TransactionTrace,
+    call: &'a Call,
+    transfer: &'a TransferAbi,
+    keccak_address_map: &'a HashMap<Hash, Address>,
+) -> Vec<(Address, &'a StorageChange, BalanceChangeType)> {
     let mut out = Vec::new();
 
     // algorithm #1 (normal case)

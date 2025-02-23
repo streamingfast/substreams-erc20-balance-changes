@@ -6,10 +6,10 @@ use substreams_ethereum::pb::eth::v2::Call;
 
 use super::utils::{get_keccak_address, is_erc20_valid_address, StorageKeyToAddressMap};
 
-pub fn compute_total_sent_received(
-    child_calls: Vec<Call>,
-    transfer: &Transfer,
-    keccak_address_map: &StorageKeyToAddressMap,
+pub fn compute_total_sent_received<'a>(
+    child_calls: Vec<&'a Call>,
+    transfer: &'a Transfer,
+    keccak_address_map: &'a StorageKeyToAddressMap,
 ) -> (BigInt, BigInt) {
     let mut total_sent = BigInt::zero();
     let mut total_received = BigInt::zero();

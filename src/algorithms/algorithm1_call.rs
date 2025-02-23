@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::abi::erc20::events::Transfer;
 use crate::pb::erc20::types::v1::BalanceChangeType;
 use substreams::log;
@@ -5,15 +7,15 @@ use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::{Call, StorageChange};
 
 use super::utils::{
-    get_keccak_address, is_erc20_valid_address, is_erc20_valid_balance, StorageKeyToAddressMap,
+    get_keccak_address, is_erc20_valid_address, is_erc20_valid_balance, Hash, Address
 };
 
 // algorithm #1 (normal case)
-pub fn find_erc20_balance_changes_algorithm1(
-    call: &Call,
-    transfer: &Transfer,
-    keccak_address_map: &StorageKeyToAddressMap,
-) -> Vec<(Vec<u8>, StorageChange, BalanceChangeType)> {
+pub fn find_erc20_balance_changes_algorithm1<'a>(
+    call: &'a Call,
+    transfer: &'a Transfer,
+    keccak_address_map: &'a HashMap<Hash, Address>,
+) -> Vec<(Address, &'a StorageChange, BalanceChangeType)> {
     let mut out = Vec::new();
 
     for storage_change in &call.storage_changes {
@@ -38,7 +40,7 @@ pub fn find_erc20_balance_changes_algorithm1(
         if is_erc20_valid_balance(transfer, storage_change) {
             out.push((
                 owner,
-                storage_change.clone(),
+                storage_change,
                 BalanceChangeType::BalanceChangeType1,
             ));
 
@@ -46,7 +48,7 @@ pub fn find_erc20_balance_changes_algorithm1(
         } else {
             out.push((
                 owner,
-                storage_change.clone(),
+                storage_change,
                 BalanceChangeType::Unspecified,
             ));
         }
