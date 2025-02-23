@@ -23,7 +23,10 @@ mod tests {
         let expected = BigInt::zero();
 
         let actual = compute_balance(scaled_balance, liquidity_index);
-        assert_eq!(actual, expected, "Balance should be zero when scaled balance is zero");
+        assert_eq!(
+            actual, expected,
+            "Balance should be zero when scaled balance is zero"
+        );
     }
 
     #[test]
@@ -49,7 +52,10 @@ mod tests {
         let expected = BigInt::from(105u64);
 
         let actual = compute_balance(scaled_balance, liquidity_index);
-        assert_eq!(actual, expected, "Should compute 105 as the updated balance");
+        assert_eq!(
+            actual, expected,
+            "Should compute 105 as the updated balance"
+        );
     }
 
     #[test]
@@ -66,11 +72,19 @@ mod tests {
     fn test_large_values() {
         let scaled_balance = BigInt::from_str("123456789000000000000000000").unwrap();
         let liquidity_index = BigInt::from_str("1000000123456789012345678900").unwrap();
-        let expected1 =  BigInt::from_str("123456804241578751714678875019052100000000000000000000").unwrap();
-        assert_eq!( &scaled_balance * &liquidity_index, expected1, "Should match multiply result");
+        let expected1 =
+            BigInt::from_str("123456804241578751714678875019052100000000000000000000").unwrap();
+        assert_eq!(
+            &scaled_balance * &liquidity_index,
+            expected1,
+            "Should match multiply result"
+        );
 
         let actual = compute_balance(scaled_balance, liquidity_index);
         let expected2 = BigInt::from_str("123456804241578751714678875").unwrap();
-        assert_eq!( actual, expected2, "Should match the manually computed big integer result");
+        assert_eq!(
+            actual, expected2,
+            "Should match the manually computed big integer result"
+        );
     }
 }

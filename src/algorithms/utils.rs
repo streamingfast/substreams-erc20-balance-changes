@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use substreams::log;
-use substreams_ethereum::pb::eth::v2::{Call, StorageChange};
-use substreams::scalar::BigInt;
-use substreams::Hex;
 use crate::abi::erc20::events::Transfer;
 use hex_literal::hex;
+use substreams::log;
+use substreams::scalar::BigInt;
+use substreams::Hex;
+use substreams_ethereum::pb::eth::v2::{Call, StorageChange};
 
 const ZERO_STORAGE_PREFIX: [u8; 16] = hex!("00000000000000000000000000000000");
 
@@ -38,18 +38,20 @@ pub fn addresses_for_storage_keys(call: &Call) -> StorageKeyToAddressMap {
 
 pub fn get_keccak_address(
     keccak_address_map: &StorageKeyToAddressMap,
-    storage_change: &StorageChange
+    storage_change: &StorageChange,
 ) -> Option<Vec<u8>> {
     let keccak_address = keccak_address_map.get(&storage_change.key);
     match keccak_address {
         Some(address) => Some(address.clone()),
         None => {
-            log::info!("storage change does not match any owner address key={}", Hex(&storage_change.key));
+            log::info!(
+                "storage change does not match any owner address key={}",
+                Hex(&storage_change.key)
+            );
             None
         }
     }
 }
-
 
 pub fn is_erc20_valid_address(address: &Vec<u8>, transfer: &Transfer) -> bool {
     address == &transfer.from || address == &transfer.to
@@ -70,13 +72,15 @@ pub fn is_erc20_valid_balance(transfer: &Transfer, storage_change: &StorageChang
     // https://github.com/streamingfast/substreams-erc20-balance-changes/issues/14
     let diff = BigInt::absolute(&(&balance_change_abs - &transfer_value_abs));
     if diff > BigInt::one() {
-        log::info!("Balance change does not match transfer value. Balance change: {}, transfer value: {}", balance_change_abs, transfer_value_abs);
+        log::info!(
+            "Balance change does not match transfer value. Balance change: {}, transfer value: {}",
+            balance_change_abs,
+            transfer_value_abs
+        );
         return false;
     }
     return true;
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -93,6 +97,9 @@ mod tests {
         };
 
         let address = NULL_ADDRESS.to_vec();
-        assert!(is_erc20_valid_address(&address, &transfer), "0x000 Null address should be valid");
+        assert!(
+            is_erc20_valid_address(&address, &transfer),
+            "0x000 Null address should be valid"
+        );
     }
 }
