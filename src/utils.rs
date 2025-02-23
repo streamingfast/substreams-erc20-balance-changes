@@ -4,13 +4,7 @@ use substreams_ethereum::pb::eth::v2::StorageChange;
 // Timestamp to date conversion
 // ex: 2015-07-30T16:02:18Z => 2015-07-30
 pub fn clock_to_date<'a>(clock: &'a Clock) -> String {
-    match clock
-        .timestamp
-        .expect("timestamp missing")
-        .to_string()
-        .split('T')
-        .next()
-    {
+    match clock.timestamp.expect("timestamp missing").to_string().split('T').next() {
         Some(date) => date.to_string(),
         None => "".to_string(),
     }

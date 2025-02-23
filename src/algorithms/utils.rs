@@ -34,18 +34,12 @@ pub fn addresses_for_storage_keys<'a>(call: &'a Call) -> HashMap<Hash, Address> 
     out
 }
 
-pub fn get_keccak_address<'a>(
-    keccak_address_map: &'a HashMap<Hash, Address>,
-    storage_change: &'a StorageChange,
-) -> Option<Address> {
+pub fn get_keccak_address<'a>(keccak_address_map: &'a HashMap<Hash, Address>, storage_change: &'a StorageChange) -> Option<Address> {
     let keccak_address = keccak_address_map.get(&storage_change.key);
     match keccak_address {
         Some(address) => Some(address.clone()),
         None => {
-            log::info!(
-                "storage change does not match any owner address key={}",
-                Hex(&storage_change.key)
-            );
+            log::info!("storage change does not match any owner address key={}", Hex(&storage_change.key));
             None
         }
     }
@@ -97,9 +91,6 @@ mod tests {
         };
 
         let address = NULL_ADDRESS.to_vec();
-        assert!(
-            is_erc20_valid_address(&address, &transfer),
-            "0x000 Null address should be valid"
-        );
+        assert!(is_erc20_valid_address(&address, &transfer), "0x000 Null address should be valid");
     }
 }

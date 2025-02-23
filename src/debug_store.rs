@@ -37,21 +37,9 @@ pub fn store_valid_balance_changes(events: Events, store: StoreAddBigInt) {
         transfers += 1;
     }
 
-    store.add(
-        0,
-        "balance_changes_type_1",
-        BigInt::from(balance_changes_type_1),
-    );
-    store.add(
-        0,
-        "balance_changes_type_2",
-        BigInt::from(balance_changes_type_2),
-    );
+    store.add(0, "balance_changes_type_1", BigInt::from(balance_changes_type_1));
+    store.add(0, "balance_changes_type_2", BigInt::from(balance_changes_type_2));
     store.add(0, "balance_changes", BigInt::from(balance_changes));
     store.add(0, "transfers", BigInt::from(transfers));
-    store.add(
-        0,
-        "transfers_not_matched",
-        BigInt::from(transfers_not_matched),
-    );
+    store.add(0, "transfers_not_matched", BigInt::from(transfers_not_matched));
 }
