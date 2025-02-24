@@ -10,7 +10,10 @@ use super::utils::{get_keccak_address, is_erc20_valid_address};
 use super::utils::{Address, Hash};
 
 pub fn get_all_child_call_storage_changes<'a>(original: &'a Call, trx: &'a TransactionTrace) -> impl Iterator<Item = &'a StorageChange> + 'a {
-    trx.calls.iter().filter(move |call| call.parent_index == original.index).flat_map(|call| call.storage_changes.iter())
+    trx.calls
+        .iter()
+        .filter(move |call| call.parent_index == original.index)
+        .flat_map(|call| call.storage_changes.iter())
 }
 
 // algorithm #2 (case where storage changes are not in the same call as the transfer event)
@@ -29,7 +32,12 @@ pub fn find_erc20_balance_changes_algorithm2<'a>(
             None => continue,
         };
         if !is_erc20_valid_address(&owner, transfer) {
-            log::info!("owner={} does not match transfer from={} to={}", Hex(owner), Hex(&transfer.from), Hex(&transfer.to));
+            log::info!(
+                "owner={} does not match transfer from={} to={}",
+                Hex(owner),
+                Hex(&transfer.from),
+                Hex(&transfer.to)
+            );
             continue;
         }
         out.push((owner, storage_change, BalanceChangeType::BalanceChangeType2));

@@ -9,7 +9,10 @@ pub fn graph_out(events: Events) -> Result<EntityChanges, Error> {
 
     for balance_change in events.balance_changes {
         tables
-            .create_row("BalanceChange", format!("{}:{}", &balance_change.transaction_id, &balance_change.storage_ordinal))
+            .create_row(
+                "BalanceChange",
+                format!("{}:{}", &balance_change.transaction_id, &balance_change.storage_ordinal),
+            )
             // -- block --
             .set_bigint("block_num", &balance_change.block_num.to_string())
             .set("block_hash", &balance_change.block_hash)
@@ -126,7 +129,10 @@ pub fn db_out(events: Events) -> Result<DatabaseChanges, Error> {
         tables
             .create_row(
                 "transfers",
-                [("transaction_id", (transfer).transaction_id.to_string()), ("log_index", (transfer).log_index.to_string())],
+                [
+                    ("transaction_id", (transfer).transaction_id.to_string()),
+                    ("log_index", (transfer).log_index.to_string()),
+                ],
             )
             // -- block --
             .set("block_num", transfer.block_num.to_string())
