@@ -1,14 +1,13 @@
 use std::collections::HashMap;
 
-use crate::abi::{self};
 use crate::algorithms::algorithm1_call::find_erc20_balance_changes_algorithm1;
 use crate::algorithms::algorithm2_child_calls::find_erc20_balance_changes_algorithm2;
 use crate::algorithms::fishing::is_fishing_transfers;
 use crate::algorithms::utils::{addresses_for_storage_keys, Address, Hash};
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
 use crate::utils::{clock_to_date, index_to_version};
-use abi::erc20::events::Transfer as TransferAbi;
 use substreams::errors::Error;
+use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
 
 use substreams::pb::substreams::Clock;
 use substreams::scalar::BigInt;

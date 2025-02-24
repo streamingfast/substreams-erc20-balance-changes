@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use crate::abi::erc20::events::Transfer;
 use crate::pb::erc20::types::v1::BalanceChangeType;
 use substreams::log;
 use substreams::Hex;
+use substreams_abis::evm::token::erc20::events::Transfer;
 use substreams_ethereum::pb::eth::v2::{Call, StorageChange};
 
 use super::utils::{get_keccak_address, is_erc20_valid_address, is_erc20_valid_balance, Address, Hash};

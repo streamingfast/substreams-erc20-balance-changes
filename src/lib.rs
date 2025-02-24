@@ -1,4 +1,3 @@
-mod abi;
 mod algorithms;
 mod debug;
 mod debug_store;

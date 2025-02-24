@@ -4,3 +4,4 @@ replay.log
 /.idea
 out/
 state.yaml
+buf.gen.yaml

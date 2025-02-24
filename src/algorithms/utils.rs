@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use crate::abi::erc20::events::Transfer;
 use substreams::log;
 use substreams::scalar::BigInt;
 use substreams::Hex;
+use substreams_abis::evm::token::erc20::events::Transfer;
 use substreams_ethereum::pb::eth::v2::{Call, StorageChange};
 
 pub type Address = Vec<u8>;
