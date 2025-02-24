@@ -13,17 +13,12 @@ pub fn find_erc20_balance_changes_algorithm1<'a>(
     call: &'a Call,
     transfer: &'a Transfer,
     keccak_address_map: &'a HashMap<Hash, Address>,
-) -> Vec<(Address, &'a StorageChange, BalanceChangeType)> {
-    let mut out = Vec::new();
+) -> impl Iterator<Item = (Address, &'a StorageChange, BalanceChangeType)> + 'a {
+    call.storage_changes.iter().filter_map(move |storage_change| {
+        // Extract the owner address
+        let owner = get_keccak_address(keccak_address_map, storage_change)?;
 
-    for storage_change in &call.storage_changes {
-        // extract the owner address
-        let owner = match get_keccak_address(keccak_address_map, storage_change) {
-            Some(address) => address,
-            None => continue,
-        };
-
-        // make sure owner is either the sender or receiver
+        // Ensure owner is either the sender or receiver
         if !is_erc20_valid_address(&owner, transfer) {
             log::info!(
                 "owner={} does not match transfer from={} to={}",
@@ -31,17 +26,17 @@ pub fn find_erc20_balance_changes_algorithm1<'a>(
                 Hex(&transfer.from),
                 Hex(&transfer.to)
             );
-            continue;
+            return None;
         }
 
-        // Check if the transfer matches the storage change balance changes
-        if is_erc20_valid_balance(transfer, storage_change) {
-            out.push((owner, storage_change, BalanceChangeType::BalanceChangeType1));
-
-        // Storage Change does not match the transfer value, but does match owner address
+        // Yield one of two results depending on whether the storage change
+        // matches the transfer's balance changes
+        let balance_type = if is_erc20_valid_balance(transfer, storage_change) {
+            BalanceChangeType::BalanceChangeType1
         } else {
-            out.push((owner, storage_change, BalanceChangeType::Unspecified));
-        }
-    }
-    out
+            BalanceChangeType::Unspecified
+        };
+
+        Some((owner, storage_change, balance_type))
+    })
 }

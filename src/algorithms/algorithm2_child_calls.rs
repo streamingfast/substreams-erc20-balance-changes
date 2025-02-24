@@ -22,15 +22,12 @@ pub fn find_erc20_balance_changes_algorithm2<'a>(
     original: &'a Call,
     transfer: &'a Transfer,
     keccak_address_map: &'a HashMap<Hash, Address>,
-) -> Vec<(Address, &'a StorageChange, BalanceChangeType)> {
-    let mut out = Vec::new();
+) -> impl Iterator<Item = (Address, &'a StorageChange, BalanceChangeType)> + 'a {
+    get_all_child_call_storage_changes(original, trx).filter_map(move |storage_change| {
+        // Attempt to resolve storage_change -> owner address
+        let owner = get_keccak_address(keccak_address_map, storage_change)?;
 
-    // check if any of the storage changes match the transfer.to or transfer.from
-    for storage_change in get_all_child_call_storage_changes(original, trx) {
-        let owner = match get_keccak_address(keccak_address_map, storage_change) {
-            Some(address) => address,
-            None => continue,
-        };
+        // Skip if the owner doesn't match transfer.from or transfer.to
         if !is_erc20_valid_address(&owner, transfer) {
             log::info!(
                 "owner={} does not match transfer from={} to={}",
@@ -38,9 +35,10 @@ pub fn find_erc20_balance_changes_algorithm2<'a>(
                 Hex(&transfer.from),
                 Hex(&transfer.to)
             );
-            continue;
+            return None;
         }
-        out.push((owner, storage_change, BalanceChangeType::BalanceChangeType2));
-    }
-    out
+
+        // Yield the tuple
+        Some((owner, storage_change, BalanceChangeType::BalanceChangeType2))
+    })
 }
