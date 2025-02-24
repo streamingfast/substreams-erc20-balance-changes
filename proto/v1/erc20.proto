@@ -2,63 +2,102 @@ syntax = "proto3";
 
 package erc20.types.v1;
 
-message BalanceChanges {
-  repeated BalanceChange balance_changes = 1;
+import "google/protobuf/timestamp.proto";
+
+message Events {
+  repeated Transfer transfers = 1;
+  repeated BalanceChange balance_changes = 2;
 }
 
 enum BalanceChangeType {
-  TYPE_UNKNOWN = 0; // cannot determine balance change
-  TYPE_1 = 1; // easy case where storage change is in the same call as the Transfer call
-  TYPE_2 = 2; // storage change is in a different call than the Transfer call
+  BALANCE_CHANGE_TYPE_UNSPECIFIED = 0; // cannot determine balance change
+  BALANCE_CHANGE_TYPE_1 = 1; // easy case where storage change is in the same call as the Transfer call
+  BALANCE_CHANGE_TYPE_2 = 2; // storage change is in a different call than the Transfer call
 }
 
 message BalanceChange {
-  string contract = 1;
-  string owner = 2;
-  string old_balance = 3;
-  string new_balance = 4;
+  // -- block --
+  uint64 block_num = 1;
+  string block_hash = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  string date = 4;
 
-  string transaction = 5;
-  string storage_key = 6;
-  uint32 call_index = 7;
+  // -- transaction --
+  string transaction_id = 5;
 
-  string transfer_value = 8;
+  // -- call --
+  uint32 call_index = 6;
 
-  BalanceChangeType change_type = 9;
+  // -- log --
+  uint32 log_index = 7; // Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
+  uint32 log_block_index = 8; // BlockIndex represents the index of the log relative to the Block.
+  uint64 log_ordinal = 9; // the block's global ordinal when the transfer was recorded.
+
+  // -- storage change --
+  string storage_key = 10;
+  uint64 storage_ordinal = 11;
+  string storage_address = 12;
+
+  // -- balance change --
+  string contract = 20;
+  string owner = 21;
+  string old_balance = 22;
+  string new_balance = 23;
+  string amount = 24; // delta between old and new balance
+
+  // -- transfer --
+  string from = 25;
+  string to = 26;
+  string value = 27;
+
+  // -- indexing --
+  uint64 version = 30; // latest version of the balance change (block_num << 32 + storage_ordinal)
+
+  // -- debug --
+  int32 change_type = 99; // type enum isn't supported yet as a leaf node
 }
 
-message ValidBalanceChanges {
-  repeated ValidBalanceChange valid_balance_changes = 1;
+message Transfer {
+  // -- block --
+  uint64 block_num = 1;
+  string block_hash = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  string date = 4;
+
+  // -- transaction --
+  string transaction_id = 5;
+
+  // -- call --
+  uint32 call_index = 6;
+
+  // -- log --
+  uint32 log_index = 10; // Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
+  uint32 log_block_index = 11; // BlockIndex represents the index of the log relative to the Block.
+  uint64 log_ordinal = 12; // the block's global ordinal when the transfer was recorded.
+  string topic0 = 13;
+  string data = 14;
+
+  // -- transfer --
+  string contract = 20;
+  string from = 21;
+  string to = 22;
+  string value = 23;
 }
-
-message ValidBalanceChange {
-  string contract = 1;
-  string owner = 2;
-  string old_balance = 3;
-  string new_balance = 4;
-
-  string transaction = 5;
-}
-
-message UnknownBalanceChanges {
-  repeated UnknownBalanceChange unknown_balance_changes = 1;
-}
-
-message UnknownBalanceChange {
-  string contract = 1;
-  string owner = 2;
-  string transaction = 3;
-  uint32 call_index = 4;
-  string transfer_value = 5;
-}
-
 
 message BalanceChangeStats {
-  uint64 type0_count = 1;
-  uint64 type1_count = 2;
-  uint64 type2_count = 3;
+  BalanceChangeStat current = 1;
+  BalanceChangeStat total = 2;
 
-  uint64 total_count = 42;
-  string valid_rate = 43;
+  // block
   uint64 block_number = 99;
+  google.protobuf.Timestamp timestamp = 100;
+}
+
+message BalanceChangeStat {
+  uint64 type1_balance_changes = 1;
+  uint64 type2_balance_changes = 2;
+  uint64 balance_changes = 3;
+  uint64 transfers = 4;
+  uint64 transfers_not_matched = 5;
+  string valid_rate = 6;
 }

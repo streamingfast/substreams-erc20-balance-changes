@@ -150,10 +150,23 @@ As of block 18005744, the sum of type 1 and type 2 matches accounts for approxim
   "type1Count": "2608546600",
   "type2Count": "5195308",
   "totalCount": "2702551678",
-  "validRate": "0.9671385488303694890529305171717793142603506581308747872905614795055919001005685856860791544131205324",
+  "validRate": "0.9671",
   "blockNumber": "18005744"
 }
 ```
+
+## Ignoring 0x000 null balance changes
+
+**Burn Address:**
+When tokens are “burned,” they are effectively sent to an address where no one has—or can ever have—the private key.
+By convention, the zero address is often used to signal “tokens have been removed from circulation.”
+
+> ex: emit `Transfer(holder, address(0), amount);`
+
+**Minting Source:**
+Conversely, some implementations also use the zero address as the “source” when tokens are minted.
+
+> ex: emit `Transfer(address(0), recipient, amount);`
 
 ## Running
 

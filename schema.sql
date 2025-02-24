@@ -1,4 +1,9 @@
 CREATE TABLE IF NOT EXISTS balance_changes (
+
+   -- block --
+   -- transaction --
+   -- storage --
+   -- balance change --
    "contract" TEXT NOT NULL,
    "owner" TEXT NOT NULL,
    "amount" NUMERIC NOT NULL,
