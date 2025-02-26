@@ -65,7 +65,6 @@ pub fn to_balance_change<'a>(
 ) -> BalanceChange {
     let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
     let new_balance = BigInt::from_unsigned_bytes_be(&storage_change.new_value);
-    let amount = new_balance.clone() - old_balance.clone();
 
     BalanceChange {
         // -- block --
@@ -94,7 +93,6 @@ pub fn to_balance_change<'a>(
         owner: Hex::encode(owner),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
-        amount: amount.to_string(),
 
         // -- transfer --
         from: Hex::encode(&transfer.from),

@@ -42,7 +42,6 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    owner                FixedString(40),
    old_balance          UInt256,
    new_balance          UInt256,
-   amount               UInt256,
 
    -- transfer --
    `from`               FixedString(40),
@@ -55,8 +54,8 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    -- debug --
    balance_change_type  Int32
 )
-ENGINE = ReplacingMergeTree PRIMARY KEY (transaction_id, storage_ordinal)
-ORDER BY (transaction_id, storage_ordinal);
+ENGINE = ReplacingMergeTree PRIMARY KEY (block_num, storage_ordinal)
+ORDER BY (block_num, storage_ordinal);
 
 -------------------------------------------------
 -- Transfer events                      --
@@ -77,7 +76,7 @@ CREATE TABLE IF NOT EXISTS transfers  (
 
    -- log --
    log_index            UInt32,
-   log_block_index      UInt32,
+   log_block_index      UInt32
    log_ordinal          UInt64,
 
    -- transfer --
@@ -89,5 +88,5 @@ CREATE TABLE IF NOT EXISTS transfers  (
    -- debug --
    transfer_type        Int32
 )
-ENGINE = ReplacingMergeTree PRIMARY KEY (transaction_id, log_index)
-ORDER BY (transaction_id, log_index);
+ENGINE = ReplacingMergeTree PRIMARY KEY (block_num, log_block_index)
+ORDER BY (block_num, log_block_index);

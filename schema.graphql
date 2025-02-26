@@ -10,31 +10,11 @@ type BalanceChange @entity {
     # -- transaction --
     transaction_id: String!
 
-    # -- call --
-    call_index: Int!
-
-    # -- log --
-    log_index: Int!
-    log_block_index: Int!
-    log_ordinal: Int!
-
-    # -- storage --
-    storage_key: String!
-
     # -- balance change --
     contract: String!
     owner: String!
     old_balance: Int!
     new_balance: Int!
-    amount: Int!
-
-    # -- transfer --
-    from: String!
-    to: String!
-    value: Int!
-
-    # -- debug --
-    balance_change_type: Int!
 }
 
 type Balance @entity {
@@ -63,16 +43,6 @@ type Transfer @entity {
 
     # -- transaction --
     transaction_id: String!
-
-    # -- call --
-    call_index: Int!
-
-    # -- log --
-    log_index: Int!
-    log_block_index: Int!
-    log_ordinal: Int!
-    topic0: String!
-    data: String!
 
     # -- transfer --
     contract: String!

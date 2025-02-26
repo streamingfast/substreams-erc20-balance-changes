@@ -53,9 +53,6 @@ pub struct BalanceChange {
     pub old_balance: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
-    /// delta between old and new balance
-    #[prost(string, tag="24")]
-    pub amount: ::prost::alloc::string::String,
     /// -- transfer --
     #[prost(string, tag="25")]
     pub from: ::prost::alloc::string::String,
