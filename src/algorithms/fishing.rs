@@ -11,7 +11,7 @@ pub fn is_fishing_transfers<'a>(trx: &'a TransactionTrace, call: &'a Call) -> bo
     count += storage_changes.count();
     if count == 0 {
         info!("ignoring fishing token transfer trx: {:?}", trx.hash);
-        return false;
+        return true;
     }
-    true
+    false
 }
