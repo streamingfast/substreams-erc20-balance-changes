@@ -1,30 +1,13 @@
-type BalanceChange @entity {
-    id: ID!
-
-    # -- block --
-    block_num: Int!
-    block_hash: String!
-    timestamp: Timestamp!
-    date: String!
-
-    # -- transaction --
-    transaction_id: String!
-
-    # -- balance change --
-    contract: String!
-    owner: String!
-    old_balance: Int!
-    new_balance: Int!
-}
-
 type Balance @entity {
     id: ID!
 
     # -- block --
     block_num: Int!
-    block_hash: String!
     timestamp: Timestamp!
     date: String!
+
+    # -- transaction --
+    transaction_id: String!
 
     # -- current balance --
     contract: String!
@@ -37,7 +20,6 @@ type Transfer @entity {
 
     # -- block --
     block_num: Int!
-    block_hash: String!
     timestamp: Timestamp!
     date: String!
 
