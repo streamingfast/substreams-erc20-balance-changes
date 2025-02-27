@@ -1,19 +1,19 @@
 specVersion: v0.1.0
 package:
-  name: erc20_balances
+  name: erc20_balances_transfers
   version: v1.5.0
   url: https://github.com/pinax-network/substreams-erc20-balances
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: target/wasm32-unknown-unknown/release/erc20_balance.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc20_balances_transfers.wasm
 
 protobuf:
   files:
     - erc20.proto
   importPaths:
-    - ./proto/v1
+    - ../proto/v1
   excludePaths:
     - sf/substreams
     - google

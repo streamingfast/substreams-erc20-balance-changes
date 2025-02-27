@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "erc20-balances",
+  "erc20-balances-transfers",
   "clickhouse",
   "subgraphs",
 ]

@@ -2,13 +2,19 @@
 
 ## Quickstart
 
-**Install [`substreams-sink-files`](https://github.com/streamingfast/substreams-sink-files)**
+### Install [`substreams-sink-files`](https://github.com/streamingfast/substreams-sink-files)
 
 ```bash
 brew install streamingfast/tap/substreams-sink-files
 ```
 
-**Download parquet files from Substreams**
+### Install [Duckdb](https://duckdb.org/#quickinstall)
+
+```bash
+curl https://install.duckdb.org | sh
+```
+
+### Download parquet files from Substreams
 ```bash
 substreams-sink-files run eth.substreams.pinax.network:443 \
     https://spkg.io/pinax-network/erc20-balances-v1.5.0.spkg map_events \
@@ -16,10 +22,17 @@ substreams-sink-files run eth.substreams.pinax.network:443 \
     --encoder parquet --file-block-count 1
 ```
 
-**Query the parquet files with DuckDB**
+Folder structure:
+
+- `./out`
+  - `./balance_changes`
+  - `./transfers`
+
+### Query the parquet files with DuckDB
+
+> Select the top sending addresses for DAI by total transferred value.
 
 ```sql
--- Select the top sending addresses for DAI by total transferred value.
 SELECT
     "from",
     count() as total_transfers,

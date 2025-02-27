@@ -1,9 +1,9 @@
-# Substreams ERC20 Balance Changes
+# Substreams: `ERC20 Balances & Transfers`
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 The goal of this Substreams project is to extract all ERC20 transfers from Ethereum events for the full chain.
 
-The `map_balance_changes` module will output messages of type [erc20.types.v1.BalanceChange](./proto/v1/erc20.proto#L15) defined by: 
+The `map_balance_changes` module will output messages of type [erc20.types.v1.BalanceChange](./proto/v1/erc20.proto#L15) defined by:
 
 ```proto
 message BalanceChange {
