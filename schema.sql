@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS transfers  (
 
    -- log --
    log_index            UInt32,
-   log_block_index      UInt32
+   log_block_index      UInt32,
    log_ordinal          UInt64,
 
    -- transfer --
