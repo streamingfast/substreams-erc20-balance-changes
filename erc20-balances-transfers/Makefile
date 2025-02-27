@@ -16,6 +16,6 @@ protogen:
 gui: build
 	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 21525891
 
-.PHONY: production
-production: build
-	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 21525891 -t 0 --production-mode
+.PHONY: cache
+cache: build
+	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 1397553 -t 0 --production-mode
