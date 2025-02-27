@@ -8,21 +8,22 @@
 brew install streamingfast/tap/substreams-sink-sql
 ```
 
-**Setup SQL tables in Clickhouse**
+### Setup SQL tables in Clickhouse
 
 ```bash
 substreams-sink-sql setup clickhouse://default:default@localhost:9000/default \
     https://spkg.io/pinax-network/erc20-balances-v1.5.0.spkg
 ```
 
-**Load Clickhouse data from Substreams**
+### Load Clickhouse data from Substreams
+
 ```bash
 substreams-sink-sql run clickhouse://default:default@localhost:9000/default \
     https://spkg.io/pinax-network/erc20-balances-v1.5.0.spkg \
      -e eth.substreams.pinax.network:443 21525891:
 ```
 
-**Perform SQL query with Clickhouse**
+### Perform SQL query with Clickhouse
 
 ```sql
 -- Select the top sending addresses for DAI by total transferred value.
