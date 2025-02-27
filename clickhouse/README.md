@@ -1,4 +1,4 @@
-# ERC-20 Balances: `Clickhouse`
+# ERC-20: `Clickhouse`
 
 ## Quickstart
 

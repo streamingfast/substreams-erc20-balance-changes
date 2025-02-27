@@ -1,8 +1,8 @@
-# ERC-20 Substreams
+# ERC-20: `Substreams`
 
 > Substreams for tracking ERC-20 token balances & transfers for EVM blockchains.
 >
-> Ethereum, Base, BSC, Polygon, ArbOne, etc..
+> Ethereum, Base, BSC, Polygon, ArbitrumOne, Optimism, etc..
 
 Includes the following:
 
