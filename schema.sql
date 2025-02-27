@@ -54,8 +54,14 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    -- debug --
    balance_change_type  Int32
 )
-ENGINE = ReplacingMergeTree PRIMARY KEY (block_num, storage_ordinal)
+ENGINE = ReplacingMergeTree
+PARTITION BY date
+PRIMARY KEY (block_num, storage_ordinal)
 ORDER BY (block_num, storage_ordinal);
+
+-- create a bloom-filter index for these high-cardinality string columns
+CREATE INDEX idx_balance_changes_contract ON balance_changes (contract) TYPE bloom_filter GRANULARITY 4;
+CREATE INDEX idx_balance_changes_owner    ON balance_changes (owner)   TYPE bloom_filter GRANULARITY 4;
 
 -------------------------------------------------
 -- Transfer events                      --
@@ -88,5 +94,28 @@ CREATE TABLE IF NOT EXISTS transfers  (
    -- debug --
    transfer_type        Int32
 )
-ENGINE = ReplacingMergeTree PRIMARY KEY (block_num, log_block_index)
+ENGINE = ReplacingMergeTree
+PARTITION BY date
+PRIMARY KEY (block_num, log_block_index)
 ORDER BY (block_num, log_block_index);
+
+-- create a bloom-filter index for these high-cardinality string columns
+CREATE INDEX idx_transfers_contract ON transfers (contract) TYPE bloom_filter GRANULARITY 4;
+CREATE INDEX idx_transfers_from     ON transfers (`from`)   TYPE bloom_filter GRANULARITY 4;
+CREATE INDEX idx_transfers_to       ON transfers (`to`)     TYPE bloom_filter GRANULARITY 4;
+
+-- latest balances by account --
+CREATE MATERIALIZED VIEW balances
+ENGINE = ReplacingMergeTree(version)
+ORDER BY (owner, contract)
+POPULATE
+AS
+SELECT * FROM balance_changes;
+
+-- latest balances by account & by date --
+CREATE MATERIALIZED VIEW balances_by_date
+ENGINE = ReplacingMergeTree(version)
+ORDER BY (owner, contract, date)
+POPULATE
+AS
+SELECT * FROM balance_changes;
