@@ -1,22 +1,15 @@
-[package]
-name = "erc20-balance-changes"
-version = "0.0.0"
-description = "ERC-20"
-edition = "2021"
-authors = [
-    "Denis <denis@pinax.network>",
-    "Yaro <yaro@pinax.network>",
-    "Matthieu Vachon <https://github.com/maoueh>",
+[workspace]
+members = [
+  "erc20-balances",
+  "clickhouse",
+  "subgraphs",
 ]
+resolver = "2"
 
-[lib]
-crate-type = ["cdylib"]
+[workspace.package]
+description = "ERC-20 Balances"
+edition = "2021"
+version = "0.0.0"
 
-[dependencies]
-prost = "0.13"
-prost-types = "0.13"
+[workspace.dependencies]
 substreams = "0.6"
-substreams-ethereum = "0.10"
-substreams-abis = "0.1"
-substreams-entity-change = "2.0"
-substreams-database-change = "2.0"

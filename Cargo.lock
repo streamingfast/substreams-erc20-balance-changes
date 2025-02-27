@@ -165,16 +165,32 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
-name = "erc20-balance-changes"
+name = "erc20-balances"
 version = "0.0.0"
 dependencies = [
  "prost 0.13.5",
  "prost-types 0.13.5",
  "substreams",
  "substreams-abis",
- "substreams-database-change",
- "substreams-entity-change",
  "substreams-ethereum",
+]
+
+[[package]]
+name = "erc20-balances-clickhouse"
+version = "0.0.0"
+dependencies = [
+ "erc20-balances",
+ "substreams",
+ "substreams-database-change",
+]
+
+[[package]]
+name = "erc20-balances-subgraphs"
+version = "0.0.0"
+dependencies = [
+ "erc20-balances",
+ "substreams",
+ "substreams-entity-change",
 ]
 
 [[package]]
