@@ -3,6 +3,6 @@ target/
 replay.log
 /.idea
 out/
-state.yaml
+*state.yaml
 buf.gen.yaml
 .DS_Store

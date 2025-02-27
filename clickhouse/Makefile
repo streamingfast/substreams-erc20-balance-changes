@@ -14,3 +14,7 @@ sql: build
 .PHONY: sql-setup
 sql-setup: build
 	substreams-sink-sql setup clickhouse://default:default@localhost:9000/default substreams.yaml
+
+.PHONY: cache
+cache: build
+	substreams-sink-noop eth.substreams.pinax.network:443 ./substreams.yaml db_out 1: --state-store eth.state.yaml
