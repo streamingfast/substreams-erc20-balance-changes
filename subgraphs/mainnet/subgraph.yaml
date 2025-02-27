@@ -1,17 +1,17 @@
 specVersion: 1.2.0
-description: Ethereum ERC20 Balances
-repository: https://github.com/pinax-network/substreams-erc20-balance-changes
+description: Ethereum ERC-20
+repository: https://github.com/pinax-network/substreams-erc20
 schema:
-  file: ../../schema.graphql
-image: logo.png
-
+  file: ../schema.graphql
+indexerHints:
+  prune: never
 dataSources:
   - kind: substreams
-    name: erc20-balances-transfers
+    name: erc20
     network: mainnet
     source:
+      startBlock: 1397553
       package:
-        startBlock: 1397553
         moduleName: graph_out
         file: ../erc20-subgraph-v1.5.0.spkg
     mapping:

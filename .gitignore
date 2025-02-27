@@ -6,3 +6,4 @@ out/
 *state.yaml
 buf.gen.yaml
 .DS_Store
+build

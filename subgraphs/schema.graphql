@@ -1,34 +1,36 @@
 type Balance @entity {
-    id: ID!
-
-    # -- block --
-    block_num: Int!
-    timestamp: Timestamp!
-    date: String!
-
-    # -- transaction --
-    transaction_id: String!
-
-    # -- current balance --
+    # -- balance --
     contract: String!
     owner: String!
     balance: Int!
-}
-
-type Transfer @entity {
-    id: ID!
 
     # -- block --
-    block_num: Int!
     timestamp: Timestamp!
+    block_num: Int!
     date: String!
+
+    # -- primary key --
+    id: ID!
 
     # -- transaction --
     transaction_id: String!
+}
 
+type Transfer @entity {
     # -- transfer --
     contract: String!
     from: String!
     to: String!
     value: Int!
+
+    # -- primary key --
+    id: ID!
+
+    # -- block --
+    timestamp: Timestamp!
+    block_num: Int!
+    date: String!
+
+    # -- transaction --
+    transaction_id: String!
 }
