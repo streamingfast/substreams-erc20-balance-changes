@@ -7,13 +7,13 @@ image: logo.png
 
 dataSources:
   - kind: substreams
-    name: erc20-balance-changes
+    name: erc20-balances-transfers
     network: mainnet
     source:
       package:
         startBlock: 1397553
         moduleName: graph_out
-        file: ./erc20-balance-changes-v1.5.0.spkg
+        file: ../erc20-subgraph-v1.5.0.spkg
     mapping:
       kind: substreams/graph-entities
       apiVersion: 0.0.7

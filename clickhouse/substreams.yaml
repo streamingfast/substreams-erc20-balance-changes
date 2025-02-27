@@ -7,12 +7,12 @@ package:
 imports:
   database_changes: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v2.0.0/substreams-database-change-v2.0.0.spkg
   sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
-  erc20_balances: ./erc20-balances/erc20-balances-transfers-v1.5.0.spkg
+  erc20_balances: ../erc20-balances-transfers/erc20-balances-transfers-v1.5.0.spkg
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: target/wasm32-unknown-unknown/release/erc20_clickhouse.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc20_clickhouse.wasm
 
 modules:
   - name: db_out
