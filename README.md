@@ -11,8 +11,20 @@ Includes the following:
 - [x] Clickhouse SQL
 - [ ] Subgraphs (SpS)
 
-## Modules included
+## Substreams Packages
 
 - [x] ERC-20 Balances & Transfers
 - [ ] ERC-20 Contract Metadata
 - [ ] ERC-20 Supply
+
+## Substreams Graph
+
+```mermaid
+graph TD;
+  graph_out[map: graph_out];
+  erc20_balances:map_events --> graph_out;
+  erc20_balances:map_events --> db_out;
+  erc20_balances:map_events[map: erc20_balances:map_events];
+  sf.substreams.v1.Clock[source: sf.substreams.v1.Clock] --> erc20_balances:map_events;
+  sf.ethereum.type.v2.Block[source: sf.ethereum.type.v2.Block] --> erc20_balances:map_events;
+```
