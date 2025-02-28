@@ -2,11 +2,11 @@ type Balance @entity {
     # -- balance --
     contract: String!
     owner: String!
-    balance: Int!
+    balance: BigInt!
 
     # -- block --
     timestamp: Timestamp!
-    block_num: Int!
+    block_num: BigInt!
     date: String!
 
     # -- primary key --
@@ -21,14 +21,14 @@ type Transfer @entity {
     contract: String!
     from: String!
     to: String!
-    value: Int!
+    value: BigInt!
 
     # -- primary key --
     id: ID!
 
     # -- block --
     timestamp: Timestamp!
-    block_num: Int!
+    block_num: BigInt!
     date: String!
 
     # -- transaction --
