@@ -9,12 +9,12 @@ build:
 .PHONY: deploy
 deploy:
 	graph build
-	graph create --node=http://localhost:8020 erc20-arbone
-	graph deploy --node=http://localhost:8020 erc20-arbone
+	graph create --node=http://localhost:8020 erc20-matic
+	graph deploy --node=http://localhost:8020 erc20-matic
 
 .PHONY: cache
 cache:
-	substreams-sink-noop arbone.substreams.pinax.network:443 ../ graph_out 1:
+	substreams-sink-noop polygon.substreams.pinax.network:443 ../ graph_out 1:
 
 .PHONY: publish
 publish:
