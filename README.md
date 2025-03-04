@@ -6,10 +6,10 @@ Substreams for tracking ERC-20 token balances & transfers for EVM blockchains.
 
 Includes the following:
 
-- [x] Protobuf Map modules
-- [x] Apache Parquet
-- [x] Clickhouse SQL
-- [ ] Subgraphs (SpS)
+- [x] Apache Parquet - File Sink (Protobuf Map modules)
+- [x] Clickhouse SQL Sink
+- [ ] Postgres SQL Sink
+- [x] Graph Node - Subgraphs (SpS)
 
 ## Substreams Packages
 
