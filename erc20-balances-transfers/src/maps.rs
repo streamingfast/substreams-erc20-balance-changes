@@ -78,6 +78,7 @@ pub fn to_balance_change<'a>(
 
         // -- call --
         call_index: call.index,
+        call_address: Hex::encode(&call.address),
 
         // -- log --
         log_index: log.index,
@@ -93,14 +94,6 @@ pub fn to_balance_change<'a>(
         owner: Hex::encode(owner),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
-
-        // -- transfer --
-        from: Hex::encode(&transfer.from),
-        to: Hex::encode(&transfer.to),
-        value: transfer.value.to_string(),
-
-        // -- indexing --
-        version: index_to_version(clock, storage_change),
 
         // -- debug --
         balance_change_type: change_type as i32,
