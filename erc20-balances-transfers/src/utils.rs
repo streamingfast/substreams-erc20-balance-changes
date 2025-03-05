@@ -6,7 +6,7 @@ use substreams_ethereum::pb::eth::v2::StorageChange;
 pub fn clock_to_date(clock: &Clock) -> String {
     match clock.timestamp.expect("timestamp missing").to_string().split('T').next() {
         Some(date) => date.to_string(),
-        None => "".to_string(),
+        _ => "".to_string(),
     }
 }
 

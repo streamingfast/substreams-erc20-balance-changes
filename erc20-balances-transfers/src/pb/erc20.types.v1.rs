@@ -56,6 +56,11 @@ pub struct BalanceChange {
     pub old_balance: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
+    /// -- indexing --
+    ///
+    /// latest version of the balance change (block_num << 32 + storage_ordinal)
+    #[prost(uint64, tag="30")]
+    pub version: u64,
     /// -- debug --
     ///
     /// type enum isn't supported yet as a leaf node

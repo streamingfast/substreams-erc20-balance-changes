@@ -43,13 +43,8 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    old_balance          UInt256,
    new_balance          UInt256,
 
-   -- transfer --
-   `from`               FixedString(40),
-   `to`                 FixedString(40),
-   value                UInt256,
-
    -- indexing --
-   version              UInt64,
+   version              UInt64, -- latest version of the balance change (block_num << 32 + storage_ordinal)
 
    -- debug --
    balance_change_type  Int32

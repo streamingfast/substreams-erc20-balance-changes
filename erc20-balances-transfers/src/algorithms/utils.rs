@@ -38,7 +38,7 @@ pub fn get_keccak_address<'a>(keccak_address_map: &'a HashMap<Hash, Address>, st
     let keccak_address = keccak_address_map.get(&storage_change.key);
     match keccak_address {
         Some(address) => Some(address.clone()),
-        None => {
+        _ => {
             log::info!("storage change does not match any owner address key={}", Hex(&storage_change.key));
             None
         }

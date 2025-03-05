@@ -58,7 +58,6 @@ pub fn to_balance_change<'a>(
     trx: &'a TransactionTrace,
     call: &'a Call,
     log: &'a Log,
-    transfer: &'a TransferAbi,
     owner: Address,
     storage_change: &'a StorageChange,
     change_type: BalanceChangeType,
@@ -95,6 +94,9 @@ pub fn to_balance_change<'a>(
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
 
+        // -- indexing --
+        version: index_to_version(clock, storage_change),
+
         // -- debug --
         balance_change_type: change_type as i32,
     }
@@ -128,7 +130,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             keccak_address_map.extend(addresses_for_storage_keys(call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
             for (owner, storage_change, change_type) in balance_changes {
-                let balance_change = to_balance_change(clock, trx, call, log, &transfer, owner, storage_change, change_type);
+                let balance_change = to_balance_change(clock, trx, call, log, owner, storage_change, change_type);
 
                 // insert balance change event
                 events.balance_changes.push(balance_change);
