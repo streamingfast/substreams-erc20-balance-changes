@@ -37,7 +37,7 @@ pub fn db_out(events: Events) -> Result<DatabaseChanges, Error> {
             .set("old_balance", balance_change.old_balance)
             .set("new_balance", balance_change.new_balance)
             // -- indexing --
-            .set("version", balance_change.version)
+            .set("global_sequence", balance_change.global_sequence)
             // -- debug --
             .set("balance_change_type", balance_change.balance_change_type.to_string());
     }

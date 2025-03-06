@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    new_balance          UInt256,
 
    -- indexing --
-   version              UInt64, -- latest version of the balance change (block_num << 32 + storage_ordinal)
+   global_sequence      UInt64, -- latest version of the balance change (block_num << 32 + storage_ordinal)
 
    -- debug --
    balance_change_type  Int32
@@ -101,7 +101,7 @@ CREATE INDEX IF NOT EXISTS idx_transfers_to       ON transfers (`to`)     TYPE b
 
 -- latest balances by account --
 CREATE MATERIALIZED VIEW IF NOT EXISTS balances
-ENGINE = ReplacingMergeTree(version)
+ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (owner, contract)
 POPULATE
 AS
@@ -109,7 +109,7 @@ SELECT * FROM balance_changes;
 
 -- latest balances by account & by date --
 CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_date
-ENGINE = ReplacingMergeTree(version)
+ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (owner, contract, date)
 POPULATE
 AS

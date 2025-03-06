@@ -5,7 +5,7 @@ use crate::algorithms::algorithm2_child_calls::find_erc20_balance_changes_algori
 use crate::algorithms::fishing::is_fishing_transfers;
 use crate::algorithms::utils::{addresses_for_storage_keys, Address, Hash};
 use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
-use crate::utils::{clock_to_date, index_to_version};
+use crate::utils::{clock_to_date, to_global_sequence};
 use substreams::errors::Error;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
 
@@ -95,7 +95,7 @@ pub fn to_balance_change<'a>(
         new_balance: new_balance.to_string(),
 
         // -- indexing --
-        version: index_to_version(clock, storage_change),
+        global_sequence: to_global_sequence(clock, &storage_change.ordinal),
 
         // -- debug --
         balance_change_type: change_type as i32,
