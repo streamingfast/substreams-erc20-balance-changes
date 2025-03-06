@@ -119,5 +119,5 @@ AS
 SELECT * FROM balance_changes;
 
 -- remove zero balances --
-ALTER TABLE balances MODIFY TTL timestamp WHERE balance <= 0;
-ALTER TABLE balances_by_date MODIFY TTL timestamp WHERE balance <= 0;
+ALTER TABLE balances MODIFY TTL timestamp WHERE new_balance <= 0;
+ALTER TABLE balances_by_date MODIFY TTL timestamp WHERE new_balance <= 0;
