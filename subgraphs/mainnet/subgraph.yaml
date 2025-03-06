@@ -1,6 +1,6 @@
 specVersion: 1.2.0
 description: Tracks ERC-20 token balances & transfers for EVM blockchains.
-repository: https://github.com/pinax-network/substreams-erc20
+repository: https://github.com/pinax-network/substreams-evm-tokens
 schema:
   file: ../schema.graphql
 indexerHints:

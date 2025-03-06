@@ -2,7 +2,7 @@ specVersion: v0.1.0
 package:
   name: erc20_clickhouse
   version: v1.5.0
-  url: https://github.com/pinax-network/substreams-erc20
+  url: https://github.com/pinax-network/substreams-evm-tokens
 
 imports:
   database_changes: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v2.0.0/substreams-database-change-v2.0.0.spkg

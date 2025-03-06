@@ -2,7 +2,7 @@ specVersion: v0.1.0
 package:
   name: erc20_subgraph
   version: v1.5.0
-  url: https://github.com/pinax-network/substreams-erc20
+  url: https://github.com/pinax-network/substreams-evm-tokens
 
 imports:
   entity_changes: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v2.0.0/substreams-entity-change-v2.0.0.spkg
