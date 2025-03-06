@@ -40,11 +40,6 @@ pub struct BalanceChange {
     /// the block's global ordinal when the transfer was recorded.
     #[prost(uint64, tag="12")]
     pub log_ordinal: u64,
-    /// -- storage change --
-    #[prost(string, tag="13")]
-    pub storage_key: ::prost::alloc::string::String,
-    #[prost(uint64, tag="14")]
-    pub storage_ordinal: u64,
     /// -- balance change --
     ///
     /// storage_change.address
@@ -116,43 +111,16 @@ pub struct Transfer {
     #[prost(int32, tag="99")]
     pub transfer_type: i32,
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct BalanceChangeStats {
-    #[prost(message, optional, tag="1")]
-    pub current: ::core::option::Option<BalanceChangeStat>,
-    #[prost(message, optional, tag="2")]
-    pub total: ::core::option::Option<BalanceChangeStat>,
-    /// block
-    #[prost(uint64, tag="99")]
-    pub block_number: u64,
-    #[prost(message, optional, tag="100")]
-    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct BalanceChangeStat {
-    #[prost(uint64, tag="1")]
-    pub type1_balance_changes: u64,
-    #[prost(uint64, tag="2")]
-    pub type2_balance_changes: u64,
-    #[prost(uint64, tag="3")]
-    pub balance_changes: u64,
-    #[prost(uint64, tag="4")]
-    pub transfers: u64,
-    #[prost(uint64, tag="5")]
-    pub transfers_not_matched: u64,
-    #[prost(string, tag="6")]
-    pub valid_rate: ::prost::alloc::string::String,
-}
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum BalanceChangeType {
     Unspecified = 0,
-    /// easy case where storage change is in the same call as the Transfer call
+    /// ERC-20 within a Transfer call
     BalanceChangeType1 = 1,
-    /// storage change is in a different call than the Transfer call
+    /// ERC-20 different Transfer call
     BalanceChangeType2 = 2,
+    /// Native (ETH)
+    Native = 3,
 }
 impl BalanceChangeType {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -164,6 +132,7 @@ impl BalanceChangeType {
             BalanceChangeType::Unspecified => "BALANCE_CHANGE_TYPE_UNSPECIFIED",
             BalanceChangeType::BalanceChangeType1 => "BALANCE_CHANGE_TYPE_1",
             BalanceChangeType::BalanceChangeType2 => "BALANCE_CHANGE_TYPE_2",
+            BalanceChangeType::Native => "BALANCE_CHANGE_TYPE_NATIVE",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -172,6 +141,7 @@ impl BalanceChangeType {
             "BALANCE_CHANGE_TYPE_UNSPECIFIED" => Some(Self::Unspecified),
             "BALANCE_CHANGE_TYPE_1" => Some(Self::BalanceChangeType1),
             "BALANCE_CHANGE_TYPE_2" => Some(Self::BalanceChangeType2),
+            "BALANCE_CHANGE_TYPE_NATIVE" => Some(Self::Native),
             _ => None,
         }
     }
@@ -180,8 +150,11 @@ impl BalanceChangeType {
 #[repr(i32)]
 pub enum TransferType {
     Unspecified = 0,
+    /// ERC-20 mint
     Mint = 1,
+    /// ERC-20 burn
     Burn = 2,
+    /// ERC-20 fishing
     Fishing = 3,
 }
 impl TransferType {

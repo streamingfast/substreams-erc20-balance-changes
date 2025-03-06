@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package erc20.types.v1;
+package evm.tokens.types.v1;
 
 import "google/protobuf/timestamp.proto";
 
@@ -11,15 +11,16 @@ message Events {
 
 enum BalanceChangeType {
   BALANCE_CHANGE_TYPE_UNSPECIFIED = 0;
-  BALANCE_CHANGE_TYPE_1 = 1; // easy case where storage change is in the same call as the Transfer call
-  BALANCE_CHANGE_TYPE_2 = 2; // storage change is in a different call than the Transfer call
+  BALANCE_CHANGE_TYPE_ERC20_ALGO_1 = 1; // ERC-20 within a Transfer call
+  BALANCE_CHANGE_TYPE_ERC20_ALGO_2 = 2; // ERC-20 different Transfer call
+  BALANCE_CHANGE_TYPE_NATIVE = 3; // Native (ETH)
 }
 
 enum TransferType {
   TRANSFER_TYPE_UNSPECIFIED = 0;
-  TRANSFER_TYPE_MINT = 1;
-  TRANSFER_TYPE_BURN = 2;
-  TRANSFER_TYPE_FISHING = 3;
+  TRANSFER_TYPE_MINT = 1; // ERC-20 mint
+  TRANSFER_TYPE_BURN = 2; // ERC-20 burn
+  TRANSFER_TYPE_FISHING = 3; // ERC-20 fishing
 }
 
 message BalanceChange {
@@ -41,10 +42,6 @@ message BalanceChange {
   uint32 log_block_index = 11; // BlockIndex represents the index of the log relative to the Block.
   uint64 log_ordinal = 12; // the block's global ordinal when the transfer was recorded.
 
-  // -- storage change --
-  string storage_key = 13;
-  uint64 storage_ordinal = 14;
-
   // -- balance change --
   string contract = 20; // storage_change.address
   string owner = 21;
@@ -52,10 +49,11 @@ message BalanceChange {
   string new_balance = 23;
 
   // -- indexing --
-  uint64 global_sequence = 30; // latest global sequence of the balance change (block_num << 32 + index)
+  uint32 ordinal = 30; // storage.ordinal or balance_change.ordinal
+  uint64 global_sequence = 31; // latest global sequence of the balance change (block_num << 32 + index)
 
-  // -- debug --
-  int32 balance_change_type = 99; // type enum isn't supported yet as a leaf node
+  // -- metadata --
+  BalanceChangeType type = 99;
 }
 
 message Transfer {
@@ -83,24 +81,6 @@ message Transfer {
   string to = 22;
   string value = 23;
 
-  // -- debug --
-  int32 transfer_type = 99; // type enum isn't supported yet as a leaf node
-}
-
-message BalanceChangeStats {
-  BalanceChangeStat current = 1;
-  BalanceChangeStat total = 2;
-
-  // block
-  uint64 block_number = 99;
-  google.protobuf.Timestamp timestamp = 100;
-}
-
-message BalanceChangeStat {
-  uint64 type1_balance_changes = 1;
-  uint64 type2_balance_changes = 2;
-  uint64 balance_changes = 3;
-  uint64 transfers = 4;
-  uint64 transfers_not_matched = 5;
-  string valid_rate = 6;
+  // -- metadata --
+  TransferType type = 99;
 }

@@ -1,4 +1,4 @@
-use erc20_balances_transfers::pb::erc20::types::v1::Events;
+use proto::pb::evm::tokens::types::v1::Events;
 use substreams::errors::Error;
 use substreams_entity_change::pb::entity::EntityChanges;
 

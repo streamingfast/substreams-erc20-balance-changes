@@ -1,5 +1,5 @@
 [package]
-name = "erc20-balances-transfers"
+name = "erc20"
 description = { workspace = true }
 edition = { workspace = true }
 version = { workspace = true }
@@ -13,8 +13,7 @@ authors = [
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-prost = "0.13"
-prost-types = "0.13"
 substreams = { workspace = true }
 substreams-ethereum = "0.10"
 substreams-abis = "0.1"
+proto = { path = "../proto" }

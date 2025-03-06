@@ -1,4 +1,4 @@
-use erc20_balances_transfers::pb::erc20::types::v1::Events;
+use proto::pb::evm::tokens::types::v1::Events;
 use substreams::errors::Error;
 use substreams_database_change::pb::database::DatabaseChanges;
 
@@ -12,7 +12,7 @@ pub fn db_out(events: Events) -> Result<DatabaseChanges, Error> {
                 "balance_changes",
                 [
                     ("block_num", (balance_change).block_num.to_string()),
-                    ("storage_ordinal", (balance_change).storage_ordinal.to_string()),
+                    ("ordinal", (balance_change).ordinal.to_string()),
                 ],
             )
             // -- block --
@@ -28,9 +28,7 @@ pub fn db_out(events: Events) -> Result<DatabaseChanges, Error> {
             .set("log_index", balance_change.log_index.to_string())
             .set("log_block_index", balance_change.log_block_index.to_string())
             .set("log_ordinal", balance_change.log_ordinal.to_string())
-            // -- storage --
-            .set("storage_key", balance_change.storage_key)
-            .set("storage_ordinal", balance_change.storage_ordinal.to_string())
+
             // -- balance change --
             .set("contract", balance_change.contract)
             .set("owner", balance_change.owner)

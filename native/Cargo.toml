@@ -1,5 +1,5 @@
 [package]
-name = "native-balances"
+name = "native"
 description = { workspace = true }
 edition = { workspace = true }
 version = { workspace = true }
@@ -14,3 +14,5 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 substreams = { workspace = true }
 substreams-ethereum = "0.10"
+proto = { path = "../proto" }
+erc20 = { path = "../erc20" }

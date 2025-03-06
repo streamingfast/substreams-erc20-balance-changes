@@ -10,4 +10,5 @@ crate-type = ["cdylib"]
 [dependencies]
 substreams = { workspace = true }
 substreams-entity-change = "2.0"
-erc20-balances-transfers = { path = "../erc20-balances-transfers" }
+erc20 = { path = "../erc20" }
+proto = { path = "../proto" }

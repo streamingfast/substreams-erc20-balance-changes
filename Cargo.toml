@@ -1,14 +1,15 @@
 [workspace]
 members = [
-  "erc20-balances-transfers",
-  "native-balances",
+  "erc20",
+  "native",
+  "proto",
   "clickhouse",
-  "subgraphs",
+  "subgraph",
 ]
 resolver = "2"
 
 [workspace.package]
-description = "ERC-20 Balances"
+description = "EVM Tokens"
 edition = "2021"
 version = "0.0.0"
 

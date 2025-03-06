@@ -4,7 +4,7 @@ use crate::algorithms::algorithm1_call::find_erc20_balance_changes_algorithm1;
 use crate::algorithms::algorithm2_child_calls::find_erc20_balance_changes_algorithm2;
 use crate::algorithms::fishing::is_fishing_transfers;
 use crate::algorithms::utils::{addresses_for_storage_keys, Address, Hash};
-use crate::pb::erc20::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
+use proto::pb::evm::tokens::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
 use crate::utils::{clock_to_date, to_global_sequence};
 use substreams::errors::Error;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
@@ -83,10 +83,6 @@ pub fn to_balance_change<'a>(
         log_index: log.index,
         log_block_index: log.block_index,
         log_ordinal: log.ordinal,
-
-        // -- storage change --
-        storage_key: Hex::encode(&storage_change.key),
-        storage_ordinal: storage_change.ordinal,
 
         // -- balance change --
         contract: Hex::encode(&storage_change.address),

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package debug.types.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message BalanceChangeStats {
+  BalanceChangeStat current = 1;
+  BalanceChangeStat total = 2;
+
+  // block
+  uint64 block_number = 99;
+  google.protobuf.Timestamp timestamp = 100;
+}
+
+message BalanceChangeStat {
+  uint64 type1_balance_changes = 1;
+  uint64 type2_balance_changes = 2;
+  uint64 balance_changes = 3;
+  uint64 transfers = 4;
+  uint64 transfers_not_matched = 5;
+  string valid_rate = 6;
+}

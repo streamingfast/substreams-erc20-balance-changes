@@ -9,11 +9,13 @@ Includes the following:
 - [x] Apache Parquet - File Sink (Protobuf Map modules)
 - [x] Clickhouse SQL Sink
 - [ ] Postgres SQL Sink
-- [x] Graph Node - Subgraphs (SpS)
+- [ ] Graph Node - Subgraphs (SpS)
 
 ## Substreams Packages
 
 - [x] ERC-20 Balances & Transfers
+- [x] Native Balances
+- [ ] Native Transfers
 - [ ] ERC-20 Contract Metadata
 - [ ] ERC-20 Supply
 
