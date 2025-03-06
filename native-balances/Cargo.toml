@@ -1,0 +1,16 @@
+[package]
+name = "native-balances"
+description = { workspace = true }
+edition = { workspace = true }
+version = { workspace = true }
+authors = [
+    "Denis <denis@pinax.network>",
+    "Colin Dickson <https://github.com/colindickson>",
+]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+substreams = { workspace = true }
+substreams-ethereum = "0.10"
