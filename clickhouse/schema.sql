@@ -99,22 +99,24 @@ CREATE INDEX IF NOT EXISTS idx_transfers_contract ON transfers (contract) TYPE b
 CREATE INDEX IF NOT EXISTS idx_transfers_from     ON transfers (`from`)   TYPE bloom_filter GRANULARITY 4;
 CREATE INDEX IF NOT EXISTS idx_transfers_to       ON transfers (`to`)     TYPE bloom_filter GRANULARITY 4;
 
--- latest balances by contract/owner --
+-- latest balances by owner --
 CREATE MATERIALIZED VIEW IF NOT EXISTS balances
 ENGINE = ReplacingMergeTree(global_sequence)
-PARTITION BY contract
-ORDER BY (contract, owner)
+PARTITION BY owner
+ORDER BY (owner, contract)
+POPULATE
 AS
 SELECT * FROM balance_changes;
 
 -- create a bloom-filter index for these high-cardinality string columns
-CREATE INDEX IF NOT EXISTS idx_balances_owner ON balances (owner) TYPE bloom_filter GRANULARITY 4;
+CREATE INDEX IF NOT EXISTS idx_balances_contract ON balances (contract) TYPE bloom_filter GRANULARITY 4;
 
 -- latest balances by account & by date --
 CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_date
 ENGINE = ReplacingMergeTree(global_sequence)
-PARTITION BY contract
-ORDER BY (contract, owner, date)
+PARTITION BY owner
+ORDER BY (owner, contract, date)
+POPULATE
 AS
 SELECT * FROM balance_changes;
 
