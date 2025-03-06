@@ -176,24 +176,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "erc20-clickhouse"
-version = "0.0.0"
-dependencies = [
- "erc20-balances-transfers",
- "substreams",
- "substreams-database-change",
-]
-
-[[package]]
-name = "erc20-subgraph"
-version = "0.0.0"
-dependencies = [
- "erc20-balances-transfers",
- "substreams",
- "substreams-entity-change",
-]
-
-[[package]]
 name = "errno"
 version = "0.3.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -289,6 +271,24 @@ dependencies = [
  "impl-serde 0.4.0",
  "primitive-types 0.12.2",
  "uint",
+]
+
+[[package]]
+name = "evm-tokens-clickhouse"
+version = "0.0.0"
+dependencies = [
+ "erc20-balances-transfers",
+ "substreams",
+ "substreams-database-change",
+]
+
+[[package]]
+name = "evm-tokens-subgraph"
+version = "0.0.0"
+dependencies = [
+ "erc20-balances-transfers",
+ "substreams",
+ "substreams-entity-change",
 ]
 
 [[package]]

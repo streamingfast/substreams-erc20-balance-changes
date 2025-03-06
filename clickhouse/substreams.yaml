@@ -1,24 +1,24 @@
 specVersion: v0.1.0
 package:
-  name: erc20_clickhouse
+  name: evm_tokens_clickhouse
   version: v1.5.0
   url: https://github.com/pinax-network/substreams-evm-tokens
 
 imports:
   database_changes: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v2.0.0/substreams-database-change-v2.0.0.spkg
   sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
-  erc20_balances: ../erc20-balances-transfers/erc20-balances-transfers-v1.5.0.spkg
+  erc20_balances_transfers: ../erc20-balances-transfers/erc20-balances-transfers-v1.5.0.spkg
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/erc20_clickhouse.wasm
+    file: ../target/wasm32-unknown-unknown/release/evm_tokens_clickhouse.wasm
 
 modules:
   - name: db_out
     kind: map
     inputs:
-      - map: erc20_balances:map_events
+      - map: erc20_balances_transfers:map_events
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 

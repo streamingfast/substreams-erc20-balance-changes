@@ -1,5 +1,5 @@
 [package]
-name = "erc20-clickhouse"
+name = "evm-tokens-clickhouse"
 description = { workspace = true }
 edition = { workspace = true }
 version = { workspace = true }

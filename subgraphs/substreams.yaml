@@ -1,22 +1,22 @@
 specVersion: v0.1.0
 package:
-  name: erc20_subgraph
+  name: evm_tokens_subgraph
   version: v1.5.0
   url: https://github.com/pinax-network/substreams-evm-tokens
 
 imports:
   entity_changes: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v2.0.0/substreams-entity-change-v2.0.0.spkg
-  erc20_balances: ../erc20-balances-transfers/erc20-balances-transfers-v1.5.0.spkg
+  erc20_balances_transfers: ../erc20-balances-transfers/erc20-balances-transfers-v1.5.0.spkg
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/erc20_subgraph.wasm
+    file: ../target/wasm32-unknown-unknown/release/evm_tokens_subgraph.wasm
 
 modules:
   - name: graph_out
     kind: map
     inputs:
-      - map: erc20_balances:map_events
+      - map: erc20_balances_transfers:map_events
     output:
       type: proto:sf.substreams.sink.entity.v1.EntityChanges
