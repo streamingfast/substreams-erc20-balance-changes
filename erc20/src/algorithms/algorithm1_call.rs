@@ -32,7 +32,7 @@ pub fn find_erc20_balance_changes_algorithm1<'a>(
         // Yield one of two results depending on whether the storage change
         // matches the transfer's balance changes
         let balance_type = if is_erc20_valid_balance(transfer, storage_change) {
-            BalanceChangeType::BalanceChangeType1
+            BalanceChangeType::Erc20Algo1
         } else {
             BalanceChangeType::Unspecified
         };

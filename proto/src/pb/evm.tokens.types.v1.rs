@@ -53,14 +53,15 @@ pub struct BalanceChange {
     pub new_balance: ::prost::alloc::string::String,
     /// -- indexing --
     ///
-    /// latest global sequence of the balance change (block_num << 32 + index)
+    /// storage.ordinal or balance_change.ordinal
     #[prost(uint64, tag="30")]
+    pub ordinal: u64,
+    /// latest global sequence of the balance change (block_num << 32 + index)
+    #[prost(uint64, tag="31")]
     pub global_sequence: u64,
-    /// -- debug --
-    ///
-    /// type enum isn't supported yet as a leaf node
-    #[prost(int32, tag="99")]
-    pub balance_change_type: i32,
+    /// -- metadata --
+    #[prost(enumeration="BalanceChangeType", tag="99")]
+    pub r#type: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -105,20 +106,18 @@ pub struct Transfer {
     pub to: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
     pub value: ::prost::alloc::string::String,
-    /// -- debug --
-    ///
-    /// type enum isn't supported yet as a leaf node
-    #[prost(int32, tag="99")]
-    pub transfer_type: i32,
+    /// -- metadata --
+    #[prost(enumeration="TransferType", tag="99")]
+    pub r#type: i32,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum BalanceChangeType {
     Unspecified = 0,
     /// ERC-20 within a Transfer call
-    BalanceChangeType1 = 1,
+    Erc20Algo1 = 1,
     /// ERC-20 different Transfer call
-    BalanceChangeType2 = 2,
+    Erc20Algo2 = 2,
     /// Native (ETH)
     Native = 3,
 }
@@ -130,8 +129,8 @@ impl BalanceChangeType {
     pub fn as_str_name(&self) -> &'static str {
         match self {
             BalanceChangeType::Unspecified => "BALANCE_CHANGE_TYPE_UNSPECIFIED",
-            BalanceChangeType::BalanceChangeType1 => "BALANCE_CHANGE_TYPE_1",
-            BalanceChangeType::BalanceChangeType2 => "BALANCE_CHANGE_TYPE_2",
+            BalanceChangeType::Erc20Algo1 => "BALANCE_CHANGE_TYPE_ERC20_ALGO_1",
+            BalanceChangeType::Erc20Algo2 => "BALANCE_CHANGE_TYPE_ERC20_ALGO_2",
             BalanceChangeType::Native => "BALANCE_CHANGE_TYPE_NATIVE",
         }
     }
@@ -139,8 +138,8 @@ impl BalanceChangeType {
     pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
         match value {
             "BALANCE_CHANGE_TYPE_UNSPECIFIED" => Some(Self::Unspecified),
-            "BALANCE_CHANGE_TYPE_1" => Some(Self::BalanceChangeType1),
-            "BALANCE_CHANGE_TYPE_2" => Some(Self::BalanceChangeType2),
+            "BALANCE_CHANGE_TYPE_ERC20_ALGO_1" => Some(Self::Erc20Algo1),
+            "BALANCE_CHANGE_TYPE_ERC20_ALGO_2" => Some(Self::Erc20Algo2),
             "BALANCE_CHANGE_TYPE_NATIVE" => Some(Self::Native),
             _ => None,
         }

@@ -57,10 +57,11 @@ pub fn to_balance_change<'a>(
         new_balance: new_balance.to_string(),
 
         // -- indexing --
+        ordinal: balance_change.ordinal,
         global_sequence: to_global_sequence(clock, &balance_change.ordinal),
 
         // -- debug --
-        balance_change_type: change_type as i32,
+        r#type: change_type as i32,
     }
 }
 

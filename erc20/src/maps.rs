@@ -49,7 +49,7 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Ca
         value: transfer.value.to_string(),
 
         // -- debug --
-        transfer_type: 1_i32,
+        r#type: 1_i32,
     }
 }
 
@@ -91,10 +91,11 @@ pub fn to_balance_change<'a>(
         new_balance: new_balance.to_string(),
 
         // -- indexing --
+        ordinal: storage_change.ordinal,
         global_sequence: to_global_sequence(clock, &storage_change.ordinal),
 
         // -- debug --
-        balance_change_type: change_type as i32,
+        r#type: change_type as i32,
     }
 }
 

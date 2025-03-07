@@ -39,6 +39,6 @@ pub fn find_erc20_balance_changes_algorithm2<'a>(
         }
 
         // Yield the tuple
-        Some((owner, storage_change, BalanceChangeType::BalanceChangeType2))
+        Some((owner, storage_change, BalanceChangeType::Erc20Algo2))
     })
 }
