@@ -25,17 +25,9 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    -- transaction --
    transaction_id       FixedString(64),
 
-   -- call --
-   call_index           UInt32,
-
-   -- log --
-   log_index            UInt32,
-   log_block_index      UInt32,
-   log_ordinal          UInt64,
-
-   -- storage change --
-   storage_key          FixedString(64),
-   storage_ordinal      UInt64,
+   -- ordering --
+   ordinal              UInt64, -- storage_change.ordinal or balance_change.ordinal
+   global_sequence      UInt64, -- latest version of the balance change (block_num << 32 + index)
 
    -- balance change --
    contract             FixedString(40),
@@ -43,20 +35,18 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    old_balance          UInt256,
    new_balance          UInt256,
 
-   -- indexing --
-   global_sequence      UInt64, -- latest version of the balance change (block_num << 32 + storage_ordinal)
+   -- metadata --
+   type                 LowCardinality(String),
 
-   -- debug --
-   balance_change_type  Int32
+   -- indexes --
+   INDEX idx_balance_changes_date     (date)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_balance_changes_contract (contract)  TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_balance_changes_owner    (owner)     TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
 PARTITION BY date
-PRIMARY KEY (block_num, storage_ordinal)
-ORDER BY (block_num, storage_ordinal);
-
--- create a bloom-filter index for these high-cardinality string columns
-CREATE INDEX IF NOT EXISTS idx_balance_changes_contract ON balance_changes (contract) TYPE bloom_filter GRANULARITY 4;
-CREATE INDEX IF NOT EXISTS idx_balance_changes_owner    ON balance_changes (owner)   TYPE bloom_filter GRANULARITY 4;
+PRIMARY KEY (block_num, ordinal)
+ORDER BY (block_num, ordinal);
 
 -------------------------------------------------
 -- Transfer events                      --
@@ -71,14 +61,9 @@ CREATE TABLE IF NOT EXISTS transfers  (
    -- transaction --
    transaction_id       FixedString(64),
 
-   -- call --
-   call_index           UInt32,
-   call_address         FixedString(40),
-
-   -- log --
-   log_index            UInt32,
-   log_block_index      UInt32,
-   log_ordinal          UInt64,
+   -- ordering --
+   ordinal              UInt64, -- log.ordinal
+   global_sequence      UInt64, -- latest global sequence of the transfer (block_num << 32 + index)
 
    -- transfer --
    contract             FixedString(40), -- log.address
@@ -86,38 +71,66 @@ CREATE TABLE IF NOT EXISTS transfers  (
    `to`                 FixedString(40),
    value                UInt256,
 
-   -- debug --
-   transfer_type        Int32
+   -- metadata --
+   type                 LowCardinality(String),
+
+   -- indexes --
+   INDEX idx_transfers_date     (date)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_contract (contract)  TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_from     (`from`)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_to       (`to`)      TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
 PARTITION BY date
-PRIMARY KEY (block_num, log_block_index)
-ORDER BY (block_num, log_block_index);
+PRIMARY KEY (block_num, ordinal)
+ORDER BY (block_num, ordinal);
 
--- create a bloom-filter index for these high-cardinality string columns
-CREATE INDEX IF NOT EXISTS idx_transfers_contract ON transfers (contract) TYPE bloom_filter GRANULARITY 4;
-CREATE INDEX IF NOT EXISTS idx_transfers_from     ON transfers (`from`)   TYPE bloom_filter GRANULARITY 4;
-CREATE INDEX IF NOT EXISTS idx_transfers_to       ON transfers (`to`)     TYPE bloom_filter GRANULARITY 4;
+-- latest balances by owner/contract --
+CREATE TABLE IF NOT EXISTS balances  (
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
 
--- latest balances by owner --
-CREATE MATERIALIZED VIEW IF NOT EXISTS balances
+   -- balance change --
+   contract             FixedString(40),
+   owner                FixedString(40),
+   new_balance          UInt256,
+
+   -- ordering --
+   global_sequence      UInt64, -- block_num << 32 + index
+
+   -- indexes --
+   INDEX idx_balances_contract (contract)  TYPE bloom_filter GRANULARITY 4
+)
 ENGINE = ReplacingMergeTree(global_sequence)
-PARTITION BY owner
-ORDER BY (owner, contract)
-POPULATE
-AS
+PRIMARY KEY (owner, contract)
+ORDER BY (owner, contract);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS balances_mv
+TO balances AS
 SELECT * FROM balance_changes;
 
--- create a bloom-filter index for these high-cardinality string columns
-CREATE INDEX IF NOT EXISTS idx_balances_contract ON balances (contract) TYPE bloom_filter GRANULARITY 4;
+-- latest balances by owner/contract/date --
+CREATE TABLE IF NOT EXISTS balances_by_date  (
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
 
--- latest balances by account & by date --
-CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_date
+   -- balance change --
+   contract             FixedString(40),
+   owner                FixedString(40),
+   new_balance              UInt256,
+
+   -- ordering --
+   global_sequence      UInt64, -- block_num << 32 + index
+
+   -- indexes --
+   INDEX idx_balances_contract (contract)  TYPE bloom_filter GRANULARITY 4
+)
 ENGINE = ReplacingMergeTree(global_sequence)
-PARTITION BY owner
-ORDER BY (owner, contract, date)
-POPULATE
-AS
+PRIMARY KEY (owner, contract, date)
+ORDER BY (owner, contract, date);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_date_mv
+TO balances_by_date AS
 SELECT * FROM balance_changes;
 
 -- remove zero balances --
