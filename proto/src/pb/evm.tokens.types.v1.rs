@@ -23,23 +23,14 @@ pub struct BalanceChange {
     /// -- transaction --
     #[prost(string, tag="5")]
     pub transaction_id: ::prost::alloc::string::String,
-    /// -- call --
-    #[prost(uint32, tag="6")]
-    pub call_index: u32,
-    /// may indicate the “to” or “from” in a lower-level call context, but is not the address that emitted the event.
-    #[prost(string, tag="7")]
-    pub call_address: ::prost::alloc::string::String,
-    /// -- log --
+    /// -- ordering --
     ///
-    /// Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
-    #[prost(uint32, tag="10")]
-    pub log_index: u32,
-    /// BlockIndex represents the index of the log relative to the Block.
-    #[prost(uint32, tag="11")]
-    pub log_block_index: u32,
-    /// the block's global ordinal when the transfer was recorded.
-    #[prost(uint64, tag="12")]
-    pub log_ordinal: u64,
+    /// storage_change.ordinal or balance_change.ordinal
+    #[prost(uint64, tag="10")]
+    pub ordinal: u64,
+    /// latest global sequence of the balance change (block_num << 32 + index)
+    #[prost(uint64, tag="11")]
+    pub global_sequence: u64,
     /// -- balance change --
     ///
     /// storage_change.address
@@ -51,14 +42,6 @@ pub struct BalanceChange {
     pub old_balance: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
-    /// -- indexing --
-    ///
-    /// storage.ordinal or balance_change.ordinal
-    #[prost(uint64, tag="30")]
-    pub ordinal: u64,
-    /// latest global sequence of the balance change (block_num << 32 + index)
-    #[prost(uint64, tag="31")]
-    pub global_sequence: u64,
     /// -- metadata --
     #[prost(enumeration="BalanceChangeType", tag="99")]
     pub r#type: i32,
@@ -78,23 +61,14 @@ pub struct Transfer {
     /// -- transaction --
     #[prost(string, tag="5")]
     pub transaction_id: ::prost::alloc::string::String,
-    /// -- call --
-    #[prost(uint32, tag="6")]
-    pub call_index: u32,
-    /// may indicate the “to” or “from” in a lower-level call context, but is not the address that emitted the event.
-    #[prost(string, tag="7")]
-    pub call_address: ::prost::alloc::string::String,
-    /// -- log --
+    /// -- ordinal --
     ///
-    /// Index is the index of the log relative to the transaction. This index is always populated regardless of the state revertion of the the call that emitted this log.
-    #[prost(uint32, tag="10")]
-    pub log_index: u32,
-    /// BlockIndex represents the index of the log relative to the Block.
-    #[prost(uint32, tag="11")]
-    pub log_block_index: u32,
-    /// the block's global ordinal when the transfer was recorded.
-    #[prost(uint64, tag="12")]
-    pub log_ordinal: u64,
+    /// log.ordinal
+    #[prost(uint64, tag="10")]
+    pub ordinal: u64,
+    /// latest global sequence of the transfer (block_num << 32 + index)
+    #[prost(uint64, tag="11")]
+    pub global_sequence: u64,
     /// -- transfer --
     ///
     /// log.address

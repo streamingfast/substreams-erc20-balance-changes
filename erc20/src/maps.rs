@@ -22,7 +22,7 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
     Ok(events)
 }
 
-pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Call, log: &'a Log, transfer: &'a TransferAbi) -> Transfer {
+pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log, transfer: &'a TransferAbi, index: &u64) -> Transfer {
     Transfer {
         // -- block --
         block_num: clock.number,
@@ -33,14 +33,9 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Ca
         // -- transaction --
         transaction_id: Hex::encode(&trx.hash),
 
-        // -- call --
-        call_index: call.index,
-        call_address: Hex::encode(&call.address),
-
-        // -- log --
-        log_index: log.index,
-        log_block_index: log.block_index,
-        log_ordinal: log.ordinal,
+        // -- ordering --
+        ordinal: log.ordinal,
+        global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
         contract: Hex::encode(&log.address),
@@ -48,19 +43,18 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Ca
         to: Hex::encode(&transfer.to),
         value: transfer.value.to_string(),
 
-        // -- debug --
-        r#type: 1_i32,
+        // -- metadata --
+        r#type: 1_i32, // TO-DO
     }
 }
 
 pub fn to_balance_change<'a>(
     clock: &Clock,
     trx: &'a TransactionTrace,
-    call: &'a Call,
-    log: &'a Log,
     owner: Address,
     storage_change: &'a StorageChange,
-    change_type: BalanceChangeType,
+    r#type: BalanceChangeType,
+    index: &u64,
 ) -> BalanceChange {
     let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
     let new_balance = BigInt::from_unsigned_bytes_be(&storage_change.new_value);
@@ -75,33 +69,26 @@ pub fn to_balance_change<'a>(
         // -- transaction
         transaction_id: Hex::encode(&trx.hash),
 
-        // -- call --
-        call_index: call.index,
-        call_address: Hex::encode(&call.address),
-
-        // -- log --
-        log_index: log.index,
-        log_block_index: log.block_index,
-        log_ordinal: log.ordinal,
-
         // -- balance change --
         contract: Hex::encode(&storage_change.address),
         owner: Hex::encode(owner),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
 
-        // -- indexing --
+        // -- ordering --
         ordinal: storage_change.ordinal,
-        global_sequence: to_global_sequence(clock, &storage_change.ordinal),
+        global_sequence: to_global_sequence(clock, index),
 
-        // -- debug --
-        r#type: change_type as i32,
+        // -- metadata --
+        r#type: r#type as i32,
     }
 }
 
 pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events) {
     // We memoize the keccak address map by call because it is expensive to compute
     let mut keccak_address_map = HashMap::new();
+    let mut transfer_index = 0;
+    let mut balance_changes_index = 0;
 
     // Iterates over successful transactions
     for trx in block.transactions() {
@@ -121,13 +108,15 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             if transfer.value.is_zero() {
                 continue;
             }
-            events.transfers.push(to_transfer(clock, trx, call, log, &transfer));
+            events.transfers.push(to_transfer(clock, trx, log, &transfer, &transfer_index));
+            transfer_index += 1;
 
             // -- Balance Changes --
             keccak_address_map.extend(addresses_for_storage_keys(call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
             for (owner, storage_change, change_type) in balance_changes {
-                let balance_change = to_balance_change(clock, trx, call, log, owner, storage_change, change_type);
+                let balance_change = to_balance_change(clock, trx, owner, storage_change, change_type, &balance_changes_index);
+                balance_changes_index += 1;
 
                 // insert balance change event
                 events.balance_changes.push(balance_change);

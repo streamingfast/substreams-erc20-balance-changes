@@ -17,9 +17,9 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
 pub fn to_balance_change<'a>(
     clock: &Clock,
     trx: &'a TransactionTrace,
-    call: &'a Call,
     balance_change: &'a BalanceChangeAbi,
     change_type: BalanceChangeType,
+    index: &u64,
 ) -> BalanceChange {
     let old_balance = match balance_change.old_value.as_ref() {
         Some(v) => BigInt::from_unsigned_bytes_be(&v.bytes).to_string(),
@@ -41,37 +41,30 @@ pub fn to_balance_change<'a>(
         // -- transaction
         transaction_id: Hex::encode(&trx.hash),
 
-        // -- call --
-        call_index: call.index,
-        call_address: Hex::encode(&call.address),
-
-        // -- log --
-        log_index: 0,
-        log_block_index: 0,
-        log_ordinal: 0,
-
         // -- balance change --
         contract: "native".to_string(),
         owner: Hex::encode(&balance_change.address),
-        old_balance: old_balance.to_string(),
-        new_balance: new_balance.to_string(),
+        old_balance,
+        new_balance,
 
-        // -- indexing --
+        // -- ordering --
         ordinal: balance_change.ordinal,
-        global_sequence: to_global_sequence(clock, &balance_change.ordinal),
+        global_sequence: to_global_sequence(clock, &index),
 
-        // -- debug --
+        // -- metadata --
         r#type: change_type as i32,
     }
 }
 
 pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events) {
+    let mut index = 0;
     // balance changes from block
     for balance_change in &block.balance_changes {
         if skip_balance_change(&balance_change) { continue; }
         events.balance_changes.push(
-            to_balance_change(clock, &TransactionTrace::default(), &Call::default(), balance_change, BalanceChangeType::Native)
+            to_balance_change(clock, &TransactionTrace::default(), balance_change, BalanceChangeType::Native, &index)
         );
+        index += 1;
     }
 
     // balance changes from transactions
@@ -86,8 +79,9 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             for balance_change in &call.balance_changes {
                 if skip_balance_change(&balance_change) { continue; }
                 events.balance_changes.push(
-                    to_balance_change(clock, &trx, call, &balance_change, BalanceChangeType::Native)
+                    to_balance_change(clock, &trx, &balance_change, BalanceChangeType::Native, &index)
                 );
+                index += 1;
             }
         }
     }

@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS balances_by_date  (
    -- balance change --
    contract             FixedString(40),
    owner                FixedString(40),
-   new_balance              UInt256,
+   new_balance          UInt256,
 
    -- ordering --
    global_sequence      UInt64, -- block_num << 32 + index
