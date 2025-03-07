@@ -1,13 +1,13 @@
 specVersion: v0.1.0
 package:
-  name: native_balances
+  name: evm-tokens-native
   version: v0.1.0
   url: https://github.com/pinax-network/substreams-evm-tokens
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/native_balances.wasm
+    file: ../target/wasm32-unknown-unknown/release/native.wasm
 
 protobuf:
   files:

@@ -1,13 +1,13 @@
 specVersion: v0.1.0
 package:
-  name: erc20_balances_transfers
-  version: v1.5.0
+  name: evm-tokens-erc20
+  version: v1.6.0
   url: https://github.com/pinax-network/substreams-evm-tokens
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/erc20_balances_transfers.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc20.wasm
 
 modules:
   - name: map_events

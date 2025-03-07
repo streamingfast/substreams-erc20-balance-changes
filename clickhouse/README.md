@@ -1,4 +1,4 @@
-# ERC-20: `Clickhouse`
+# EVM Tokens: `Clickhouse`
 
 ## Quickstart
 
@@ -26,12 +26,14 @@ substreams-sink-sql run clickhouse://default:default@localhost:9000/default \
 ### Perform SQL query with Clickhouse
 
 ```sql
--- Select the top sending addresses for DAI by total transferred value.
+-- Select the top 10 addresses with the most USDT
 SELECT
-    "from",
-    count() as total_transfers,
-    sum(value::HUGEINT / 10**18)::DECIMAL(18, 2) as total_value
-FROM read_parquet('./out/transfers/*.parquet') AS t
-WHERE contract = '6b175474e89094c44da98b954eedeac495271d0f' -- DAI
-GROUP BY "from" ORDER BY total_value DESC LIMIT 30;
+    concat('0x', owner) AS address,
+    new_balance AS amount,
+    date
+FROM balances
+FINAL
+WHERE (contract = 'dac17f958d2ee523a2206206994597c13d831ec7') AND (new_balance > 0)
+ORDER BY amount DESC
+LIMIT 10
 ```

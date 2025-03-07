@@ -1,4 +1,4 @@
-# ERC-20 Balances: `Parquet`
+# EVM Tokens: `Parquet`
 
 ## Quickstart
 

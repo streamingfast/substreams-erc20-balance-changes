@@ -85,6 +85,7 @@ ORDER BY (block_num, ordinal);
 
 -- latest balances by owner/contract --
 CREATE TABLE IF NOT EXISTS balances  (
+   block_num            UInt32,
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
@@ -109,6 +110,7 @@ SELECT * FROM balance_changes;
 
 -- latest balances by owner/contract/date --
 CREATE TABLE IF NOT EXISTS balances_by_date  (
+   block_num            UInt32,
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
@@ -122,6 +124,7 @@ CREATE TABLE IF NOT EXISTS balances_by_date  (
 
    -- indexes --
    INDEX idx_balances_contract (contract)  TYPE bloom_filter GRANULARITY 4
+   INDEX idx_balances_date (date)  TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (owner, contract, date)

@@ -98,6 +98,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "clickhouse"
+version = "0.0.0"
+dependencies = [
+ "erc20",
+ "proto",
+ "substreams",
+ "substreams-database-change",
+]
+
+[[package]]
 name = "const_format"
 version = "0.2.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -270,26 +280,6 @@ dependencies = [
  "impl-serde 0.4.0",
  "primitive-types 0.12.2",
  "uint",
-]
-
-[[package]]
-name = "evm-tokens-clickhouse"
-version = "0.0.0"
-dependencies = [
- "erc20",
- "proto",
- "substreams",
- "substreams-database-change",
-]
-
-[[package]]
-name = "evm-tokens-subgraph"
-version = "0.0.0"
-dependencies = [
- "erc20",
- "proto",
- "substreams",
- "substreams-entity-change",
 ]
 
 [[package]]
@@ -1059,6 +1049,16 @@ name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
+
+[[package]]
+name = "subgraph"
+version = "0.0.0"
+dependencies = [
+ "erc20",
+ "proto",
+ "substreams",
+ "substreams-entity-change",
+]
 
 [[package]]
 name = "substreams"
