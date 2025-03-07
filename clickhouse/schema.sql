@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS balances_by_date  (
    global_sequence      UInt64, -- block_num << 32 + index
 
    -- indexes --
-   INDEX idx_balances_contract (contract)  TYPE bloom_filter GRANULARITY 4
+   INDEX idx_balances_contract (contract)  TYPE bloom_filter GRANULARITY 4,
    INDEX idx_balances_date (date)  TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree(global_sequence)

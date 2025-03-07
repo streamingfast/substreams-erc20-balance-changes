@@ -9,15 +9,6 @@ binaries:
     type: wasm/rust-v1
     file: ../target/wasm32-unknown-unknown/release/native.wasm
 
-protobuf:
-  files:
-    - erc20.proto
-  importPaths:
-    - ../proto/v1
-  excludePaths:
-    - sf/substreams
-    - google
-
 modules:
   - name: map_events
     kind: map
