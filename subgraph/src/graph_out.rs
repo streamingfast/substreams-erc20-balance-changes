@@ -3,8 +3,14 @@ use substreams::errors::Error;
 use substreams_entity_change::pb::entity::EntityChanges;
 
 #[substreams::handlers::map]
-pub fn graph_out(events: Events) -> Result<EntityChanges, Error> {
+pub fn graph_out(erc20: Events, native: Events) -> Result<EntityChanges, Error> {
     let mut tables = substreams_entity_change::tables::Tables::new();
+
+    // merge erc20 + native events
+    let events = Events {
+        balance_changes: erc20.balance_changes.into_iter().chain(native.balance_changes).collect(),
+        transfers: erc20.transfers.into_iter().chain(native.transfers).collect(),
+    };
 
     for balance_change in events.balance_changes {
         tables

@@ -1,12 +1,13 @@
 specVersion: v0.1.0
 package:
-  name: subgraph
+  name: evm-tokens-subgraph
   version: v1.6.0
   url: https://github.com/pinax-network/substreams-evm-tokens
 
 imports:
   entity_changes: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v2.0.0/substreams-entity-change-v2.0.0.spkg
-  erc20: ../erc20/erc20-v1.5.0.spkg
+  erc20: ../erc20/substreams.yaml
+  native: ../native/substreams.yaml
 
 binaries:
   default:
@@ -17,6 +18,7 @@ modules:
   - name: graph_out
     kind: map
     inputs:
-      - map: erc20_balances_transfers:map_events
+      - map: erc20:map_events
+      - map: native:map_events
     output:
       type: proto:sf.substreams.sink.entity.v1.EntityChanges

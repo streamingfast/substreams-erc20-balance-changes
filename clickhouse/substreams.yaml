@@ -8,6 +8,7 @@ imports:
   database_changes: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v2.0.0/substreams-database-change-v2.0.0.spkg
   sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
   erc20: ../erc20/substreams.yaml
+  native: ../native/substreams.yaml
 
 binaries:
   default:
@@ -19,6 +20,7 @@ modules:
     kind: map
     inputs:
       - map: erc20:map_events
+      - map: native:map_events
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 

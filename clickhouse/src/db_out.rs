@@ -3,8 +3,14 @@ use substreams::errors::Error;
 use substreams_database_change::pb::database::DatabaseChanges;
 
 #[substreams::handlers::map]
-pub fn db_out(events: Events) -> Result<DatabaseChanges, Error> {
+pub fn db_out(erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
+
+    // merge erc20 + native events
+    let events = Events {
+        balance_changes: erc20.balance_changes.into_iter().chain(native.balance_changes).collect(),
+        transfers: erc20.transfers.into_iter().chain(native.transfers).collect(),
+    };
 
     for balance_change in events.balance_changes {
         tables
