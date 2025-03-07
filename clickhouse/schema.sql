@@ -44,7 +44,6 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    INDEX idx_balance_changes_owner    (owner)     TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
-PARTITION BY date
 PRIMARY KEY (block_num, ordinal)
 ORDER BY (block_num, ordinal);
 
@@ -81,7 +80,6 @@ CREATE TABLE IF NOT EXISTS transfers  (
    INDEX idx_transfers_to       (`to`)      TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
-PARTITION BY date
 PRIMARY KEY (block_num, ordinal)
 ORDER BY (block_num, ordinal);
 
