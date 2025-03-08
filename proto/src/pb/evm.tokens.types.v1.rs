@@ -43,96 +43,11 @@ pub struct BalanceChange {
     #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
     /// -- metadata --
-    #[prost(enumeration="TokenType", tag="100")]
-    pub r#type: i32,
-    #[prost(enumeration="balance_change::Reason", tag="101")]
-    pub reason: i32,
-    #[prost(enumeration="balance_change::Algorithm", tag="102")]
+    #[prost(enumeration="balance_change::Algorithm", tag="99")]
     pub algorithm: i32,
 }
 /// Nested message and enum types in `BalanceChange`.
 pub mod balance_change {
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum Reason {
-        Unspecified = 0,
-        RewardMineUncle = 1,
-        RewardMineBlock = 2,
-        DaoRefundContract = 3,
-        DaoAdjustBalance = 4,
-        Transfer = 5,
-        GenesisBalance = 6,
-        GasBuy = 7,
-        RewardTransactionFee = 8,
-        RewardFeeReset = 14,
-        GasRefund = 9,
-        TouchAccount = 10,
-        SuicideRefund = 11,
-        SuicideWithdraw = 13,
-        CallBalanceOverride = 12,
-        /// Used on chain(s) where some Ether burning happens
-        Burn = 15,
-        Withdrawal = 16,
-        /// Rewards for Blob processing on BNB chain added in Tycho hard-fork, refers
-        /// to BNB documentation to check the timestamp at which it was activated.
-        RewardBlobFee = 17,
-        /// This reason is used only on Optimism chain.
-        IncreaseMint = 18,
-    }
-    impl Reason {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Reason::Unspecified => "REASON_UNSPECIFIED",
-                Reason::RewardMineUncle => "REASON_REWARD_MINE_UNCLE",
-                Reason::RewardMineBlock => "REASON_REWARD_MINE_BLOCK",
-                Reason::DaoRefundContract => "REASON_DAO_REFUND_CONTRACT",
-                Reason::DaoAdjustBalance => "REASON_DAO_ADJUST_BALANCE",
-                Reason::Transfer => "REASON_TRANSFER",
-                Reason::GenesisBalance => "REASON_GENESIS_BALANCE",
-                Reason::GasBuy => "REASON_GAS_BUY",
-                Reason::RewardTransactionFee => "REASON_REWARD_TRANSACTION_FEE",
-                Reason::RewardFeeReset => "REASON_REWARD_FEE_RESET",
-                Reason::GasRefund => "REASON_GAS_REFUND",
-                Reason::TouchAccount => "REASON_TOUCH_ACCOUNT",
-                Reason::SuicideRefund => "REASON_SUICIDE_REFUND",
-                Reason::SuicideWithdraw => "REASON_SUICIDE_WITHDRAW",
-                Reason::CallBalanceOverride => "REASON_CALL_BALANCE_OVERRIDE",
-                Reason::Burn => "REASON_BURN",
-                Reason::Withdrawal => "REASON_WITHDRAWAL",
-                Reason::RewardBlobFee => "REASON_REWARD_BLOB_FEE",
-                Reason::IncreaseMint => "REASON_INCREASE_MINT",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "REASON_UNSPECIFIED" => Some(Self::Unspecified),
-                "REASON_REWARD_MINE_UNCLE" => Some(Self::RewardMineUncle),
-                "REASON_REWARD_MINE_BLOCK" => Some(Self::RewardMineBlock),
-                "REASON_DAO_REFUND_CONTRACT" => Some(Self::DaoRefundContract),
-                "REASON_DAO_ADJUST_BALANCE" => Some(Self::DaoAdjustBalance),
-                "REASON_TRANSFER" => Some(Self::Transfer),
-                "REASON_GENESIS_BALANCE" => Some(Self::GenesisBalance),
-                "REASON_GAS_BUY" => Some(Self::GasBuy),
-                "REASON_REWARD_TRANSACTION_FEE" => Some(Self::RewardTransactionFee),
-                "REASON_REWARD_FEE_RESET" => Some(Self::RewardFeeReset),
-                "REASON_GAS_REFUND" => Some(Self::GasRefund),
-                "REASON_TOUCH_ACCOUNT" => Some(Self::TouchAccount),
-                "REASON_SUICIDE_REFUND" => Some(Self::SuicideRefund),
-                "REASON_SUICIDE_WITHDRAW" => Some(Self::SuicideWithdraw),
-                "REASON_CALL_BALANCE_OVERRIDE" => Some(Self::CallBalanceOverride),
-                "REASON_BURN" => Some(Self::Burn),
-                "REASON_WITHDRAWAL" => Some(Self::Withdrawal),
-                "REASON_REWARD_BLOB_FEE" => Some(Self::RewardBlobFee),
-                "REASON_INCREASE_MINT" => Some(Self::IncreaseMint),
-                _ => None,
-            }
-        }
-    }
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
     #[repr(i32)]
     pub enum Algorithm {
@@ -145,8 +60,10 @@ pub mod balance_change {
         ChildCalls = 3,
         /// ERC-20 which the balances grow over time due to accrued interest
         RebasingToken = 4,
+        /// Native (ETH) block balance changes
+        NativeBlock = 5,
         /// Native (ETH) failed transaction
-        Failed = 5,
+        NativeFailed = 6,
     }
     impl Algorithm {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -160,7 +77,8 @@ pub mod balance_change {
                 Algorithm::CallNoValidBalance => "ALGORITHM_CALL_NO_VALID_BALANCE",
                 Algorithm::ChildCalls => "ALGORITHM_CHILD_CALLS",
                 Algorithm::RebasingToken => "ALGORITHM_REBASING_TOKEN",
-                Algorithm::Failed => "ALGORITHM_FAILED",
+                Algorithm::NativeBlock => "ALGORITHM_NATIVE_BLOCK",
+                Algorithm::NativeFailed => "ALGORITHM_NATIVE_FAILED",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -171,7 +89,8 @@ pub mod balance_change {
                 "ALGORITHM_CALL_NO_VALID_BALANCE" => Some(Self::CallNoValidBalance),
                 "ALGORITHM_CHILD_CALLS" => Some(Self::ChildCalls),
                 "ALGORITHM_REBASING_TOKEN" => Some(Self::RebasingToken),
-                "ALGORITHM_FAILED" => Some(Self::Failed),
+                "ALGORITHM_NATIVE_BLOCK" => Some(Self::NativeBlock),
+                "ALGORITHM_NATIVE_FAILED" => Some(Self::NativeFailed),
                 _ => None,
             }
         }
@@ -211,39 +130,5 @@ pub struct Transfer {
     pub to: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
     pub value: ::prost::alloc::string::String,
-    /// -- metadata --
-    #[prost(enumeration="TokenType", tag="100")]
-    pub r#type: i32,
-}
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum TokenType {
-    Unspecified = 0,
-    /// ERC-20
-    Erc20 = 1,
-    /// Native (ETH)
-    Native = 2,
-}
-impl TokenType {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            TokenType::Unspecified => "TOKEN_TYPE_UNSPECIFIED",
-            TokenType::Erc20 => "TOKEN_TYPE_ERC20",
-            TokenType::Native => "TOKEN_TYPE_NATIVE",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "TOKEN_TYPE_UNSPECIFIED" => Some(Self::Unspecified),
-            "TOKEN_TYPE_ERC20" => Some(Self::Erc20),
-            "TOKEN_TYPE_NATIVE" => Some(Self::Native),
-            _ => None,
-        }
-    }
 }
 // @@protoc_insertion_point(module)

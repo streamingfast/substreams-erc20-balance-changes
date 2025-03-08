@@ -19,7 +19,6 @@ pub fn to_balance_change<'a>(
     clock: &Clock,
     trx: &'a TransactionTrace,
     balance_change: &'a BalanceChangeAbi,
-    change_type: BalanceChangeType,
     algorithm: Algorithm,
     index: &u64,
 ) -> BalanceChange {
@@ -54,9 +53,7 @@ pub fn to_balance_change<'a>(
         global_sequence: to_global_sequence(clock, index),
 
         // -- metadata --
-        r#type: change_type as i32,
-        reason: i32_1,
-        algorithm: algorithm,
+        algorithm: algorithm.into(),
     }
 }
 
@@ -66,7 +63,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
     for balance_change in &block.balance_changes {
         if skip_balance_change(balance_change) { continue; }
         events.balance_changes.push(
-            to_balance_change(clock, &TransactionTrace::default(), balance_change, BalanceChangeType::Native, &index)
+            to_balance_change(clock, &TransactionTrace::default(), balance_change, Algorithm::NativeBlock, &index)
         );
         index += 1;
     }
@@ -83,7 +80,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             for balance_change in &call.balance_changes {
                 if skip_balance_change(balance_change) { continue; }
                 events.balance_changes.push(
-                    to_balance_change(clock, trx, balance_change, BalanceChangeType::Native, &index)
+                    to_balance_change(clock, trx, balance_change, Algorithm::NativeFailed, &index)
                 );
                 index += 1;
             }
