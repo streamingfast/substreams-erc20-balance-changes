@@ -7,6 +7,10 @@ build:
 	cargo build --target wasm32-unknown-unknown --release
 	substreams pack
 
+.PHONY: gui
+gui: build
+	substreams gui substreams.yaml -e eth.substreams.pinax.network:443 -s 1397553 --network eth
+
 .PHONY: run
 run: build
 	substreams-sink-sql run clickhouse://default:default@localhost:9000/default substreams.yaml -e eth.substreams.pinax.network:443 1397553: --undo-buffer-size 100

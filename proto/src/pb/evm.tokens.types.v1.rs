@@ -43,8 +43,139 @@ pub struct BalanceChange {
     #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
     /// -- metadata --
-    #[prost(enumeration="BalanceChangeType", tag="99")]
+    #[prost(enumeration="TokenType", tag="100")]
     pub r#type: i32,
+    #[prost(enumeration="balance_change::Reason", tag="101")]
+    pub reason: i32,
+    #[prost(enumeration="balance_change::Algorithm", tag="102")]
+    pub algorithm: i32,
+}
+/// Nested message and enum types in `BalanceChange`.
+pub mod balance_change {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Reason {
+        Unspecified = 0,
+        RewardMineUncle = 1,
+        RewardMineBlock = 2,
+        DaoRefundContract = 3,
+        DaoAdjustBalance = 4,
+        Transfer = 5,
+        GenesisBalance = 6,
+        GasBuy = 7,
+        RewardTransactionFee = 8,
+        RewardFeeReset = 14,
+        GasRefund = 9,
+        TouchAccount = 10,
+        SuicideRefund = 11,
+        SuicideWithdraw = 13,
+        CallBalanceOverride = 12,
+        /// Used on chain(s) where some Ether burning happens
+        Burn = 15,
+        Withdrawal = 16,
+        /// Rewards for Blob processing on BNB chain added in Tycho hard-fork, refers
+        /// to BNB documentation to check the timestamp at which it was activated.
+        RewardBlobFee = 17,
+        /// This reason is used only on Optimism chain.
+        IncreaseMint = 18,
+    }
+    impl Reason {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Reason::Unspecified => "REASON_UNSPECIFIED",
+                Reason::RewardMineUncle => "REASON_REWARD_MINE_UNCLE",
+                Reason::RewardMineBlock => "REASON_REWARD_MINE_BLOCK",
+                Reason::DaoRefundContract => "REASON_DAO_REFUND_CONTRACT",
+                Reason::DaoAdjustBalance => "REASON_DAO_ADJUST_BALANCE",
+                Reason::Transfer => "REASON_TRANSFER",
+                Reason::GenesisBalance => "REASON_GENESIS_BALANCE",
+                Reason::GasBuy => "REASON_GAS_BUY",
+                Reason::RewardTransactionFee => "REASON_REWARD_TRANSACTION_FEE",
+                Reason::RewardFeeReset => "REASON_REWARD_FEE_RESET",
+                Reason::GasRefund => "REASON_GAS_REFUND",
+                Reason::TouchAccount => "REASON_TOUCH_ACCOUNT",
+                Reason::SuicideRefund => "REASON_SUICIDE_REFUND",
+                Reason::SuicideWithdraw => "REASON_SUICIDE_WITHDRAW",
+                Reason::CallBalanceOverride => "REASON_CALL_BALANCE_OVERRIDE",
+                Reason::Burn => "REASON_BURN",
+                Reason::Withdrawal => "REASON_WITHDRAWAL",
+                Reason::RewardBlobFee => "REASON_REWARD_BLOB_FEE",
+                Reason::IncreaseMint => "REASON_INCREASE_MINT",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "REASON_UNSPECIFIED" => Some(Self::Unspecified),
+                "REASON_REWARD_MINE_UNCLE" => Some(Self::RewardMineUncle),
+                "REASON_REWARD_MINE_BLOCK" => Some(Self::RewardMineBlock),
+                "REASON_DAO_REFUND_CONTRACT" => Some(Self::DaoRefundContract),
+                "REASON_DAO_ADJUST_BALANCE" => Some(Self::DaoAdjustBalance),
+                "REASON_TRANSFER" => Some(Self::Transfer),
+                "REASON_GENESIS_BALANCE" => Some(Self::GenesisBalance),
+                "REASON_GAS_BUY" => Some(Self::GasBuy),
+                "REASON_REWARD_TRANSACTION_FEE" => Some(Self::RewardTransactionFee),
+                "REASON_REWARD_FEE_RESET" => Some(Self::RewardFeeReset),
+                "REASON_GAS_REFUND" => Some(Self::GasRefund),
+                "REASON_TOUCH_ACCOUNT" => Some(Self::TouchAccount),
+                "REASON_SUICIDE_REFUND" => Some(Self::SuicideRefund),
+                "REASON_SUICIDE_WITHDRAW" => Some(Self::SuicideWithdraw),
+                "REASON_CALL_BALANCE_OVERRIDE" => Some(Self::CallBalanceOverride),
+                "REASON_BURN" => Some(Self::Burn),
+                "REASON_WITHDRAWAL" => Some(Self::Withdrawal),
+                "REASON_REWARD_BLOB_FEE" => Some(Self::RewardBlobFee),
+                "REASON_INCREASE_MINT" => Some(Self::IncreaseMint),
+                _ => None,
+            }
+        }
+    }
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Algorithm {
+        Unspecified = 0,
+        /// ERC-20 within a Transfer call
+        Call = 1,
+        /// ERC-20 within a Transfer call, without a matching balance change to transfer value
+        CallNoValidBalance = 2,
+        /// ERC-20 different Transfer call
+        ChildCalls = 3,
+        /// ERC-20 which the balances grow over time due to accrued interest
+        RebasingToken = 4,
+        /// Native (ETH) failed transaction
+        Failed = 5,
+    }
+    impl Algorithm {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Algorithm::Unspecified => "ALGORITHM_UNSPECIFIED",
+                Algorithm::Call => "ALGORITHM_CALL",
+                Algorithm::CallNoValidBalance => "ALGORITHM_CALL_NO_VALID_BALANCE",
+                Algorithm::ChildCalls => "ALGORITHM_CHILD_CALLS",
+                Algorithm::RebasingToken => "ALGORITHM_REBASING_TOKEN",
+                Algorithm::Failed => "ALGORITHM_FAILED",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "ALGORITHM_UNSPECIFIED" => Some(Self::Unspecified),
+                "ALGORITHM_CALL" => Some(Self::Call),
+                "ALGORITHM_CALL_NO_VALID_BALANCE" => Some(Self::CallNoValidBalance),
+                "ALGORITHM_CHILD_CALLS" => Some(Self::ChildCalls),
+                "ALGORITHM_REBASING_TOKEN" => Some(Self::RebasingToken),
+                "ALGORITHM_FAILED" => Some(Self::Failed),
+                _ => None,
+            }
+        }
+    }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -81,75 +212,36 @@ pub struct Transfer {
     #[prost(string, tag="23")]
     pub value: ::prost::alloc::string::String,
     /// -- metadata --
-    #[prost(enumeration="TransferType", tag="99")]
+    #[prost(enumeration="TokenType", tag="100")]
     pub r#type: i32,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
-pub enum BalanceChangeType {
+pub enum TokenType {
     Unspecified = 0,
-    /// ERC-20 within a Transfer call
-    Erc20Algo1 = 1,
-    /// ERC-20 different Transfer call
-    Erc20Algo2 = 2,
+    /// ERC-20
+    Erc20 = 1,
     /// Native (ETH)
-    Native = 3,
+    Native = 2,
 }
-impl BalanceChangeType {
+impl TokenType {
     /// String value of the enum field names used in the ProtoBuf definition.
     ///
     /// The values are not transformed in any way and thus are considered stable
     /// (if the ProtoBuf definition does not change) and safe for programmatic use.
     pub fn as_str_name(&self) -> &'static str {
         match self {
-            BalanceChangeType::Unspecified => "BALANCE_CHANGE_TYPE_UNSPECIFIED",
-            BalanceChangeType::Erc20Algo1 => "BALANCE_CHANGE_TYPE_ERC20_ALGO_1",
-            BalanceChangeType::Erc20Algo2 => "BALANCE_CHANGE_TYPE_ERC20_ALGO_2",
-            BalanceChangeType::Native => "BALANCE_CHANGE_TYPE_NATIVE",
+            TokenType::Unspecified => "TOKEN_TYPE_UNSPECIFIED",
+            TokenType::Erc20 => "TOKEN_TYPE_ERC20",
+            TokenType::Native => "TOKEN_TYPE_NATIVE",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
     pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
         match value {
-            "BALANCE_CHANGE_TYPE_UNSPECIFIED" => Some(Self::Unspecified),
-            "BALANCE_CHANGE_TYPE_ERC20_ALGO_1" => Some(Self::Erc20Algo1),
-            "BALANCE_CHANGE_TYPE_ERC20_ALGO_2" => Some(Self::Erc20Algo2),
-            "BALANCE_CHANGE_TYPE_NATIVE" => Some(Self::Native),
-            _ => None,
-        }
-    }
-}
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum TransferType {
-    Unspecified = 0,
-    /// ERC-20 mint
-    Mint = 1,
-    /// ERC-20 burn
-    Burn = 2,
-    /// ERC-20 fishing
-    Fishing = 3,
-}
-impl TransferType {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            TransferType::Unspecified => "TRANSFER_TYPE_UNSPECIFIED",
-            TransferType::Mint => "TRANSFER_TYPE_MINT",
-            TransferType::Burn => "TRANSFER_TYPE_BURN",
-            TransferType::Fishing => "TRANSFER_TYPE_FISHING",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "TRANSFER_TYPE_UNSPECIFIED" => Some(Self::Unspecified),
-            "TRANSFER_TYPE_MINT" => Some(Self::Mint),
-            "TRANSFER_TYPE_BURN" => Some(Self::Burn),
-            "TRANSFER_TYPE_FISHING" => Some(Self::Fishing),
+            "TOKEN_TYPE_UNSPECIFIED" => Some(Self::Unspecified),
+            "TOKEN_TYPE_ERC20" => Some(Self::Erc20),
+            "TOKEN_TYPE_NATIVE" => Some(Self::Native),
             _ => None,
         }
     }

@@ -4,7 +4,8 @@ use crate::algorithms::algorithm1_call::find_erc20_balance_changes_algorithm1;
 use crate::algorithms::algorithm2_child_calls::find_erc20_balance_changes_algorithm2;
 use crate::algorithms::fishing::is_fishing_transfers;
 use crate::algorithms::utils::{addresses_for_storage_keys, Address, Hash};
-use proto::pb::evm::tokens::types::v1::{BalanceChange, BalanceChangeType, Events, Transfer};
+use proto::pb::evm::tokens::types::v1::balance_change::{Reason as BalanceChangeReason, Algorithm as BalanceChangeAlgorithm};
+use proto::pb::evm::tokens::types::v1::{BalanceChange, Events, TokenType, Transfer};
 use crate::utils::{clock_to_date, to_global_sequence};
 use substreams::errors::Error;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
@@ -44,7 +45,7 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log
         value: transfer.value.to_string(),
 
         // -- metadata --
-        r#type: 1_i32, // TO-DO
+        r#type: TokenType::Erc20.into(),
     }
 }
 
@@ -53,7 +54,7 @@ pub fn to_balance_change<'a>(
     trx: &'a TransactionTrace,
     owner: Address,
     storage_change: &'a StorageChange,
-    r#type: BalanceChangeType,
+    algorithm: BalanceChangeAlgorithm,
     index: &u64,
 ) -> BalanceChange {
     let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
@@ -80,7 +81,9 @@ pub fn to_balance_change<'a>(
         global_sequence: to_global_sequence(clock, index),
 
         // -- metadata --
-        r#type: r#type as i32,
+        r#type: TokenType::Erc20.into(),
+        reason: BalanceChangeReason::Transfer.into(),
+        algorithm: algorithm.into(),
     }
 }
 
@@ -130,7 +133,7 @@ pub fn iter_balance_changes_algorithms<'a>(
     call: &'a Call,
     transfer: &'a TransferAbi,
     keccak_address_map: &'a HashMap<Hash, Address>,
-) -> Vec<(Address, &'a StorageChange, BalanceChangeType)> {
+) -> Vec<(Address, &'a StorageChange, BalanceChangeAlgorithm)> {
     let mut out = Vec::new();
 
     // algorithm #1 (normal case)

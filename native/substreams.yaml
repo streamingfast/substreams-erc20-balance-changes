@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: evm-tokens-native
+  name: evm_tokens_native
   version: v1.6.0
   url: https://github.com/pinax-network/substreams-evm-tokens
 
@@ -8,6 +8,12 @@ binaries:
   default:
     type: wasm/rust-v1
     file: ../target/wasm32-unknown-unknown/release/native.wasm
+
+protobuf:
+  files:
+    - evm-tokens.proto
+  importPaths:
+    - ../proto/v1
 
 modules:
   - name: map_events
@@ -17,4 +23,4 @@ modules:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:erc20.types.v1.Events
+      type: proto:evm.tokens.types.v1.Events

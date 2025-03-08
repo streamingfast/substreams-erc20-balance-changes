@@ -9,18 +9,10 @@ message Events {
   repeated BalanceChange balance_changes = 2;
 }
 
-enum BalanceChangeType {
-  BALANCE_CHANGE_TYPE_UNSPECIFIED = 0;
-  BALANCE_CHANGE_TYPE_ERC20_ALGO_1 = 1; // ERC-20 within a Transfer call
-  BALANCE_CHANGE_TYPE_ERC20_ALGO_2 = 2; // ERC-20 different Transfer call
-  BALANCE_CHANGE_TYPE_NATIVE = 3; // Native (ETH)
-}
-
-enum TransferType {
-  TRANSFER_TYPE_UNSPECIFIED = 0;
-  TRANSFER_TYPE_MINT = 1; // ERC-20 mint
-  TRANSFER_TYPE_BURN = 2; // ERC-20 burn
-  TRANSFER_TYPE_FISHING = 3; // ERC-20 fishing
+enum TokenType {
+  TOKEN_TYPE_UNSPECIFIED = 0;
+  TOKEN_TYPE_ERC20 = 1; // ERC-20
+  TOKEN_TYPE_NATIVE = 2; // Native (ETH)
 }
 
 message BalanceChange {
@@ -44,7 +36,46 @@ message BalanceChange {
   string new_balance = 23;
 
   // -- metadata --
-  BalanceChangeType type = 99;
+  TokenType type = 100;
+  Reason reason = 101;
+  Algorithm algorithm = 102;
+
+  enum Reason {
+    REASON_UNSPECIFIED = 0;
+    REASON_REWARD_MINE_UNCLE = 1;
+    REASON_REWARD_MINE_BLOCK = 2;
+    REASON_DAO_REFUND_CONTRACT = 3;
+    REASON_DAO_ADJUST_BALANCE = 4;
+    REASON_TRANSFER = 5;
+    REASON_GENESIS_BALANCE = 6;
+    REASON_GAS_BUY = 7;
+    REASON_REWARD_TRANSACTION_FEE = 8;
+    REASON_REWARD_FEE_RESET = 14;
+    REASON_GAS_REFUND = 9;
+    REASON_TOUCH_ACCOUNT = 10;
+    REASON_SUICIDE_REFUND = 11;
+    REASON_SUICIDE_WITHDRAW = 13;
+    REASON_CALL_BALANCE_OVERRIDE = 12;
+    // Used on chain(s) where some Ether burning happens
+    REASON_BURN = 15;
+    REASON_WITHDRAWAL = 16;
+
+    // Rewards for Blob processing on BNB chain added in Tycho hard-fork, refers
+    // to BNB documentation to check the timestamp at which it was activated.
+    REASON_REWARD_BLOB_FEE = 17;
+
+    // This reason is used only on Optimism chain.
+    REASON_INCREASE_MINT = 18;
+  }
+
+  enum Algorithm {
+    ALGORITHM_UNSPECIFIED = 0;
+    ALGORITHM_CALL = 1; // ERC-20 within a Transfer call
+    ALGORITHM_CALL_NO_VALID_BALANCE = 2; // ERC-20 within a Transfer call, without a matching balance change to transfer value
+    ALGORITHM_CHILD_CALLS = 3; // ERC-20 different Transfer call
+    ALGORITHM_REBASING_TOKEN = 4; // ERC-20 which the balances grow over time due to accrued interest
+    ALGORITHM_FAILED = 5; // Native (ETH) failed transaction
+  }
 }
 
 message Transfer {
@@ -68,5 +99,13 @@ message Transfer {
   string value = 23;
 
   // -- metadata --
-  TransferType type = 99;
+  TokenType type = 100;
+
+  // // TO-DO: not implemented yet
+  // enum Reason {
+  //   REASON_UNSPECIFIED = 0;
+  //   REASON_MINT = 1; // ERC-20 mint
+  //   REASON_BURN = 2; // ERC-20 burn
+  //   REASON_FISHING = 3; // ERC-20 fishing
+  // }
 }

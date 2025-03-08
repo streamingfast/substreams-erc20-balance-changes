@@ -8,6 +8,13 @@ pub mod debug {
         }
     }
 }
+pub mod ethereum {
+    // @@protoc_insertion_point(attribute:ethereum.v1)
+    pub mod v1 {
+        include!("ethereum.v1.rs");
+        // @@protoc_insertion_point(ethereum.v1)
+    }
+}
 pub mod evm {
     pub mod tokens {
         pub mod types {

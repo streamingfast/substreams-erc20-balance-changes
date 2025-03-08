@@ -1,4 +1,5 @@
-use proto::pb::evm::tokens::types::v1::{BalanceChange, BalanceChangeType, Events};
+use proto::pb::evm::tokens::types::v1::balance_change::Algorithm;
+use proto::pb::evm::tokens::types::v1::{BalanceChange, Events};
 use erc20::utils::{clock_to_date, to_global_sequence};
 use substreams::Hex;
 use substreams::{errors::Error, scalar::BigInt};
@@ -19,6 +20,7 @@ pub fn to_balance_change<'a>(
     trx: &'a TransactionTrace,
     balance_change: &'a BalanceChangeAbi,
     change_type: BalanceChangeType,
+    algorithm: Algorithm,
     index: &u64,
 ) -> BalanceChange {
     let old_balance = match balance_change.old_value.as_ref() {
@@ -53,6 +55,8 @@ pub fn to_balance_change<'a>(
 
         // -- metadata --
         r#type: change_type as i32,
+        reason: i32_1,
+        algorithm: algorithm,
     }
 }
 

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use proto::pb::evm::tokens::types::v1::BalanceChangeType;
+use proto::pb::evm::tokens::types::v1::balance_change::Algorithm;
 use substreams::log;
 use substreams::Hex;
 use substreams_abis::evm::token::erc20::events::Transfer;
@@ -13,7 +13,7 @@ pub fn find_erc20_balance_changes_algorithm1<'a>(
     call: &'a Call,
     transfer: &'a Transfer,
     keccak_address_map: &'a HashMap<Hash, Address>,
-) -> impl Iterator<Item = (Address, &'a StorageChange, BalanceChangeType)> + 'a {
+) -> impl Iterator<Item = (Address, &'a StorageChange, Algorithm)> + 'a {
     call.storage_changes.iter().filter_map(move |storage_change| {
         // Extract the owner address
         let owner = get_keccak_address(keccak_address_map, storage_change)?;
@@ -32,9 +32,9 @@ pub fn find_erc20_balance_changes_algorithm1<'a>(
         // Yield one of two results depending on whether the storage change
         // matches the transfer's balance changes
         let balance_type = if is_erc20_valid_balance(transfer, storage_change) {
-            BalanceChangeType::Erc20Algo1
+            Algorithm::Call
         } else {
-            BalanceChangeType::Unspecified
+            Algorithm::CallNoValidBalance
         };
 
         Some((owner, storage_change, balance_type))

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use proto::pb::evm::tokens::types::v1::BalanceChangeType;
+use proto::pb::evm::tokens::types::v1::balance_change::Algorithm;
 use substreams::log;
 use substreams::Hex;
 use substreams_abis::evm::token::erc20::events::Transfer;
@@ -22,7 +22,7 @@ pub fn find_erc20_balance_changes_algorithm2<'a>(
     original: &'a Call,
     transfer: &'a Transfer,
     keccak_address_map: &'a HashMap<Hash, Address>,
-) -> impl Iterator<Item = (Address, &'a StorageChange, BalanceChangeType)> + 'a {
+) -> impl Iterator<Item = (Address, &'a StorageChange, Algorithm)> + 'a {
     get_all_child_call_storage_changes(original, trx).filter_map(move |storage_change| {
         // Attempt to resolve storage_change -> owner address
         let owner = get_keccak_address(keccak_address_map, storage_change)?;
@@ -39,6 +39,6 @@ pub fn find_erc20_balance_changes_algorithm2<'a>(
         }
 
         // Yield the tuple
-        Some((owner, storage_change, BalanceChangeType::Erc20Algo2))
+        Some((owner, storage_change, Algorithm::ChildCalls))
     })
 }
