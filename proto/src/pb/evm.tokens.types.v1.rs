@@ -64,6 +64,12 @@ pub mod balance_change {
         NativeBlock = 5,
         /// Native (ETH) failed transaction
         NativeFailed = 6,
+        /// Native (ETH) gas fee consumed
+        NativeGas = 7,
+        /// Native (ETH) transfer
+        NativeTransfer = 8,
+        /// Native (ETH) transaction
+        NativeTransaction = 9,
     }
     impl Algorithm {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -79,6 +85,9 @@ pub mod balance_change {
                 Algorithm::RebasingToken => "ALGORITHM_REBASING_TOKEN",
                 Algorithm::NativeBlock => "ALGORITHM_NATIVE_BLOCK",
                 Algorithm::NativeFailed => "ALGORITHM_NATIVE_FAILED",
+                Algorithm::NativeGas => "ALGORITHM_NATIVE_GAS",
+                Algorithm::NativeTransfer => "ALGORITHM_NATIVE_TRANSFER",
+                Algorithm::NativeTransaction => "ALGORITHM_NATIVE_TRANSACTION",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -91,6 +100,9 @@ pub mod balance_change {
                 "ALGORITHM_REBASING_TOKEN" => Some(Self::RebasingToken),
                 "ALGORITHM_NATIVE_BLOCK" => Some(Self::NativeBlock),
                 "ALGORITHM_NATIVE_FAILED" => Some(Self::NativeFailed),
+                "ALGORITHM_NATIVE_GAS" => Some(Self::NativeGas),
+                "ALGORITHM_NATIVE_TRANSFER" => Some(Self::NativeTransfer),
+                "ALGORITHM_NATIVE_TRANSACTION" => Some(Self::NativeTransaction),
                 _ => None,
             }
         }

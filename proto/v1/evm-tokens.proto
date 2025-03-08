@@ -40,6 +40,9 @@ message BalanceChange {
     ALGORITHM_REBASING_TOKEN = 4; // ERC-20 which the balances grow over time due to accrued interest
     ALGORITHM_NATIVE_BLOCK = 5; // Native (ETH) block balance changes
     ALGORITHM_NATIVE_FAILED = 6; // Native (ETH) failed transaction
+    ALGORITHM_NATIVE_GAS = 7; // Native (ETH) gas fee consumed
+    ALGORITHM_NATIVE_TRANSFER = 8; // Native (ETH) transfer
+    ALGORITHM_NATIVE_TRANSACTION = 9; // Native (ETH) transaction
   }
 }
 
