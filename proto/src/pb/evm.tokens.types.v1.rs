@@ -42,71 +42,9 @@ pub struct BalanceChange {
     pub old_balance: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
-    /// -- metadata --
-    #[prost(enumeration="balance_change::Algorithm", tag="99")]
+    /// -- debug --
+    #[prost(enumeration="Algorithm", tag="99")]
     pub algorithm: i32,
-}
-/// Nested message and enum types in `BalanceChange`.
-pub mod balance_change {
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum Algorithm {
-        Unspecified = 0,
-        /// ERC-20 within a Transfer call
-        Call = 1,
-        /// ERC-20 within a Transfer call, without a matching balance change to transfer value
-        CallNoValidBalance = 2,
-        /// ERC-20 different Transfer call
-        ChildCalls = 3,
-        /// ERC-20 which the balances grow over time due to accrued interest
-        RebasingToken = 4,
-        /// Native (ETH) block balance changes
-        NativeBlock = 5,
-        /// Native (ETH) failed transaction
-        NativeFailed = 6,
-        /// Native (ETH) gas fee consumed
-        NativeGas = 7,
-        /// Native (ETH) transfer
-        NativeTransfer = 8,
-        /// Native (ETH) transaction
-        NativeTransaction = 9,
-    }
-    impl Algorithm {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Algorithm::Unspecified => "ALGORITHM_UNSPECIFIED",
-                Algorithm::Call => "ALGORITHM_CALL",
-                Algorithm::CallNoValidBalance => "ALGORITHM_CALL_NO_VALID_BALANCE",
-                Algorithm::ChildCalls => "ALGORITHM_CHILD_CALLS",
-                Algorithm::RebasingToken => "ALGORITHM_REBASING_TOKEN",
-                Algorithm::NativeBlock => "ALGORITHM_NATIVE_BLOCK",
-                Algorithm::NativeFailed => "ALGORITHM_NATIVE_FAILED",
-                Algorithm::NativeGas => "ALGORITHM_NATIVE_GAS",
-                Algorithm::NativeTransfer => "ALGORITHM_NATIVE_TRANSFER",
-                Algorithm::NativeTransaction => "ALGORITHM_NATIVE_TRANSACTION",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "ALGORITHM_UNSPECIFIED" => Some(Self::Unspecified),
-                "ALGORITHM_CALL" => Some(Self::Call),
-                "ALGORITHM_CALL_NO_VALID_BALANCE" => Some(Self::CallNoValidBalance),
-                "ALGORITHM_CHILD_CALLS" => Some(Self::ChildCalls),
-                "ALGORITHM_REBASING_TOKEN" => Some(Self::RebasingToken),
-                "ALGORITHM_NATIVE_BLOCK" => Some(Self::NativeBlock),
-                "ALGORITHM_NATIVE_FAILED" => Some(Self::NativeFailed),
-                "ALGORITHM_NATIVE_GAS" => Some(Self::NativeGas),
-                "ALGORITHM_NATIVE_TRANSFER" => Some(Self::NativeTransfer),
-                "ALGORITHM_NATIVE_TRANSACTION" => Some(Self::NativeTransaction),
-                _ => None,
-            }
-        }
-    }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -142,5 +80,71 @@ pub struct Transfer {
     pub to: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
     pub value: ::prost::alloc::string::String,
+    /// -- debug --
+    #[prost(enumeration="Algorithm", tag="99")]
+    pub algorithm: i32,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum Algorithm {
+    Unspecified = 0,
+    /// ERC-20 within a Transfer log
+    Log = 1,
+    /// ERC-20 within a Transfer call
+    Call = 2,
+    /// ERC-20 within a Transfer call, without a matching balance change to transfer value
+    CallNoValidBalance = 3,
+    /// ERC-20 different Transfer call
+    ChildCalls = 4,
+    /// ERC-20 which the balances grow over time due to accrued interest
+    RebasingToken = 5,
+    /// Native (ETH) block balance changes
+    NativeBlock = 50,
+    /// Native (ETH) failed transaction
+    NativeFailed = 51,
+    /// Native (ETH) gas fee consumed
+    NativeGas = 52,
+    /// Native (ETH) transfer
+    NativeTransfer = 53,
+    /// Native (ETH) transaction
+    NativeTransaction = 54,
+}
+impl Algorithm {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Algorithm::Unspecified => "ALGORITHM_UNSPECIFIED",
+            Algorithm::Log => "ALGORITHM_LOG",
+            Algorithm::Call => "ALGORITHM_CALL",
+            Algorithm::CallNoValidBalance => "ALGORITHM_CALL_NO_VALID_BALANCE",
+            Algorithm::ChildCalls => "ALGORITHM_CHILD_CALLS",
+            Algorithm::RebasingToken => "ALGORITHM_REBASING_TOKEN",
+            Algorithm::NativeBlock => "ALGORITHM_NATIVE_BLOCK",
+            Algorithm::NativeFailed => "ALGORITHM_NATIVE_FAILED",
+            Algorithm::NativeGas => "ALGORITHM_NATIVE_GAS",
+            Algorithm::NativeTransfer => "ALGORITHM_NATIVE_TRANSFER",
+            Algorithm::NativeTransaction => "ALGORITHM_NATIVE_TRANSACTION",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "ALGORITHM_UNSPECIFIED" => Some(Self::Unspecified),
+            "ALGORITHM_LOG" => Some(Self::Log),
+            "ALGORITHM_CALL" => Some(Self::Call),
+            "ALGORITHM_CALL_NO_VALID_BALANCE" => Some(Self::CallNoValidBalance),
+            "ALGORITHM_CHILD_CALLS" => Some(Self::ChildCalls),
+            "ALGORITHM_REBASING_TOKEN" => Some(Self::RebasingToken),
+            "ALGORITHM_NATIVE_BLOCK" => Some(Self::NativeBlock),
+            "ALGORITHM_NATIVE_FAILED" => Some(Self::NativeFailed),
+            "ALGORITHM_NATIVE_GAS" => Some(Self::NativeGas),
+            "ALGORITHM_NATIVE_TRANSFER" => Some(Self::NativeTransfer),
+            "ALGORITHM_NATIVE_TRANSACTION" => Some(Self::NativeTransaction),
+            _ => None,
+        }
+    }
 }
 // @@protoc_insertion_point(module)

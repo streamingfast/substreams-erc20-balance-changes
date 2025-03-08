@@ -4,7 +4,7 @@ use crate::algorithms::algorithm1_call::find_erc20_balance_changes_algorithm1;
 use crate::algorithms::algorithm2_child_calls::find_erc20_balance_changes_algorithm2;
 use crate::algorithms::fishing::is_fishing_transfers;
 use crate::algorithms::utils::{addresses_for_storage_keys, Address, Hash};
-use proto::pb::evm::tokens::types::v1::balance_change::Algorithm;
+use proto::pb::evm::tokens::types::v1::Algorithm;
 use proto::pb::evm::tokens::types::v1::{BalanceChange, Events, Transfer};
 use crate::utils::{clock_to_date, to_global_sequence};
 use substreams::errors::Error;
@@ -43,6 +43,9 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log
         from: Hex::encode(&transfer.from),
         to: Hex::encode(&transfer.to),
         value: transfer.value.to_string(),
+
+        // -- debug --
+        algorithm: Algorithm::Log.into(),
     }
 }
 

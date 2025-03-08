@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use proto::pb::evm::tokens::types::v1::balance_change::Algorithm;
+use proto::pb::evm::tokens::types::v1::Algorithm;
 use substreams::log;
 use substreams::Hex;
 use substreams_abis::evm::token::erc20::events::Transfer;

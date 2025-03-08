@@ -40,7 +40,7 @@ pub fn db_out(erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
             .set("old_balance", balance_change.old_balance)
             .set("new_balance", balance_change.new_balance)
 
-            // -- metadata --
+            // -- debug --
             .set("algorithm", balance_change.algorithm.to_string());
     }
 
@@ -70,7 +70,10 @@ pub fn db_out(erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
             .set("contract", transfer.contract)
             .set("from", transfer.from)
             .set("to", transfer.to)
-            .set("value", transfer.value);
+            .set("value", transfer.value)
+
+            // -- debug --
+            .set("algorithm", transfer.algorithm.to_string());
     }
 
     Ok(tables.to_database_changes())

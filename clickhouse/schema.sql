@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    old_balance          UInt256,
    new_balance          UInt256,
 
-   -- metadata --
+   -- debug --
    algorithm            LowCardinality(String),
 
    -- indexes --
@@ -69,6 +69,9 @@ CREATE TABLE IF NOT EXISTS transfers  (
    `from`               FixedString(40),
    `to`                 FixedString(40),
    value                UInt256,
+
+   -- debug --
+   algorithm            LowCardinality(String),
 
    -- indexes --
    INDEX idx_transfers_date     (date)      TYPE bloom_filter GRANULARITY 4,

@@ -1,5 +1,4 @@
-use proto::pb::evm::tokens::types::v1::balance_change::Algorithm;
-use proto::pb::evm::tokens::types::v1::{BalanceChange, Events, Transfer};
+use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
 use erc20::utils::{clock_to_date, to_global_sequence};
 use substreams::Hex;
 use substreams::{errors::Error, scalar::BigInt};
@@ -57,7 +56,7 @@ pub fn to_balance_change<'a>(
     }
 }
 
-pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, balance_change: &'a BalanceChangeAbi, index: &u64) -> Transfer {
+pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, balance_change: &'a BalanceChangeAbi, algorithm: Algorithm, index: &u64) -> Transfer {
     let old_balance = match balance_change.old_value.as_ref() {
         Some(v) => BigInt::from_unsigned_bytes_be(&v.bytes),
         None => BigInt::zero(),
@@ -89,6 +88,9 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, balance_chan
         from: Hex::encode(&trx.from),
         to: Hex::encode(&trx.to),
         value: value.to_string(),
+
+        // -- debug --
+        algorithm: algorithm.into(),
     }
 }
 
@@ -132,7 +134,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
                         continue;
                     }
                     events.transfers.push(
-                        to_transfer(clock, &trx, balance_change, &transfer_index)
+                        to_transfer(clock, &trx, balance_change, algorithm, &transfer_index)
                     );
                     transfer_index += 1;
                 }
