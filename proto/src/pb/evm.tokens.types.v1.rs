@@ -94,14 +94,12 @@ pub enum Algorithm {
     Erc20Log = 1,
     /// ERC-20 within a Transfer call
     Erc20Call = 2,
-    /// ERC-20 within a Transfer call, without a matching balance change to transfer value
-    Erc20CallNoValidBalance = 3,
     /// ERC-20 different Transfer call
-    Erc20ChildCalls = 4,
-    /// ERC-20 different Transfer call, without a matching balance change to transfer value
-    Erc20ChildCallsNoValidBalance = 5,
+    Erc20ChildCalls = 3,
+    /// ERC-20 does not match balance change amount compared to transfer value
+    Erc20NoValidBalance = 4,
     /// ERC-20 which the balances grow over time due to accrued interest
-    Erc20RebasingToken = 6,
+    Erc20RebasingToken = 5,
     /// Native (ETH)
     ///
     /// Native (ETH) block balance changes
@@ -125,9 +123,8 @@ impl Algorithm {
             Algorithm::Unspecified => "ALGORITHM_UNSPECIFIED",
             Algorithm::Erc20Log => "ALGORITHM_ERC20_LOG",
             Algorithm::Erc20Call => "ALGORITHM_ERC20_CALL",
-            Algorithm::Erc20CallNoValidBalance => "ALGORITHM_ERC20_CALL_NO_VALID_BALANCE",
             Algorithm::Erc20ChildCalls => "ALGORITHM_ERC20_CHILD_CALLS",
-            Algorithm::Erc20ChildCallsNoValidBalance => "ALGORITHM_ERC20_CHILD_CALLS_NO_VALID_BALANCE",
+            Algorithm::Erc20NoValidBalance => "ALGORITHM_ERC20_NO_VALID_BALANCE",
             Algorithm::Erc20RebasingToken => "ALGORITHM_ERC20_REBASING_TOKEN",
             Algorithm::NativeBlock => "ALGORITHM_NATIVE_BLOCK",
             Algorithm::NativeFailed => "ALGORITHM_NATIVE_FAILED",
@@ -142,9 +139,8 @@ impl Algorithm {
             "ALGORITHM_UNSPECIFIED" => Some(Self::Unspecified),
             "ALGORITHM_ERC20_LOG" => Some(Self::Erc20Log),
             "ALGORITHM_ERC20_CALL" => Some(Self::Erc20Call),
-            "ALGORITHM_ERC20_CALL_NO_VALID_BALANCE" => Some(Self::Erc20CallNoValidBalance),
             "ALGORITHM_ERC20_CHILD_CALLS" => Some(Self::Erc20ChildCalls),
-            "ALGORITHM_ERC20_CHILD_CALLS_NO_VALID_BALANCE" => Some(Self::Erc20ChildCallsNoValidBalance),
+            "ALGORITHM_ERC20_NO_VALID_BALANCE" => Some(Self::Erc20NoValidBalance),
             "ALGORITHM_ERC20_REBASING_TOKEN" => Some(Self::Erc20RebasingToken),
             "ALGORITHM_NATIVE_BLOCK" => Some(Self::NativeBlock),
             "ALGORITHM_NATIVE_FAILED" => Some(Self::NativeFailed),

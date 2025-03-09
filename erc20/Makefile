@@ -1,7 +1,6 @@
 .PHONY: all
 all:
 	make build
-	substreams info
 
 .PHONY: build
 build:

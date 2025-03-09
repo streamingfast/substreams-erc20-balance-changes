@@ -15,10 +15,9 @@ enum Algorithm {
   // ERC-20
   ALGORITHM_ERC20_LOG = 1; // ERC-20 within a Transfer log
   ALGORITHM_ERC20_CALL = 2; // ERC-20 within a Transfer call
-  ALGORITHM_ERC20_CALL_NO_VALID_BALANCE = 3; // ERC-20 within a Transfer call, without a matching balance change to transfer value
-  ALGORITHM_ERC20_CHILD_CALLS = 4; // ERC-20 different Transfer call
-  ALGORITHM_ERC20_CHILD_CALLS_NO_VALID_BALANCE = 5; // ERC-20 different Transfer call, without a matching balance change to transfer value
-  ALGORITHM_ERC20_REBASING_TOKEN = 6; // ERC-20 which the balances grow over time due to accrued interest
+  ALGORITHM_ERC20_CHILD_CALLS = 3; // ERC-20 different Transfer call
+  ALGORITHM_ERC20_NO_VALID_BALANCE = 4; // ERC-20 does not match balance change amount compared to transfer value
+  ALGORITHM_ERC20_REBASING_TOKEN = 5; // ERC-20 which the balances grow over time due to accrued interest
 
   // Native (ETH)
   ALGORITHM_NATIVE_BLOCK = 50; // Native (ETH) block balance changes
