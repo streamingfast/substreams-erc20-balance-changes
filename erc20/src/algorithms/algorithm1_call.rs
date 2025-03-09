@@ -34,7 +34,7 @@ pub fn find_erc20_balance_changes_algorithm1<'a>(
         let algorithm = if is_erc20_valid_balance(transfer, storage_change) {
             Algorithm::Erc20Call
         } else {
-            Algorithm::Erc20NoValidBalance
+            Algorithm::Erc20BalanceDoesNotMatchTransfer
         };
 
         Some((owner, storage_change, algorithm))

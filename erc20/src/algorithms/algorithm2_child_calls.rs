@@ -44,7 +44,7 @@ pub fn find_erc20_balance_changes_algorithm2<'a>(
         let algorithm = if is_erc20_valid_balance(transfer, storage_change) {
             Algorithm::Erc20ChildCalls
         } else {
-            Algorithm::Erc20NoValidBalance
+            Algorithm::Erc20BalanceDoesNotMatchTransfer
         };
 
         // Yield the tuple
