@@ -6,6 +6,7 @@ use substreams::Hex;
 use substreams_abis::evm::token::erc20::events::Transfer;
 use substreams_ethereum::pb::eth::v2::{Call, StorageChange, TransactionTrace};
 
+use super::utils::is_erc20_valid_balance;
 use super::utils::{get_keccak_address, is_erc20_valid_address};
 use super::utils::{Address, Hash};
 
@@ -38,7 +39,17 @@ pub fn find_erc20_balance_changes_algorithm2<'a>(
             return None;
         }
 
+        // Yield one of two results depending on whether the storage change
+        // matches the transfer's balance changes
+        let algorithm = if is_erc20_valid_balance(transfer, storage_change) {
+            Algorithm::Erc20ChildCalls
+        } else {
+            Algorithm::Erc20ChildCallsNoValidBalance
+        };
+
         // Yield the tuple
-        Some((owner, storage_change, Algorithm::ChildCalls))
+        Some((owner, storage_change, algorithm))
     })
 }
+
+// TO-DO: refactor to re-use algorith1_call.rs

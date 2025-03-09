@@ -88,16 +88,22 @@ pub struct Transfer {
 #[repr(i32)]
 pub enum Algorithm {
     Unspecified = 0,
+    /// ERC-20
+    ///
     /// ERC-20 within a Transfer log
-    Log = 1,
+    Erc20Log = 1,
     /// ERC-20 within a Transfer call
-    Call = 2,
+    Erc20Call = 2,
     /// ERC-20 within a Transfer call, without a matching balance change to transfer value
-    CallNoValidBalance = 3,
+    Erc20CallNoValidBalance = 3,
     /// ERC-20 different Transfer call
-    ChildCalls = 4,
+    Erc20ChildCalls = 4,
+    /// ERC-20 different Transfer call, without a matching balance change to transfer value
+    Erc20ChildCallsNoValidBalance = 5,
     /// ERC-20 which the balances grow over time due to accrued interest
-    RebasingToken = 5,
+    Erc20RebasingToken = 6,
+    /// Native (ETH)
+    ///
     /// Native (ETH) block balance changes
     NativeBlock = 50,
     /// Native (ETH) failed transaction
@@ -117,11 +123,12 @@ impl Algorithm {
     pub fn as_str_name(&self) -> &'static str {
         match self {
             Algorithm::Unspecified => "ALGORITHM_UNSPECIFIED",
-            Algorithm::Log => "ALGORITHM_LOG",
-            Algorithm::Call => "ALGORITHM_CALL",
-            Algorithm::CallNoValidBalance => "ALGORITHM_CALL_NO_VALID_BALANCE",
-            Algorithm::ChildCalls => "ALGORITHM_CHILD_CALLS",
-            Algorithm::RebasingToken => "ALGORITHM_REBASING_TOKEN",
+            Algorithm::Erc20Log => "ALGORITHM_ERC20_LOG",
+            Algorithm::Erc20Call => "ALGORITHM_ERC20_CALL",
+            Algorithm::Erc20CallNoValidBalance => "ALGORITHM_ERC20_CALL_NO_VALID_BALANCE",
+            Algorithm::Erc20ChildCalls => "ALGORITHM_ERC20_CHILD_CALLS",
+            Algorithm::Erc20ChildCallsNoValidBalance => "ALGORITHM_ERC20_CHILD_CALLS_NO_VALID_BALANCE",
+            Algorithm::Erc20RebasingToken => "ALGORITHM_ERC20_REBASING_TOKEN",
             Algorithm::NativeBlock => "ALGORITHM_NATIVE_BLOCK",
             Algorithm::NativeFailed => "ALGORITHM_NATIVE_FAILED",
             Algorithm::NativeGas => "ALGORITHM_NATIVE_GAS",
@@ -133,11 +140,12 @@ impl Algorithm {
     pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
         match value {
             "ALGORITHM_UNSPECIFIED" => Some(Self::Unspecified),
-            "ALGORITHM_LOG" => Some(Self::Log),
-            "ALGORITHM_CALL" => Some(Self::Call),
-            "ALGORITHM_CALL_NO_VALID_BALANCE" => Some(Self::CallNoValidBalance),
-            "ALGORITHM_CHILD_CALLS" => Some(Self::ChildCalls),
-            "ALGORITHM_REBASING_TOKEN" => Some(Self::RebasingToken),
+            "ALGORITHM_ERC20_LOG" => Some(Self::Erc20Log),
+            "ALGORITHM_ERC20_CALL" => Some(Self::Erc20Call),
+            "ALGORITHM_ERC20_CALL_NO_VALID_BALANCE" => Some(Self::Erc20CallNoValidBalance),
+            "ALGORITHM_ERC20_CHILD_CALLS" => Some(Self::Erc20ChildCalls),
+            "ALGORITHM_ERC20_CHILD_CALLS_NO_VALID_BALANCE" => Some(Self::Erc20ChildCallsNoValidBalance),
+            "ALGORITHM_ERC20_REBASING_TOKEN" => Some(Self::Erc20RebasingToken),
             "ALGORITHM_NATIVE_BLOCK" => Some(Self::NativeBlock),
             "ALGORITHM_NATIVE_FAILED" => Some(Self::NativeFailed),
             "ALGORITHM_NATIVE_GAS" => Some(Self::NativeGas),

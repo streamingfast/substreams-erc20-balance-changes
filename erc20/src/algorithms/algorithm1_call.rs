@@ -31,12 +31,12 @@ pub fn find_erc20_balance_changes_algorithm1<'a>(
 
         // Yield one of two results depending on whether the storage change
         // matches the transfer's balance changes
-        let balance_type = if is_erc20_valid_balance(transfer, storage_change) {
-            Algorithm::Call
+        let algorithm = if is_erc20_valid_balance(transfer, storage_change) {
+            Algorithm::Erc20Call
         } else {
-            Algorithm::CallNoValidBalance
+            Algorithm::Erc20CallNoValidBalance
         };
 
-        Some((owner, storage_change, balance_type))
+        Some((owner, storage_change, algorithm))
     })
 }

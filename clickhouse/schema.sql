@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
 
    -- debug --
    algorithm            LowCardinality(String),
+   algorithm_code       UInt8,
 
    -- indexes --
    INDEX idx_balance_changes_date     (date)      TYPE bloom_filter GRANULARITY 4,
@@ -72,6 +73,7 @@ CREATE TABLE IF NOT EXISTS transfers  (
 
    -- debug --
    algorithm            LowCardinality(String),
+   algorithm_code       UInt8,
 
    -- indexes --
    INDEX idx_transfers_date     (date)      TYPE bloom_filter GRANULARITY 4,

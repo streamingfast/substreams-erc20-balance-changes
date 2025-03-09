@@ -45,7 +45,7 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log
         value: transfer.value.to_string(),
 
         // -- debug --
-        algorithm: Algorithm::Log.into(),
+        algorithm: Algorithm::Erc20Log.into(),
     }
 }
 

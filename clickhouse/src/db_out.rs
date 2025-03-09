@@ -13,6 +13,7 @@ pub fn db_out(erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
     };
 
     for balance_change in events.balance_changes {
+        let algorithm = balance_change.algorithm().as_str_name();
         tables
             .create_row(
                 "balance_changes",
@@ -41,10 +42,12 @@ pub fn db_out(erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
             .set("new_balance", balance_change.new_balance)
 
             // -- debug --
-            .set("algorithm", balance_change.algorithm.to_string());
+            .set("algorithm", algorithm)
+            .set("algorithm_code", balance_change.algorithm);
     }
 
     for transfer in events.transfers {
+        let algorithm = transfer.algorithm().as_str_name();
         tables
             .create_row(
                 "transfers",
@@ -70,10 +73,11 @@ pub fn db_out(erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
             .set("contract", transfer.contract)
             .set("from", transfer.from)
             .set("to", transfer.to)
-            .set("value", transfer.value)
+            .set("value", &transfer.value)
 
             // -- debug --
-            .set("algorithm", transfer.algorithm.to_string());
+            .set("algorithm", algorithm)
+            .set("algorithm_code", transfer.algorithm);
     }
 
     Ok(tables.to_database_changes())
