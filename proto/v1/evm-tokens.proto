@@ -13,18 +13,18 @@ enum Algorithm {
   ALGORITHM_UNSPECIFIED = 0;
 
   // ERC-20
-  ALGORITHM_ERC20_LOG = 1; // ERC-20 within a Transfer log
+  ALGORITHM_ERC20_LOG = 1; // ERC-20 Transfer log event
   ALGORITHM_ERC20_CALL = 2; // ERC-20 within a Transfer call
   ALGORITHM_ERC20_CHILD_CALLS = 3; // ERC-20 different Transfer call
   ALGORITHM_ERC20_NO_VALID_BALANCE = 4; // ERC-20 does not match balance change amount compared to transfer value
   ALGORITHM_ERC20_REBASING_TOKEN = 5; // ERC-20 which the balances grow over time due to accrued interest
 
   // Native (ETH)
-  ALGORITHM_NATIVE_BLOCK = 50; // Native (ETH) block balance changes
-  ALGORITHM_NATIVE_FAILED = 51; // Native (ETH) failed transaction
-  ALGORITHM_NATIVE_GAS = 52; // Native (ETH) gas fee consumed
-  ALGORITHM_NATIVE_TRANSFER = 53; // Native (ETH) transfer
-  ALGORITHM_NATIVE_TRANSACTION = 54; // Native (ETH) transaction
+  ALGORITHM_NATIVE_BLOCK = 10; // Native (ETH) block balance changes
+  ALGORITHM_NATIVE_FAILED = 11; // Native (ETH) failed transaction
+  ALGORITHM_NATIVE_GAS = 12; // Native (ETH) gas fee consumed
+  ALGORITHM_NATIVE_TRANSFER = 13; // Native (ETH) transfer
+  ALGORITHM_NATIVE_TRANSACTION = 14; // Native (ETH) transaction
 }
 
 message BalanceChange {

@@ -90,7 +90,7 @@ pub enum Algorithm {
     Unspecified = 0,
     /// ERC-20
     ///
-    /// ERC-20 within a Transfer log
+    /// ERC-20 Transfer log event
     Erc20Log = 1,
     /// ERC-20 within a Transfer call
     Erc20Call = 2,
@@ -103,15 +103,15 @@ pub enum Algorithm {
     /// Native (ETH)
     ///
     /// Native (ETH) block balance changes
-    NativeBlock = 50,
+    NativeBlock = 10,
     /// Native (ETH) failed transaction
-    NativeFailed = 51,
+    NativeFailed = 11,
     /// Native (ETH) gas fee consumed
-    NativeGas = 52,
+    NativeGas = 12,
     /// Native (ETH) transfer
-    NativeTransfer = 53,
+    NativeTransfer = 13,
     /// Native (ETH) transaction
-    NativeTransaction = 54,
+    NativeTransaction = 14,
 }
 impl Algorithm {
     /// String value of the enum field names used in the ProtoBuf definition.

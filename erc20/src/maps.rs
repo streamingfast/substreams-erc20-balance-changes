@@ -4,8 +4,7 @@ use crate::algorithms::algorithm1_call::find_erc20_balance_changes_algorithm1;
 use crate::algorithms::algorithm2_child_calls::find_erc20_balance_changes_algorithm2;
 use crate::algorithms::fishing::is_fishing_transfers;
 use crate::algorithms::utils::{addresses_for_storage_keys, Address, Hash};
-use proto::pb::evm::tokens::types::v1::Algorithm;
-use proto::pb::evm::tokens::types::v1::{BalanceChange, Events, Transfer};
+use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
 use crate::utils::{clock_to_date, to_global_sequence};
 use substreams::errors::Error;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
@@ -80,7 +79,7 @@ pub fn to_balance_change<'a>(
         ordinal: storage_change.ordinal,
         global_sequence: to_global_sequence(clock, index),
 
-        // -- metadata --
+        // -- debug --
         algorithm: algorithm.into(),
     }
 }
@@ -88,8 +87,7 @@ pub fn to_balance_change<'a>(
 pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events) {
     // We memoize the keccak address map by call because it is expensive to compute
     let mut keccak_address_map = HashMap::new();
-    let mut transfer_index = 0;
-    let mut balance_changes_index = 0;
+    let mut index = 0;  // relative index for ordering
 
     // Iterates over successful transactions
     for trx in block.transactions() {
@@ -109,15 +107,15 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             if transfer.value.is_zero() {
                 continue;
             }
-            events.transfers.push(to_transfer(clock, trx, log, &transfer, &transfer_index));
-            transfer_index += 1;
+            events.transfers.push(to_transfer(clock, trx, log, &transfer, &index));
+            index += 1;
 
             // -- Balance Changes --
             keccak_address_map.extend(addresses_for_storage_keys(call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
             for (owner, storage_change, change_type) in balance_changes {
-                let balance_change = to_balance_change(clock, trx, owner, storage_change, change_type, &balance_changes_index);
-                balance_changes_index += 1;
+                let balance_change = to_balance_change(clock, trx, owner, storage_change, change_type, &index);
+                index += 1;
 
                 // insert balance change event
                 events.balance_changes.push(balance_change);
