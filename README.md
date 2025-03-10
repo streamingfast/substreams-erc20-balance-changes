@@ -1,6 +1,6 @@
-# ERC-20: `Substreams`
+# EVM-Tokens: `Substreams`
 
-Substreams for tracking ERC-20 token balances & transfers for EVM blockchains.
+Substreams for tracking ERC-20 & Native token balances & transfers for EVM blockchains.
 
 > Ethereum, Base, BSC, Polygon, ArbitrumOne, Optimism, etc..
 
@@ -15,7 +15,7 @@ Includes the following:
 
 - [x] ERC-20 Balances & Transfers
 - [x] Native Balances
-- [ ] Native Transfers
+- [x] Native Transfers
 - [ ] ERC-20 Contract Metadata
 - [ ] ERC-20 Supply
 
@@ -24,9 +24,11 @@ Includes the following:
 ```mermaid
 graph TD;
   graph_out[map: graph_out];
-  erc20_balances:map_events --> graph_out;
-  erc20_balances:map_events --> db_out;
-  erc20_balances:map_events[map: erc20_balances:map_events];
-  sf.substreams.v1.Clock[source: sf.substreams.v1.Clock] --> erc20_balances:map_events;
-  sf.ethereum.type.v2.Block[source: sf.ethereum.type.v2.Block] --> erc20_balances:map_events;
+  native:map_events --> map_events;
+  erc20:map_events --> map_events;
+
+  map_events --> graph_out;
+  map_events --> db_out;
+  sf.ethereum.type.v2.Block[source: sf.ethereum.type.v2.Block] --> erc20:map_events;
+  sf.ethereum.type.v2.Block[source: sf.ethereum.type.v2.Block] --> native:map_events;
 ```
