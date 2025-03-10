@@ -3,6 +3,8 @@ package:
   name: evm_tokens_native
   version: v1.6.0
   url: https://github.com/pinax-network/substreams-evm-tokens
+  description: Native balance changes & transfers
+  image: ../image.png
 
 binaries:
   default:
@@ -18,9 +20,11 @@ protobuf:
 modules:
   - name: map_events
     kind: map
-    doc: Extracts all ETH balances & transfers from Ethereum events.
+    doc: Native balance changes & transfers
     inputs:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:evm.tokens.types.v1.Events
+
+network: mainnet

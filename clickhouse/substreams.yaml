@@ -3,6 +3,8 @@ package:
   name: evm_tokens_clickhouse
   version: v1.6.0
   url: https://github.com/pinax-network/substreams-evm-tokens
+  description: EVM Tokens to Clickhouse
+  image: ../image.png
 
 imports:
   database_changes: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v2.0.0/substreams-database-change-v2.0.0.spkg
@@ -32,3 +34,5 @@ sink:
     engine: clickhouse
     postgraphile_frontend:
       enabled: false
+
+network: mainnet

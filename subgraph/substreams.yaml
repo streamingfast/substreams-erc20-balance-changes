@@ -3,6 +3,8 @@ package:
   name: evm_tokens_subgraph
   version: v1.6.0
   url: https://github.com/pinax-network/substreams-evm-tokens
+  description: EVM Tokens to Subgraph
+  image: ../image.png
 
 imports:
   entity_changes: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v2.0.0/substreams-entity-change-v2.0.0.spkg
@@ -22,3 +24,5 @@ modules:
       - map: native:map_events
     output:
       type: proto:sf.substreams.sink.entity.v1.EntityChanges
+
+network: mainnet
