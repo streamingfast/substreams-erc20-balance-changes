@@ -44,6 +44,6 @@ pub fn get_transfer_from_call<'a>(call: &'a Call) -> Option<TransferStruct> {
         to: Hex::encode(&call.address),
         value,
         ordinal: call.begin_ordinal,
-        algorithm: Algorithm::NativeTransaction,
+        algorithm: Algorithm::NativeCall,
     })
 }
