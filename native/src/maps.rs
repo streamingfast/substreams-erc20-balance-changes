@@ -4,8 +4,10 @@ use substreams::Hex;
 use substreams::{errors::Error, scalar::BigInt};
 
 use substreams::pb::substreams::Clock;
-use substreams_ethereum::pb::eth::v2::balance_change::Reason;
-use substreams_ethereum::pb::eth::v2::{BalanceChange as BalanceChangeAbi, Block, TransactionTrace, TransactionTraceStatus};
+use substreams_ethereum::pb::eth::v2::{BalanceChange as BalanceChangeAbi, Block, TransactionTrace};
+
+use crate::algorithms::transfers::{get_transfer_from_call, get_transfer_from_transaction};
+use crate::utils::{get_balances, is_failed_transaction, is_gas_balance_change, is_transfer_balance_change};
 
 #[substreams::handlers::map]
 pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
@@ -48,7 +50,17 @@ pub fn to_balance_change<'a>(
     }
 }
 
-pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, balance_change: &'a BalanceChangeAbi, value: BigInt, index: &u64) -> Transfer {
+// add default
+#[derive(Default)]
+pub struct TransferStruct {
+    pub from: String,
+    pub to: String,
+    pub value: BigInt,
+    pub ordinal: u64,
+    pub algorithm: Algorithm,
+}
+
+pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: TransferStruct, index: &u64) -> Transfer {
     Transfer {
         // -- block --
         block_num: clock.number,
@@ -60,17 +72,17 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, balance_chan
         transaction_id: Hex::encode(&trx.hash),
 
         // -- ordering --
-        ordinal: balance_change.ordinal.into(),
+        ordinal: transfer.ordinal.into(),
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
         contract: "native".to_string(),
-        from: Hex::encode(&trx.from),
-        to: Hex::encode(&trx.to),
-        value: value.to_string(),
+        from: transfer.from,
+        to: transfer.to,
+        value: transfer.value.to_string(),
 
         // -- debug --
-        algorithm: Algorithm::NativeTransfer.into(),
+        algorithm: transfer.algorithm.into(),
     }
 }
 
@@ -85,9 +97,46 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
         index += 1;
     }
 
-    // balance changes from transactions
+    // balance changes at system call level
+    for call in &block.system_calls {
+        for balance_change in &call.balance_changes {
+            events.balance_changes.push(
+                to_balance_change(clock, &TransactionTrace::default(), balance_change, Algorithm::NativeSystem, &index)
+            );
+            index += 1;
+        }
+    }
+
+    // iterate over successful transactions
+    for trx in block.transactions() {
+        // find all transfers from transactions
+        match get_transfer_from_transaction(trx) {
+            Some(transfer) => {
+                events.transfers.push(
+                    to_transfer(clock, trx, transfer, &index)
+                );
+                index += 1;
+            }
+            None => {}
+        }
+        // find all transfers from calls
+        for call_view in trx.calls() {
+            match get_transfer_from_call(call_view.call) {
+                Some(transfer) => {
+                    events.transfers.push(
+                        to_transfer(clock, trx, transfer, &index)
+                    );
+                    index += 1;
+                }
+                None => {}
+            }
+        }
+    }
+
+    // iterate over all transactions including failed ones
     for trx in &block.transaction_traces {
         for call_view in trx.calls() {
+            // balance changes
             for balance_change in &call_view.call.balance_changes {
                 let algorithm = if is_failed_transaction(trx) {
                     Algorithm::NativeFailed
@@ -96,7 +145,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
                 } else if is_transfer_balance_change(balance_change) {
                     Algorithm::NativeTransfer
                 } else {
-                    Algorithm::NativeBlock
+                    Algorithm::NativeCall
                 };
 
                 // balance change
@@ -104,65 +153,8 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
                     to_balance_change(clock, trx, balance_change, algorithm, &index)
                 );
                 index += 1;
-
-                // only allow transfer successful transactions
-                if balance_change.reason() == Reason::Transfer && !is_failed_transaction(trx) {
-                    let (old_balance, new_balance) = get_balances(balance_change);
-                    let value = new_balance - old_balance;
-                    // ignore negative or zero value transfers
-                    if value.le(&BigInt::zero()) {
-                        continue;
-                    }
-                    // only include transfer as sender (from), prevents duplicate Native transfers
-                    if balance_change.address == trx.from {
-                        continue;
-                    }
-                    events.transfers.push(
-                        to_transfer(clock, &trx, balance_change, value, &index)
-                    );
-                    index += 1;
-                }
             }
         }
 
     }
-}
-
-// failed transactions incur balance changes due to gas buy and refund
-pub fn is_failed_transaction(trx: &TransactionTrace) -> bool {
-    let status = trx.status();
-    if status == TransactionTraceStatus::Reverted || status == TransactionTraceStatus::Failed {
-        return true;
-    }
-    false
-}
-
-pub fn is_gas_balance_change(balance_change: &BalanceChangeAbi) -> bool {
-    let reason = balance_change.reason();
-    if reason == Reason::GasBuy || reason == Reason::GasRefund || reason == Reason::RewardTransactionFee {
-        return true;
-    }
-    false
-}
-
-pub fn is_transfer_balance_change(balance_change: &BalanceChangeAbi) -> bool {
-    let reason = balance_change.reason();
-    if reason == Reason::Transfer {
-        return true;
-    }
-    false
-}
-
-pub fn get_balances(balance_change: &BalanceChangeAbi) -> (BigInt, BigInt) {
-    let old_balance = match balance_change.old_value.as_ref() {
-        Some(v) => BigInt::from_unsigned_bytes_be(&v.bytes),
-        None => BigInt::zero(),
-    };
-
-    let new_balance = match balance_change.new_value.as_ref() {
-        Some(v) => BigInt::from_unsigned_bytes_be(&v.bytes),
-        None => BigInt::zero(),
-    };
-
-    (old_balance, new_balance)
 }

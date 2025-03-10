@@ -24,7 +24,9 @@ enum Algorithm {
   ALGORITHM_NATIVE_FAILED = 11; // Native (ETH) failed transaction
   ALGORITHM_NATIVE_GAS = 12; // Native (ETH) gas fee consumed
   ALGORITHM_NATIVE_TRANSFER = 13; // Native (ETH) transfer
-  ALGORITHM_NATIVE_TRANSACTION = 14; // Native (ETH) transaction
+  ALGORITHM_NATIVE_TRANSACTION = 14; // Native (ETH) from transaction
+  ALGORITHM_NATIVE_CALL = 15; // Native (ETH) from call
+  ALGORITHM_NATIVE_SYSTEM = 16; // Native (ETH) system contract
 }
 
 message BalanceChange {

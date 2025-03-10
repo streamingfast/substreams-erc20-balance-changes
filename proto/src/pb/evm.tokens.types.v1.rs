@@ -110,8 +110,12 @@ pub enum Algorithm {
     NativeGas = 12,
     /// Native (ETH) transfer
     NativeTransfer = 13,
-    /// Native (ETH) transaction
+    /// Native (ETH) from transaction
     NativeTransaction = 14,
+    /// Native (ETH) from call
+    NativeCall = 15,
+    /// Native (ETH) system contract
+    NativeSystem = 16,
 }
 impl Algorithm {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -131,6 +135,8 @@ impl Algorithm {
             Algorithm::NativeGas => "ALGORITHM_NATIVE_GAS",
             Algorithm::NativeTransfer => "ALGORITHM_NATIVE_TRANSFER",
             Algorithm::NativeTransaction => "ALGORITHM_NATIVE_TRANSACTION",
+            Algorithm::NativeCall => "ALGORITHM_NATIVE_CALL",
+            Algorithm::NativeSystem => "ALGORITHM_NATIVE_SYSTEM",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -147,6 +153,8 @@ impl Algorithm {
             "ALGORITHM_NATIVE_GAS" => Some(Self::NativeGas),
             "ALGORITHM_NATIVE_TRANSFER" => Some(Self::NativeTransfer),
             "ALGORITHM_NATIVE_TRANSACTION" => Some(Self::NativeTransaction),
+            "ALGORITHM_NATIVE_CALL" => Some(Self::NativeCall),
+            "ALGORITHM_NATIVE_SYSTEM" => Some(Self::NativeSystem),
             _ => None,
         }
     }
