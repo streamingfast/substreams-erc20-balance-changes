@@ -135,7 +135,3 @@ ORDER BY (owner, contract, date);
 CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_date_mv
 TO balances_by_date AS
 SELECT * FROM balance_changes;
-
--- remove zero balances --
-ALTER TABLE balances MODIFY TTL timestamp WHERE new_balance <= 0;
-ALTER TABLE balances_by_date MODIFY TTL timestamp WHERE new_balance <= 0;
