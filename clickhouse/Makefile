@@ -25,4 +25,4 @@ setup: build
 
 .PHONY: cache
 cache: build
-	substreams-sink-noop eth.substreams.pinax.network:443 ./substreams.yaml db_out 1: --state-store eth.state.yaml
+	substreams run -e eth.substreams.pinax.network:443 ./substreams.yaml db_out -s 1 -t 0 --production-mode --noop-mode

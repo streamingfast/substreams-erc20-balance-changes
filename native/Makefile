@@ -21,4 +21,4 @@ gui: build
 
 .PHONY: cache
 cache: build
-	substreams-sink-noop eth.substreams.pinax.network:443 ./substreams.yaml map_events 1:
+	substreams run -e eth.substreams.pinax.network:443 ./substreams.yaml map_events -s 1 -t 0 --production-mode --noop-mode
