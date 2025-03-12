@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens_subgraph
-  version: v1.6.0
+  version: v1.7.0
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: EVM Tokens to Subgraph
   image: ../image.png

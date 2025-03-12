@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens_native
-  version: v1.6.0
+  version: v1.7.0
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: Native balance changes & transfers
   image: ../image.png
