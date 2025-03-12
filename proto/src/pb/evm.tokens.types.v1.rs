@@ -3,23 +3,16 @@
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Events {
-    #[prost(message, repeated, tag="1")]
-    pub transfers: ::prost::alloc::vec::Vec<Transfer>,
     #[prost(message, repeated, tag="2")]
+    pub transfers: ::prost::alloc::vec::Vec<Transfer>,
+    #[prost(message, repeated, tag="3")]
     pub balance_changes: ::prost::alloc::vec::Vec<BalanceChange>,
+    #[prost(message, repeated, tag="4")]
+    pub contracts: ::prost::alloc::vec::Vec<Contract>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BalanceChange {
-    /// -- block --
-    #[prost(uint64, tag="1")]
-    pub block_num: u64,
-    #[prost(string, tag="2")]
-    pub block_hash: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="3")]
-    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
-    #[prost(string, tag="4")]
-    pub date: ::prost::alloc::string::String,
     /// -- transaction --
     #[prost(string, tag="5")]
     pub transaction_id: ::prost::alloc::string::String,
@@ -49,21 +42,12 @@ pub struct BalanceChange {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Transfer {
-    /// -- block --
-    #[prost(uint64, tag="1")]
-    pub block_num: u64,
-    #[prost(string, tag="2")]
-    pub block_hash: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="3")]
-    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
-    #[prost(string, tag="4")]
-    pub date: ::prost::alloc::string::String,
     /// -- transaction --
     #[prost(string, tag="5")]
     pub transaction_id: ::prost::alloc::string::String,
     /// -- ordinal --
     ///
-    /// log.ordinal
+    /// log.ordinal or call.begin_ordinal or trx.begin_ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
     /// latest global sequence of the transfer (block_num << 32 + index)
@@ -83,6 +67,22 @@ pub struct Transfer {
     /// -- debug --
     #[prost(enumeration="Algorithm", tag="99")]
     pub algorithm: i32,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Contract {
+    /// -- transaction --
+    #[prost(string, tag="5")]
+    pub transaction_id: ::prost::alloc::string::String,
+    /// -- contract --
+    #[prost(string, tag="10")]
+    pub address: ::prost::alloc::string::String,
+    #[prost(string, tag="11")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, tag="12")]
+    pub symbol: ::prost::alloc::string::String,
+    #[prost(int32, tag="13")]
+    pub decimals: i32,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

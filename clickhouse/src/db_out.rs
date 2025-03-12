@@ -1,33 +1,35 @@
+use erc20::utils::clock_to_date;
 use proto::pb::evm::tokens::types::v1::Events;
-use substreams::errors::Error;
-use substreams_database_change::pb::database::DatabaseChanges;
+use substreams::{errors::Error, pb::substreams::Clock};
+use substreams_database_change::{pb::database::DatabaseChanges, tables::Row};
+
+pub fn set_clock(clock: &Clock, row: &mut Row) {
+    row
+        .set("block_num", clock.number.to_string())
+        .set("block_hash", &clock.id)
+        .set("timestamp", clock.timestamp.expect("missing timestamp").seconds.to_string())
+        .set("date", clock_to_date(&clock));
+}
 
 #[substreams::handlers::map]
-pub fn db_out(erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
+pub fn db_out(clock: Clock, erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
     // merge erc20 + native events
     let events = Events {
         balance_changes: erc20.balance_changes.into_iter().chain(native.balance_changes).collect(),
         transfers: erc20.transfers.into_iter().chain(native.transfers).collect(),
+        contracts: vec![],
     };
 
     for balance_change in events.balance_changes {
         let algorithm = balance_change.algorithm().as_str_name();
-        tables
-            .create_row(
-                "balance_changes",
-                [
-                    ("block_num", (balance_change).block_num.to_string()),
-                    ("ordinal", (balance_change).ordinal.to_string()),
-                ],
-            )
-            // -- block --
-            .set("block_num", balance_change.block_num.to_string())
-            .set("block_hash", balance_change.block_hash)
-            .set("timestamp", balance_change.timestamp.expect("missing timestamp").seconds.to_string())
-            .set("date", balance_change.date)
-
+        let key = [
+            ("block_num", clock.number.to_string()),
+            ("ordinal", balance_change.ordinal.to_string()),
+        ];
+        let row = tables
+            .create_row("balance_changes", key)
             // -- transaction --
             .set("transaction_id", balance_change.transaction_id)
 
@@ -44,24 +46,17 @@ pub fn db_out(erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
             // -- debug --
             .set("algorithm", algorithm)
             .set("algorithm_code", balance_change.algorithm);
+
+        set_clock(&clock, row);
     }
 
     for transfer in events.transfers {
         let algorithm = transfer.algorithm().as_str_name();
-        tables
-            .create_row(
-                "transfers",
-                [
-                    ("block_num", (transfer).block_num.to_string()),
-                    ("ordinal", (transfer).ordinal.to_string()),
-                ],
-            )
-            // -- block --
-            .set("block_num", transfer.block_num.to_string())
-            .set("block_hash", transfer.block_hash)
-            .set("timestamp", transfer.timestamp.expect("missing timestamp").seconds.to_string())
-            .set("date", transfer.date)
-
+        let key = [
+            ("block_num", clock.number.to_string()),
+            ("ordinal", transfer.ordinal.to_string()),
+        ];
+        let row = tables.create_row("transfers", key)
             // -- transaction --
             .set("transaction_id", transfer.transaction_id)
 
@@ -78,6 +73,8 @@ pub fn db_out(erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
             // -- debug --
             .set("algorithm", algorithm)
             .set("algorithm_code", transfer.algorithm);
+
+        set_clock(&clock, row);
     }
 
     Ok(tables.to_database_changes())

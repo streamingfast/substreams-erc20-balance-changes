@@ -1,5 +1,5 @@
 use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
-use erc20::utils::{clock_to_date, to_global_sequence};
+use erc20::utils::to_global_sequence;
 use substreams::Hex;
 use substreams::{errors::Error, scalar::BigInt};
 
@@ -26,12 +26,6 @@ pub fn to_balance_change<'a>(
     let (old_balance, new_balance) = get_balances(balance_change);
 
     BalanceChange {
-        // -- block --
-        block_num: clock.number,
-        block_hash: clock.id.clone(),
-        date: clock_to_date(clock),
-        timestamp: clock.timestamp,
-
         // -- transaction
         transaction_id: Hex::encode(&trx.hash),
 
@@ -62,12 +56,6 @@ pub struct TransferStruct {
 
 pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: TransferStruct, index: &u64) -> Transfer {
     Transfer {
-        // -- block --
-        block_num: clock.number,
-        block_hash: clock.id.clone(),
-        date: clock_to_date(clock),
-        timestamp: clock.timestamp,
-
         // -- transaction --
         transaction_id: Hex::encode(&trx.hash),
 

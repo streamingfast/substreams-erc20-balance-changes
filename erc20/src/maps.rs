@@ -5,7 +5,7 @@ use crate::algorithms::algorithm2_child_calls::get_all_child_call_storage_change
 use crate::algorithms::fishing::is_fishing_transfer;
 use crate::algorithms::utils::{addresses_for_storage_keys, Address, Hash};
 use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
-use crate::utils::{clock_to_date, to_global_sequence};
+use crate::utils::to_global_sequence;
 use substreams::errors::Error;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
 
@@ -24,12 +24,6 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
 
 pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log, transfer: &'a TransferAbi, algorithm: Algorithm, index: &u64) -> Transfer {
     Transfer {
-        // -- block --
-        block_num: clock.number,
-        block_hash: clock.id.clone(),
-        date: clock_to_date(clock),
-        timestamp: clock.timestamp,
-
         // -- transaction --
         transaction_id: Hex::encode(&trx.hash),
 
@@ -60,12 +54,6 @@ pub fn to_balance_change<'a>(
     let new_balance = BigInt::from_unsigned_bytes_be(&storage_change.new_value);
 
     BalanceChange {
-        // -- block --
-        block_num: clock.number,
-        block_hash: clock.id.clone(),
-        date: clock_to_date(clock),
-        timestamp: clock.timestamp,
-
         // -- transaction
         transaction_id: Hex::encode(&trx.hash),
 

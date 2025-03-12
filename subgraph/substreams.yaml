@@ -20,6 +20,7 @@ modules:
   - name: graph_out
     kind: map
     inputs:
+      - source: sf.substreams.v1.Clock
       - map: erc20:map_events
       - map: native:map_events
     output:

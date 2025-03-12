@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-
-use substreams::log;
 use substreams::scalar::BigInt;
 use substreams::Hex;
 use substreams_abis::evm::token::erc20::events::Transfer;
