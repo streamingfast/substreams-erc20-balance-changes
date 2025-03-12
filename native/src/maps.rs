@@ -1,7 +1,6 @@
 use erc20::algorithms::utils::Address;
 use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
 use erc20::utils::to_global_sequence;
-use substreams::Hex;
 use substreams::{errors::Error, scalar::BigInt};
 
 use substreams::pb::substreams::Clock;

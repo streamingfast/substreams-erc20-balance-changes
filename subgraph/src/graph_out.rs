@@ -15,8 +15,8 @@ pub fn graph_out(clock: Clock, erc20: Events, native: Events) -> Result<EntityCh
     };
 
     for balance_change in events.balance_changes {
-        let contract = Hex::encode(&balance_change.contract);
-        let owner = Hex::encode(&balance_change.owner);
+        let contract = bytes_to_hex(&balance_change.contract);
+        let owner = bytes_to_hex(&balance_change.owner);
         tables
             .create_row("Balance", format!("{}:{}", contract, owner))
             // -- block --
@@ -31,4 +31,14 @@ pub fn graph_out(clock: Clock, erc20: Events, native: Events) -> Result<EntityCh
     }
 
     Ok(tables.to_entity_changes())
+}
+
+pub fn bytes_to_hex(bytes: &Vec<u8>) -> String {
+    if bytes.is_empty() {
+        return "".to_string();
+    } else if "native".to_string().into_bytes() == *bytes {
+        return "native".to_string();
+    } else {
+        format! {"0x{}", Hex::encode(bytes)}.to_string()
+    }
 }

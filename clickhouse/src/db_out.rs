@@ -83,6 +83,8 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events) -> Result<DatabaseCha
 pub fn bytes_to_hex(bytes: &Vec<u8>) -> String {
     if bytes.is_empty() {
         return "".to_string();
+    } else if "native".to_string().into_bytes() == *bytes {
+        return "native".to_string();
     } else {
         format! {"0x{}", Hex::encode(bytes)}.to_string()
     }
