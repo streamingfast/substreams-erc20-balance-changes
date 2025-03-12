@@ -4,7 +4,7 @@ use crate::algorithms::algorithm1_call::get_owner_from_erc20_balance_change;
 use crate::algorithms::algorithm2_child_calls::get_all_child_call_storage_changes;
 use crate::algorithms::fishing::is_fishing_transfer;
 use crate::algorithms::utils::{addresses_for_storage_keys, Address, Hash};
-use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer, Types};
+use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
 use crate::utils::{clock_to_date, to_global_sequence};
 use substreams::errors::Error;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
@@ -45,7 +45,6 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log
 
         // -- debug --
         algorithm: algorithm.into(),
-        r#type: Types::Erc20.into(),
     }
 }
 
@@ -82,7 +81,6 @@ pub fn to_balance_change<'a>(
 
         // -- debug --
         algorithm: algorithm.into(),
-        r#type: Types::Erc20.into(),
     }
 }
 

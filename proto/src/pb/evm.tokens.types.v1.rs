@@ -45,8 +45,6 @@ pub struct BalanceChange {
     /// -- debug --
     #[prost(enumeration="Algorithm", tag="99")]
     pub algorithm: i32,
-    #[prost(enumeration="Types", tag="100")]
-    pub r#type: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -85,8 +83,6 @@ pub struct Transfer {
     /// -- debug --
     #[prost(enumeration="Algorithm", tag="99")]
     pub algorithm: i32,
-    #[prost(enumeration="Types", tag="100")]
-    pub r#type: i32,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -147,37 +143,6 @@ impl Algorithm {
             "ALGORITHM_GAS" => Some(Self::Gas),
             "ALGORITHM_TRANSACTION" => Some(Self::Transaction),
             "ALGORITHM_SYSTEM" => Some(Self::System),
-            _ => None,
-        }
-    }
-}
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum Types {
-    Unspecified = 0,
-    /// ERC-20
-    Erc20 = 1,
-    /// Native
-    Native = 2,
-}
-impl Types {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            Types::Unspecified => "TYPES_UNSPECIFIED",
-            Types::Erc20 => "TYPES_ERC20",
-            Types::Native => "TYPES_NATIVE",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "TYPES_UNSPECIFIED" => Some(Self::Unspecified),
-            "TYPES_ERC20" => Some(Self::Erc20),
-            "TYPES_NATIVE" => Some(Self::Native),
             _ => None,
         }
     }

@@ -1,4 +1,4 @@
-use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer, Types};
+use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
 use erc20::utils::{clock_to_date, to_global_sequence};
 use substreams::Hex;
 use substreams::{errors::Error, scalar::BigInt};
@@ -36,7 +36,7 @@ pub fn to_balance_change<'a>(
         transaction_id: Hex::encode(&trx.hash),
 
         // -- balance change --
-        contract: "0x0".to_string(),
+        contract: "native".to_string(),
         owner: Hex::encode(&balance_change.address),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
@@ -47,7 +47,6 @@ pub fn to_balance_change<'a>(
 
         // -- debug --
         algorithm: algorithm.into(),
-        r#type: Types::Native.into(),
     }
 }
 
@@ -77,14 +76,13 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: Tr
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
-        contract: "0x0".to_string(),
+        contract: "native".to_string(),
         from: transfer.from,
         to: transfer.to,
         value: transfer.value.to_string(),
 
         // -- debug --
         algorithm: transfer.algorithm.into(),
-        r#type: Types::Native.into(),
     }
 }
 
