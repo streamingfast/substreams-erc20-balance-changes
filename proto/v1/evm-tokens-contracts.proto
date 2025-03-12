@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package evm.tokens.contracts.types.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message Events {
+  repeated Contract contracts = 1;
+}
+
+message Contract {
+  // -- block --
+  uint64 block_num = 1;
+  string block_hash = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  string date = 4;
+
+  // -- transaction --
+  string transaction_id = 5;
+
+  // -- contract --
+  string address = 10;
+  string name = 11;
+  string symbol = 12;
+  int32 decimals = 13;
+}

@@ -13,20 +13,23 @@ enum Algorithm {
   ALGORITHM_UNSPECIFIED = 0;
 
   // ERC-20
-  ALGORITHM_ERC20_LOG = 1; // ERC-20 Transfer log event
-  ALGORITHM_ERC20_CALL = 2; // ERC-20 within a Transfer call
-  ALGORITHM_ERC20_CHILD_CALLS = 3; // ERC-20 different Transfer call
-  ALGORITHM_ERC20_BALANCE_DOES_NOT_MATCH_TRANSFER = 4; // ERC-20 does not match balance change amount compared to transfer value
-  ALGORITHM_ERC20_REBASING_TOKEN = 5; // ERC-20 which the balances grow over time due to accrued interest
+  ALGORITHM_LOG = 1; // log event
+  ALGORITHM_CALL = 2; // call
+  ALGORITHM_CHILD_CALLS = 3; // child calls
+  ALGORITHM_REBASING_TOKEN = 4; // which the balances grow over time due to accrued interest
 
   // Native (ETH)
-  ALGORITHM_NATIVE_BLOCK = 10; // Native (ETH) block balance changes
-  ALGORITHM_NATIVE_FAILED = 11; // Native (ETH) failed transaction
-  ALGORITHM_NATIVE_GAS = 12; // Native (ETH) gas fee consumed
-  ALGORITHM_NATIVE_TRANSFER = 13; // Native (ETH) transfer
-  ALGORITHM_NATIVE_TRANSACTION = 14; // Native (ETH) from transaction
-  ALGORITHM_NATIVE_CALL = 15; // Native (ETH) from call
-  ALGORITHM_NATIVE_SYSTEM = 16; // Native (ETH) system contract
+  ALGORITHM_BLOCK = 10; // block balance changes
+  ALGORITHM_FAILED = 11; // failed transaction
+  ALGORITHM_GAS = 12; // gas fee consumed
+  ALGORITHM_TRANSACTION = 13; // from transaction
+  ALGORITHM_SYSTEM = 14; // system contract
+}
+
+enum Types {
+  TYPES_UNSPECIFIED = 0;
+  TYPES_ERC20 = 1; // ERC-20
+  TYPES_NATIVE = 2; // Native
 }
 
 message BalanceChange {
@@ -51,6 +54,7 @@ message BalanceChange {
 
   // -- debug --
   Algorithm algorithm = 99;
+  Types type = 100;
 }
 
 message Transfer {
@@ -75,4 +79,5 @@ message Transfer {
 
   // -- debug --
   Algorithm algorithm = 99;
+  Types type = 100;
 }

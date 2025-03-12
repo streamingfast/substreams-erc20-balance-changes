@@ -24,14 +24,6 @@ pub fn is_gas_balance_change(balance_change: &BalanceChange) -> bool {
     false
 }
 
-pub fn is_transfer_balance_change(balance_change: &BalanceChange) -> bool {
-    let reason = balance_change.reason();
-    if reason == Reason::Transfer {
-        return true;
-    }
-    false
-}
-
 pub fn get_balances(balance_change: &BalanceChange) -> (BigInt, BigInt) {
     let old_balance = match balance_change.old_value.as_ref() {
         Some(v) => BigInt::from_unsigned_bytes_be(&v.bytes),

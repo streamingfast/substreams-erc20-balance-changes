@@ -45,6 +45,8 @@ pub struct BalanceChange {
     /// -- debug --
     #[prost(enumeration="Algorithm", tag="99")]
     pub algorithm: i32,
+    #[prost(enumeration="Types", tag="100")]
+    pub r#type: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -83,6 +85,8 @@ pub struct Transfer {
     /// -- debug --
     #[prost(enumeration="Algorithm", tag="99")]
     pub algorithm: i32,
+    #[prost(enumeration="Types", tag="100")]
+    pub r#type: i32,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -90,32 +94,26 @@ pub enum Algorithm {
     Unspecified = 0,
     /// ERC-20
     ///
-    /// ERC-20 Transfer log event
-    Erc20Log = 1,
-    /// ERC-20 within a Transfer call
-    Erc20Call = 2,
-    /// ERC-20 different Transfer call
-    Erc20ChildCalls = 3,
-    /// ERC-20 does not match balance change amount compared to transfer value
-    Erc20BalanceDoesNotMatchTransfer = 4,
-    /// ERC-20 which the balances grow over time due to accrued interest
-    Erc20RebasingToken = 5,
+    /// log event
+    Log = 1,
+    /// call
+    Call = 2,
+    /// child calls
+    ChildCalls = 3,
+    /// which the balances grow over time due to accrued interest
+    RebasingToken = 4,
     /// Native (ETH)
     ///
-    /// Native (ETH) block balance changes
-    NativeBlock = 10,
-    /// Native (ETH) failed transaction
-    NativeFailed = 11,
-    /// Native (ETH) gas fee consumed
-    NativeGas = 12,
-    /// Native (ETH) transfer
-    NativeTransfer = 13,
-    /// Native (ETH) from transaction
-    NativeTransaction = 14,
-    /// Native (ETH) from call
-    NativeCall = 15,
-    /// Native (ETH) system contract
-    NativeSystem = 16,
+    /// block balance changes
+    Block = 10,
+    /// failed transaction
+    Failed = 11,
+    /// gas fee consumed
+    Gas = 12,
+    /// from transaction
+    Transaction = 13,
+    /// system contract
+    System = 14,
 }
 impl Algorithm {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -125,36 +123,61 @@ impl Algorithm {
     pub fn as_str_name(&self) -> &'static str {
         match self {
             Algorithm::Unspecified => "ALGORITHM_UNSPECIFIED",
-            Algorithm::Erc20Log => "ALGORITHM_ERC20_LOG",
-            Algorithm::Erc20Call => "ALGORITHM_ERC20_CALL",
-            Algorithm::Erc20ChildCalls => "ALGORITHM_ERC20_CHILD_CALLS",
-            Algorithm::Erc20BalanceDoesNotMatchTransfer => "ALGORITHM_ERC20_BALANCE_DOES_NOT_MATCH_TRANSFER",
-            Algorithm::Erc20RebasingToken => "ALGORITHM_ERC20_REBASING_TOKEN",
-            Algorithm::NativeBlock => "ALGORITHM_NATIVE_BLOCK",
-            Algorithm::NativeFailed => "ALGORITHM_NATIVE_FAILED",
-            Algorithm::NativeGas => "ALGORITHM_NATIVE_GAS",
-            Algorithm::NativeTransfer => "ALGORITHM_NATIVE_TRANSFER",
-            Algorithm::NativeTransaction => "ALGORITHM_NATIVE_TRANSACTION",
-            Algorithm::NativeCall => "ALGORITHM_NATIVE_CALL",
-            Algorithm::NativeSystem => "ALGORITHM_NATIVE_SYSTEM",
+            Algorithm::Log => "ALGORITHM_LOG",
+            Algorithm::Call => "ALGORITHM_CALL",
+            Algorithm::ChildCalls => "ALGORITHM_CHILD_CALLS",
+            Algorithm::RebasingToken => "ALGORITHM_REBASING_TOKEN",
+            Algorithm::Block => "ALGORITHM_BLOCK",
+            Algorithm::Failed => "ALGORITHM_FAILED",
+            Algorithm::Gas => "ALGORITHM_GAS",
+            Algorithm::Transaction => "ALGORITHM_TRANSACTION",
+            Algorithm::System => "ALGORITHM_SYSTEM",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
     pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
         match value {
             "ALGORITHM_UNSPECIFIED" => Some(Self::Unspecified),
-            "ALGORITHM_ERC20_LOG" => Some(Self::Erc20Log),
-            "ALGORITHM_ERC20_CALL" => Some(Self::Erc20Call),
-            "ALGORITHM_ERC20_CHILD_CALLS" => Some(Self::Erc20ChildCalls),
-            "ALGORITHM_ERC20_BALANCE_DOES_NOT_MATCH_TRANSFER" => Some(Self::Erc20BalanceDoesNotMatchTransfer),
-            "ALGORITHM_ERC20_REBASING_TOKEN" => Some(Self::Erc20RebasingToken),
-            "ALGORITHM_NATIVE_BLOCK" => Some(Self::NativeBlock),
-            "ALGORITHM_NATIVE_FAILED" => Some(Self::NativeFailed),
-            "ALGORITHM_NATIVE_GAS" => Some(Self::NativeGas),
-            "ALGORITHM_NATIVE_TRANSFER" => Some(Self::NativeTransfer),
-            "ALGORITHM_NATIVE_TRANSACTION" => Some(Self::NativeTransaction),
-            "ALGORITHM_NATIVE_CALL" => Some(Self::NativeCall),
-            "ALGORITHM_NATIVE_SYSTEM" => Some(Self::NativeSystem),
+            "ALGORITHM_LOG" => Some(Self::Log),
+            "ALGORITHM_CALL" => Some(Self::Call),
+            "ALGORITHM_CHILD_CALLS" => Some(Self::ChildCalls),
+            "ALGORITHM_REBASING_TOKEN" => Some(Self::RebasingToken),
+            "ALGORITHM_BLOCK" => Some(Self::Block),
+            "ALGORITHM_FAILED" => Some(Self::Failed),
+            "ALGORITHM_GAS" => Some(Self::Gas),
+            "ALGORITHM_TRANSACTION" => Some(Self::Transaction),
+            "ALGORITHM_SYSTEM" => Some(Self::System),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum Types {
+    Unspecified = 0,
+    /// ERC-20
+    Erc20 = 1,
+    /// Native
+    Native = 2,
+}
+impl Types {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Types::Unspecified => "TYPES_UNSPECIFIED",
+            Types::Erc20 => "TYPES_ERC20",
+            Types::Native => "TYPES_NATIVE",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "TYPES_UNSPECIFIED" => Some(Self::Unspecified),
+            "TYPES_ERC20" => Some(Self::Erc20),
+            "TYPES_NATIVE" => Some(Self::Native),
             _ => None,
         }
     }

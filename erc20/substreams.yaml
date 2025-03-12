@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens_erc20
-  version: v1.6.0
+  version: v1.6.1
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: ERC20 balance changes & transfers
   image: ../image.png

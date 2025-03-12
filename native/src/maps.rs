@@ -1,4 +1,4 @@
-use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
+use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer, Types};
 use erc20::utils::{clock_to_date, to_global_sequence};
 use substreams::Hex;
 use substreams::{errors::Error, scalar::BigInt};
@@ -7,7 +7,7 @@ use substreams::pb::substreams::Clock;
 use substreams_ethereum::pb::eth::v2::{BalanceChange as BalanceChangeAbi, Block, TransactionTrace};
 
 use crate::algorithms::transfers::{get_transfer_from_call, get_transfer_from_transaction};
-use crate::utils::{get_balances, is_failed_transaction, is_gas_balance_change, is_transfer_balance_change};
+use crate::utils::{get_balances, is_failed_transaction, is_gas_balance_change};
 
 #[substreams::handlers::map]
 pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
@@ -36,7 +36,7 @@ pub fn to_balance_change<'a>(
         transaction_id: Hex::encode(&trx.hash),
 
         // -- balance change --
-        contract: "native".to_string(),
+        contract: "0x0".to_string(),
         owner: Hex::encode(&balance_change.address),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
@@ -47,6 +47,7 @@ pub fn to_balance_change<'a>(
 
         // -- debug --
         algorithm: algorithm.into(),
+        r#type: Types::Native.into(),
     }
 }
 
@@ -76,13 +77,14 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: Tr
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
-        contract: "native".to_string(),
+        contract: "0x0".to_string(),
         from: transfer.from,
         to: transfer.to,
         value: transfer.value.to_string(),
 
         // -- debug --
         algorithm: transfer.algorithm.into(),
+        r#type: Types::Native.into(),
     }
 }
 
@@ -92,7 +94,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
     // balance changes at block level
     for balance_change in &block.balance_changes {
         events.balance_changes.push(
-            to_balance_change(clock, &TransactionTrace::default(), balance_change, Algorithm::NativeBlock, &index)
+            to_balance_change(clock, &TransactionTrace::default(), balance_change, Algorithm::Block, &index)
         );
         index += 1;
     }
@@ -101,7 +103,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
     for call in &block.system_calls {
         for balance_change in &call.balance_changes {
             events.balance_changes.push(
-                to_balance_change(clock, &TransactionTrace::default(), balance_change, Algorithm::NativeSystem, &index)
+                to_balance_change(clock, &TransactionTrace::default(), balance_change, Algorithm::System, &index)
             );
             index += 1;
         }
@@ -139,13 +141,11 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             // balance changes
             for balance_change in &call_view.call.balance_changes {
                 let algorithm = if is_failed_transaction(trx) {
-                    Algorithm::NativeFailed
+                    Algorithm::Failed
                 } else if is_gas_balance_change(balance_change) {
-                    Algorithm::NativeGas
-                } else if is_transfer_balance_change(balance_change) {
-                    Algorithm::NativeTransfer
+                    Algorithm::Gas
                 } else {
-                    Algorithm::NativeCall
+                    Algorithm::Call
                 };
 
                 // balance change
