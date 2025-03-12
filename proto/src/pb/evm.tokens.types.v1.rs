@@ -14,8 +14,8 @@ pub struct Events {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BalanceChange {
     /// -- transaction --
-    #[prost(string, tag="5")]
-    pub transaction_id: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="5")]
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
     /// -- ordering --
     ///
     /// storage_change.ordinal or balance_change.ordinal
@@ -27,10 +27,10 @@ pub struct BalanceChange {
     /// -- balance change --
     ///
     /// storage_change.address
-    #[prost(string, tag="20")]
-    pub contract: ::prost::alloc::string::String,
-    #[prost(string, tag="21")]
-    pub owner: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="20")]
+    pub contract: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="21")]
+    pub owner: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="22")]
     pub old_balance: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
@@ -43,8 +43,8 @@ pub struct BalanceChange {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Transfer {
     /// -- transaction --
-    #[prost(string, tag="5")]
-    pub transaction_id: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="5")]
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
     /// -- ordinal --
     ///
     /// log.ordinal or call.begin_ordinal or trx.begin_ordinal
@@ -56,12 +56,12 @@ pub struct Transfer {
     /// -- transfer --
     ///
     /// log.address
-    #[prost(string, tag="20")]
-    pub contract: ::prost::alloc::string::String,
-    #[prost(string, tag="21")]
-    pub from: ::prost::alloc::string::String,
-    #[prost(string, tag="22")]
-    pub to: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="20")]
+    pub contract: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="21")]
+    pub from: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="22")]
+    pub to: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="23")]
     pub value: ::prost::alloc::string::String,
     /// -- debug --
@@ -72,11 +72,11 @@ pub struct Transfer {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Contract {
     /// -- transaction --
-    #[prost(string, tag="5")]
-    pub transaction_id: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="5")]
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
     /// -- contract --
-    #[prost(string, tag="10")]
-    pub address: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="10")]
+    pub address: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="11")]
     pub name: ::prost::alloc::string::String,
     #[prost(string, tag="12")]

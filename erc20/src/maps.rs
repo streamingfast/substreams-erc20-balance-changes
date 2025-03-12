@@ -11,7 +11,6 @@ use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
 
 use substreams::pb::substreams::Clock;
 use substreams::scalar::BigInt;
-use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::{Block, Call, Log, StorageChange, TransactionTrace};
 use substreams_ethereum::Event;
 
@@ -25,16 +24,16 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
 pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log, transfer: &'a TransferAbi, algorithm: Algorithm, index: &u64) -> Transfer {
     Transfer {
         // -- transaction --
-        transaction_id: Hex::encode(&trx.hash),
+        transaction_id: trx.hash.clone(),
 
         // -- ordering --
         ordinal: log.ordinal,
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
-        contract: Hex::encode(&log.address),
-        from: Hex::encode(&transfer.from),
-        to: Hex::encode(&transfer.to),
+        contract: log.address.clone(),
+        from: transfer.from.clone(),
+        to: transfer.to.clone(),
         value: transfer.value.to_string(),
 
         // -- debug --
@@ -55,11 +54,11 @@ pub fn to_balance_change<'a>(
 
     BalanceChange {
         // -- transaction
-        transaction_id: Hex::encode(&trx.hash),
+        transaction_id: trx.hash.clone(),
 
         // -- balance change --
-        contract: Hex::encode(&storage_change.address),
-        owner: Hex::encode(owner),
+        contract: storage_change.address.clone(),
+        owner,
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
 

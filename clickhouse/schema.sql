@@ -18,20 +18,20 @@ CREATE TABLE IF NOT EXISTS cursors
 CREATE TABLE IF NOT EXISTS balance_changes  (
    -- block --
    block_num            UInt32,
-   block_hash           FixedString(64),
+   block_hash           FixedString(66),
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
    -- transaction --
-   transaction_id       FixedString(64),
+   transaction_id       FixedString(66),
 
    -- ordering --
    ordinal              UInt64, -- storage_change.ordinal or balance_change.ordinal
    global_sequence      UInt64, -- latest version of the balance change (block_num << 32 + index)
 
    -- balance change --
-   contract             FixedString(40),
-   owner                FixedString(40),
+   contract             FixedString(42),
+   owner                FixedString(42),
    old_balance          UInt256,
    new_balance          UInt256,
 
@@ -54,21 +54,21 @@ ORDER BY (block_num, ordinal);
 CREATE TABLE IF NOT EXISTS transfers  (
    -- block --
    block_num            UInt32,
-   block_hash           FixedString(64),
+   block_hash           FixedString(66),
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
    -- transaction --
-   transaction_id       FixedString(64),
+   transaction_id       FixedString(66),
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
    global_sequence      UInt64, -- latest global sequence of the transfer (block_num << 32 + index)
 
    -- transfer --
-   contract             FixedString(40), -- log.address
-   `from`               FixedString(40),
-   `to`                 FixedString(40),
+   contract             FixedString(42), -- log.address
+   `from`               FixedString(42),
+   `to`                 FixedString(42),
    value                UInt256,
 
    -- debug --
@@ -92,8 +92,8 @@ CREATE TABLE IF NOT EXISTS balances  (
    date                 Date,
 
    -- balance change --
-   contract             FixedString(40),
-   owner                FixedString(40),
+   contract             FixedString(42),
+   owner                FixedString(42),
    new_balance          UInt256,
 
    -- ordering --
@@ -117,8 +117,8 @@ CREATE TABLE IF NOT EXISTS balances_by_date  (
    date                 Date,
 
    -- balance change --
-   contract             FixedString(40),
-   owner                FixedString(40),
+   contract             FixedString(42),
+   owner                FixedString(42),
    new_balance          UInt256,
 
    -- ordering --

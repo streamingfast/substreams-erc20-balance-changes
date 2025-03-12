@@ -1,3 +1,4 @@
+use erc20::algorithms::utils::Address;
 use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
 use erc20::utils::to_global_sequence;
 use substreams::Hex;
@@ -27,11 +28,11 @@ pub fn to_balance_change<'a>(
 
     BalanceChange {
         // -- transaction
-        transaction_id: Hex::encode(&trx.hash),
+        transaction_id: trx.hash.clone(),
 
         // -- balance change --
-        contract: "native".to_string(),
-        owner: Hex::encode(&balance_change.address),
+        contract: "native".to_string().into_bytes(),
+        owner: balance_change.address.clone(),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
 
@@ -47,8 +48,8 @@ pub fn to_balance_change<'a>(
 // add default
 #[derive(Default)]
 pub struct TransferStruct {
-    pub from: String,
-    pub to: String,
+    pub from: Address,
+    pub to: Address,
     pub value: BigInt,
     pub ordinal: u64,
     pub algorithm: Algorithm,
@@ -57,14 +58,14 @@ pub struct TransferStruct {
 pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: TransferStruct, index: &u64) -> Transfer {
     Transfer {
         // -- transaction --
-        transaction_id: Hex::encode(&trx.hash),
+        transaction_id: trx.hash.clone(),
 
         // -- ordering --
         ordinal: transfer.ordinal.into(),
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
-        contract: "native".to_string(),
+        contract: "native".to_string().into_bytes(),
         from: transfer.from,
         to: transfer.to,
         value: transfer.value.to_string(),

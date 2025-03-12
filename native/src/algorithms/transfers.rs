@@ -1,5 +1,5 @@
 use proto::pb::evm::tokens::types::v1::Algorithm;
-use substreams::{scalar::BigInt, Hex};
+use substreams::scalar::BigInt;
 use substreams_ethereum::pb::eth::v2::{Call, TransactionTrace};
 
 use crate::{maps::TransferStruct, utils::{is_failed_call, is_failed_transaction}};
@@ -18,8 +18,8 @@ pub fn get_transfer_from_transaction<'a>(trx: &'a TransactionTrace) -> Option<Tr
     }
 
     Some(TransferStruct{
-        from: Hex::encode(&trx.from),
-        to: Hex::encode(&trx.to),
+        from: trx.from.clone(),
+        to: trx.to.clone(),
         value,
         ordinal: trx.begin_ordinal,
         algorithm: Algorithm::Transaction,
@@ -40,8 +40,8 @@ pub fn get_transfer_from_call<'a>(call: &'a Call) -> Option<TransferStruct> {
     }
 
     Some(TransferStruct{
-        from: Hex::encode(&call.caller),
-        to: Hex::encode(&call.address),
+        from: call.caller.clone(),
+        to: call.address.clone(),
         value,
         ordinal: call.begin_ordinal,
         algorithm: Algorithm::Call,

@@ -27,15 +27,15 @@ enum Algorithm {
 
 message BalanceChange {
   // -- transaction --
-  string transaction_id = 5;
+  bytes transaction_id = 5;
 
   // -- ordering --
   uint64 ordinal = 10; // storage_change.ordinal or balance_change.ordinal
   uint64 global_sequence = 11; // latest global sequence of the balance change (block_num << 32 + index)
 
   // -- balance change --
-  string contract = 20; // storage_change.address
-  string owner = 21;
+  bytes contract = 20; // storage_change.address
+  bytes owner = 21;
   string old_balance = 22;
   string new_balance = 23;
 
@@ -45,16 +45,16 @@ message BalanceChange {
 
 message Transfer {
   // -- transaction --
-  string transaction_id = 5;
+  bytes transaction_id = 5;
 
   // -- ordinal --
   uint64 ordinal = 10; // log.ordinal or call.begin_ordinal or trx.begin_ordinal
   uint64 global_sequence = 11; // latest global sequence of the transfer (block_num << 32 + index)
 
   // -- transfer --
-  string contract = 20; // log.address
-  string from = 21;
-  string to = 22;
+  bytes contract = 20; // log.address
+  bytes from = 21;
+  bytes to = 22;
   string value = 23;
 
   // -- debug --
@@ -63,10 +63,10 @@ message Transfer {
 
 message Contract {
   // -- transaction --
-  string transaction_id = 5;
+  bytes transaction_id = 5;
 
   // -- contract --
-  string address = 10;
+  bytes address = 10;
   string name = 11;
   string symbol = 12;
   int32 decimals = 13;
