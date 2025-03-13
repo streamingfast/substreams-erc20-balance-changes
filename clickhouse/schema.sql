@@ -71,16 +71,19 @@ CREATE TABLE IF NOT EXISTS transfers  (
    `to`                 FixedString(42),
    value                UInt256,
 
+   -- materialized --
+   from_or_to           String MATERIALIZED concat(`from`, '#', `to`),
+
    -- debug --
    algorithm            LowCardinality(String),
    algorithm_code       UInt8,
 
    -- indexes --
-   INDEX idx_transfers_date     (date)      TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_transfers_contract (contract)  TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_transfers_from     (`from`)    TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_transfers_to       (`to`)      TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_transfers_from_or_to (concat(`from`, '#', `to`)) TYPE bloom_filter GRANULARITY 4
+   INDEX idx_transfers_date         (date)         TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_contract     (contract)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_from         (`from`)       TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_to           (`to`)         TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_from_or_to   (from_or_to)   TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (block_num, ordinal)
