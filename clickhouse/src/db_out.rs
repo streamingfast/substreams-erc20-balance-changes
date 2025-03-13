@@ -1,3 +1,5 @@
+use std::vec;
+
 use erc20::utils::clock_to_date;
 use proto::pb::evm::tokens::types::v1::Events;
 use substreams::{errors::Error, pb::substreams::Clock, Hex};
@@ -12,7 +14,7 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
 }
 
 #[substreams::handlers::map]
-pub fn db_out(clock: Clock, erc20: Events, native: Events) -> Result<DatabaseChanges, Error> {
+pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
     // merge erc20 + native events
@@ -73,6 +75,29 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events) -> Result<DatabaseCha
             // -- debug --
             .set("algorithm", algorithm)
             .set("algorithm_code", transfer.algorithm);
+
+        set_clock(&clock, row);
+    }
+
+    for contract in contracts.contracts {
+        let algorithm = contract.algorithm().as_str_name();
+        let key = [
+            ("address", bytes_to_hex(&contract.address)),
+            ("block_num", clock.number.to_string()),
+        ];
+        let row = tables.create_row("contracts", key)
+            // -- transaction --
+            .set("transaction_id", bytes_to_hex(&contract.transaction_id))
+
+            // -- contract --
+            .set("address", bytes_to_hex(&contract.address))
+            .set("name", &contract.name)
+            .set("symbol", &contract.symbol)
+            .set("decimals", &contract.decimals.to_string())
+
+            // -- debug --
+            .set("algorithm", algorithm)
+            .set("algorithm_code", contract.algorithm);
 
         set_clock(&clock, row);
     }

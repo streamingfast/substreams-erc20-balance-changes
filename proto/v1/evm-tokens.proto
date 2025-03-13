@@ -69,10 +69,10 @@ message Contract {
   bytes transaction_id = 5;
 
   // -- contract --
-  bytes address = 10;
-  string name = 11;
-  string symbol = 12;
-  int32 decimals = 13;
+  bytes address = 20;
+  string name = 21;
+  string symbol = 22;
+  int32 decimals = 23;
 
   // -- debug --
   Algorithm algorithm = 99;

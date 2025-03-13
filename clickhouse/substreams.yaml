@@ -11,6 +11,7 @@ imports:
   sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
   erc20: ../erc20/substreams.yaml
   native: ../native/substreams.yaml
+  contracts: ../contracts/substreams.yaml
 
 binaries:
   default:
@@ -24,6 +25,7 @@ modules:
       - source: sf.substreams.v1.Clock
       - map: erc20:map_events
       - map: native:map_events
+      - map: contracts:map_events
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 

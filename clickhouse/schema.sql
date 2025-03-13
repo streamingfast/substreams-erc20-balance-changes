@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS contracts  (
    address              FixedString(42),
    name                 String,
    symbol               String,
-   precision            UInt32,
+   decimals             UInt8,
 
    -- debug --
    algorithm            LowCardinality(String),

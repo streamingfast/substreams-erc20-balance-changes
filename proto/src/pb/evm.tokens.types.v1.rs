@@ -75,13 +75,13 @@ pub struct Contract {
     #[prost(bytes="vec", tag="5")]
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
     /// -- contract --
-    #[prost(bytes="vec", tag="10")]
+    #[prost(bytes="vec", tag="20")]
     pub address: ::prost::alloc::vec::Vec<u8>,
-    #[prost(string, tag="11")]
+    #[prost(string, tag="21")]
     pub name: ::prost::alloc::string::String,
-    #[prost(string, tag="12")]
+    #[prost(string, tag="22")]
     pub symbol: ::prost::alloc::string::String,
-    #[prost(int32, tag="13")]
+    #[prost(int32, tag="23")]
     pub decimals: i32,
     /// -- debug --
     #[prost(enumeration="Algorithm", tag="99")]
