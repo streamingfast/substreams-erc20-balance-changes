@@ -3,7 +3,7 @@ package:
   name: evm_tokens
   version: v1.7.0
   url: https://github.com/pinax-network/substreams-evm-tokens
-  description: ERC-20 & Native token balances & transfers for EVM blockchains.
+  description: ERC-20 & Native token balances, transfers & contracts for EVM blockchains.
   image: image.png
 
 imports:
@@ -11,6 +11,7 @@ imports:
   subgraph: ./subgraph/substreams.yaml
   erc20: ./erc20/substreams.yaml
   native: ./native/substreams.yaml
+  contracts: ./contracts/substreams.yaml
 
 modules:
   - name: map_events_erc20
@@ -18,6 +19,9 @@ modules:
 
   - name: map_events_native
     use: native:map_events
+
+  - name: map_events_contracts
+    use: contracts:map_events
 
   - name: db_out
     use: clickhouse:db_out
