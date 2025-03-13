@@ -8,6 +8,7 @@ build:
 	substreams pack ./
 	substreams pack ./erc20
 	substreams pack ./native
+	substreams pack ./contracts
 	substreams pack ./clickhouse
 	substreams pack ./subgraph
 
