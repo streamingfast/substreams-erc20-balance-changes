@@ -75,6 +75,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
     // We memoize the keccak address map by call because it is expensive to compute
     let mut keccak_address_map = HashMap::new();
     let mut index = 0;  // relative index for ordering
+    let mut last_balance_changes: HashMap<Vec<u8>, BalanceChange> = HashMap::new();
 
     // Iterates over successful transactions
     for trx in block.transactions() {
@@ -101,15 +102,21 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             // -- Balance Changes --
             keccak_address_map.extend(addresses_for_storage_keys(call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
-            // log::info!("balance_changes: {:?}", balance_changes.len());
             for (owner, storage_change, change_type) in balance_changes {
                 let balance_change = to_balance_change(clock, trx, owner, storage_change, change_type, &index);
-                index += 1;
 
-                // insert balance change event
-                events.balance_changes.push(balance_change);
+                // overwrite balance change if it already exists
+                // key = contract + owner
+                let key = balance_change.contract.iter().chain(balance_change.owner.iter()).copied().collect();
+                last_balance_changes.insert(key, balance_change.clone());
+                index += 1;
             }
         }
+    }
+
+    // insert only the last balance change for each contract + owner per block
+    for balance_change in last_balance_changes.values() {
+        events.balance_changes.push(balance_change.clone());
     }
 }
 
