@@ -16,7 +16,19 @@ pub fn get_contract_symbol(address: Vec<u8>) -> Option<String> {
 // ETH Call to retrieve ERC20 token Decimal
 pub fn get_contract_decimals(address: Vec<u8>) -> Option<BigInt> {
     let method = erc20::functions::Decimals{};
-    method.call(address)
+
+    // decimals must be uint8 range
+    // UInt256 value has maximum digits of 78
+    match method.call(address) {
+        Some(decimals) => {
+            if decimals >= BigInt::from(0) && decimals <= BigInt::from(255) {
+                Some(decimals)
+            } else {
+                None
+            }
+        }
+        None => None,
+    }
 }
 
 pub fn get_contract(address: Vec<u8>) -> Option<(String, String, BigInt)> {
