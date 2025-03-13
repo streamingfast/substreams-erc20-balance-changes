@@ -7,10 +7,6 @@ build:
 	cargo build --target wasm32-unknown-unknown --release
 	substreams pack
 
-.PHONY: protogen
-protogen:
-	substreams protogen --exclude-paths sf/substreams,google
-
 .PHONY: parquet
 parquet:
 	rm -f state.yaml && substreams-sink-files run eth.substreams.pinax.network:443 ../erc20/substreams.yaml map_events "./out" 21525891:21525892 --encoder parquet --file-block-count 1

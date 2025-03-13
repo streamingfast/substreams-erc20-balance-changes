@@ -23,6 +23,9 @@ enum Algorithm {
   ALGORITHM_GAS = 12; // gas fee consumed
   ALGORITHM_TRANSACTION = 13; // from transaction
   ALGORITHM_SYSTEM = 14; // system contract
+
+  // Contracts
+  ALGORITHM_CONTRACT_CREATION = 20; // contract creation
 }
 
 message BalanceChange {
@@ -70,4 +73,7 @@ message Contract {
   string name = 11;
   string symbol = 12;
   int32 decimals = 13;
+
+  // -- debug --
+  Algorithm algorithm = 99;
 }

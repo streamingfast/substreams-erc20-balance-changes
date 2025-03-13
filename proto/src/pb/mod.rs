@@ -1,13 +1,4 @@
 // @generated
-pub mod debug {
-    pub mod types {
-        // @@protoc_insertion_point(attribute:debug.types.v1)
-        pub mod v1 {
-            include!("debug.types.v1.rs");
-            // @@protoc_insertion_point(debug.types.v1)
-        }
-    }
-}
 pub mod evm {
     pub mod tokens {
         pub mod types {

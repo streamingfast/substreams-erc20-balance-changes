@@ -85,6 +85,38 @@ ENGINE = ReplacingMergeTree
 PRIMARY KEY (block_num, ordinal)
 ORDER BY (block_num, ordinal);
 
+-------------------------------------------------
+-- Contracts creation or updates               --
+-------------------------------------------------
+CREATE TABLE IF NOT EXISTS contracts  (
+   -- block --
+   block_num            UInt32,
+   block_hash           FixedString(66),
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
+
+   -- transaction --
+   transaction_id       FixedString(66),
+
+   -- contract --
+   address              FixedString(42),
+   name                 String,
+   symbol               String,
+   precision            UInt32,
+
+   -- debug --
+   algorithm            LowCardinality(String),
+   algorithm_code       UInt8,
+
+   -- indexes --
+   INDEX idx_contracts_date     (date)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_name     (name)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_symbol   (symbol)    TYPE bloom_filter GRANULARITY 4,
+)
+ENGINE = ReplacingMergeTree
+PRIMARY KEY (address, block_num)
+ORDER BY (address, block_num);
+
 -- latest balances by owner/contract --
 CREATE TABLE IF NOT EXISTS balances  (
    block_num            UInt32,

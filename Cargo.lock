@@ -128,6 +128,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "contracts"
+version = "0.0.0"
+dependencies = [
+ "proto",
+ "substreams",
+ "substreams-abis",
+ "substreams-ethereum",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1062,9 +1072,9 @@ dependencies = [
 
 [[package]]
 name = "substreams"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5bb63116b90d4c174114fb237a8916dd995c939874f7576333990a44d78b642a"
+checksum = "fdd15565feda31101521b96860e1bd4e6b549348e8d34a385cc46de7a04f61bb"
 dependencies = [
  "anyhow",
  "bigdecimal",
@@ -1186,9 +1196,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-macro"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f36f36e9da94db29f49daf3ab6b47b529b57c43fc5d58bc35b160aaad1a7233f"
+checksum = "a3cf9954628fa6dee8458dade7088ce032e7f52267ef4777ad5bc2d1cfb4618a"
 dependencies = [
  "proc-macro2",
  "quote",

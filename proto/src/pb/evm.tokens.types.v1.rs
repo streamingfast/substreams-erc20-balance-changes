@@ -83,6 +83,9 @@ pub struct Contract {
     pub symbol: ::prost::alloc::string::String,
     #[prost(int32, tag="13")]
     pub decimals: i32,
+    /// -- debug --
+    #[prost(enumeration="Algorithm", tag="99")]
+    pub algorithm: i32,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -110,6 +113,10 @@ pub enum Algorithm {
     Transaction = 13,
     /// system contract
     System = 14,
+    /// Contracts
+    ///
+    /// contract creation
+    ContractCreation = 20,
 }
 impl Algorithm {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -128,6 +135,7 @@ impl Algorithm {
             Algorithm::Gas => "ALGORITHM_GAS",
             Algorithm::Transaction => "ALGORITHM_TRANSACTION",
             Algorithm::System => "ALGORITHM_SYSTEM",
+            Algorithm::ContractCreation => "ALGORITHM_CONTRACT_CREATION",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -143,6 +151,7 @@ impl Algorithm {
             "ALGORITHM_GAS" => Some(Self::Gas),
             "ALGORITHM_TRANSACTION" => Some(Self::Transaction),
             "ALGORITHM_SYSTEM" => Some(Self::System),
+            "ALGORITHM_CONTRACT_CREATION" => Some(Self::ContractCreation),
             _ => None,
         }
     }
