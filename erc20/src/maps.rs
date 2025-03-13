@@ -5,6 +5,7 @@ use crate::algorithms::algorithm2_child_calls::get_all_child_call_storage_change
 use crate::algorithms::fishing::is_fishing_transfer;
 use crate::algorithms::utils::{addresses_for_storage_keys, Address, Hash};
 use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
+use substreams::log;
 use crate::utils::to_global_sequence;
 use substreams::errors::Error;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
@@ -18,6 +19,7 @@ use substreams_ethereum::Event;
 pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
     let mut events = Events::default();
     insert_events(&clock, &block, &mut events);
+    log::info!(format!("transfers: {} balance_changes: {}", events.transfers.len(), events.balance_changes.len()));
     Ok(events)
 }
 

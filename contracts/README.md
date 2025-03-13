@@ -1,3 +1,4 @@
-# Substreams: `Native Balances`
+# Substreams: `Contracts`
 
-> Extracts all ETH balances & transfers from Ethereum events.
+> Extracts ERC-20 token contract metadata from the Ethereum blockchain.
+
