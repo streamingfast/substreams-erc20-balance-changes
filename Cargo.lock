@@ -140,6 +140,7 @@ name = "contracts"
 version = "0.0.0"
 dependencies = [
  "common",
+ "erc20",
  "proto",
  "substreams",
  "substreams-abis",

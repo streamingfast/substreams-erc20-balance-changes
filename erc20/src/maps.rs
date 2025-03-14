@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::algorithms::algorithm1_call::get_owner_from_erc20_balance_change;
 use crate::algorithms::algorithm2_child_calls::get_all_child_call_storage_changes;
-use crate::algorithms::fishing::is_fishing_transfer;
+use crate::algorithms::transfers::get_erc20_transfer;
 use crate::algorithms::utils::addresses_for_storage_keys;
 use common::{to_global_sequence, Address, Hash};
 use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
@@ -13,7 +13,6 @@ use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
 use substreams::pb::substreams::Clock;
 use substreams::scalar::BigInt;
 use substreams_ethereum::pb::eth::v2::{Block, Call, Log, StorageChange, TransactionTrace};
-use substreams_ethereum::Event;
 
 #[substreams::handlers::map]
 pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
@@ -87,16 +86,9 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             let call = call_view.as_ref();
 
             // -- Transfer --
-            let transfer = match TransferAbi::match_and_decode(log) {
+            let transfer = match get_erc20_transfer(trx, call, log) {
                 Some(transfer) => transfer,
                 None => continue,
-            };
-            if transfer.value.is_zero() {
-                continue;
-            }
-            // ignore fishing transfers
-            if is_fishing_transfer(trx, call) {
-                continue;
             };
             events.transfers.push(to_transfer(clock, trx, log, &transfer, Algorithm::Log, &index));
             index += 1;

@@ -65,14 +65,15 @@ message Transfer {
 }
 
 message Contract {
-  // -- transaction --
+  // -- block (contract creation) --
+  uint32 block_num = 1;
+  bytes block_hash = 2;
+  uint32 timestamp = 3;
+
+  // -- transaction (contract creation) --
   bytes transaction_id = 5;
   bytes from = 6;
   bytes to = 7;
-
-  // -- ordinal --
-  uint64 ordinal = 10; // log.ordinal or call.begin_ordinal or trx.begin_ordinal
-  uint64 global_sequence = 11; // latest global sequence of the transfer (block_num << 32 + index)
 
   // -- contract --
   bytes address = 20;

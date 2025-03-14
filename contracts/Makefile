@@ -13,8 +13,8 @@ parquet:
 
 .PHONY: gui
 gui: build
-	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 21525891
+	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 100000
 
 .PHONY: gui-base
 gui-base: build
-	substreams gui substreams.yaml map_events -e base.substreams.pinax.network:443 --network base -s 24400000 -t 0pp
+	substreams gui substreams.yaml map_events -e base.substreams.pinax.network:443 --network base -s 100000

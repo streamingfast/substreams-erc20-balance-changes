@@ -71,21 +71,20 @@ pub struct Transfer {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Contract {
-    /// -- transaction --
+    /// -- block (contract creation) --
+    #[prost(uint32, tag="1")]
+    pub block_num: u32,
+    #[prost(bytes="vec", tag="2")]
+    pub block_hash: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint32, tag="3")]
+    pub timestamp: u32,
+    /// -- transaction (contract creation) --
     #[prost(bytes="vec", tag="5")]
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="6")]
     pub from: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="7")]
     pub to: ::prost::alloc::vec::Vec<u8>,
-    /// -- ordinal --
-    ///
-    /// log.ordinal or call.begin_ordinal or trx.begin_ordinal
-    #[prost(uint64, tag="10")]
-    pub ordinal: u64,
-    /// latest global sequence of the transfer (block_num << 32 + index)
-    #[prost(uint64, tag="11")]
-    pub global_sequence: u64,
     /// -- contract --
     #[prost(bytes="vec", tag="20")]
     pub address: ::prost::alloc::vec::Vec<u8>,
