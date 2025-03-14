@@ -1,6 +1,6 @@
 
 use common::to_global_sequence;
-use substreams::{errors::Error, pb::substreams::Clock};
+use substreams::{errors::Error, log, pb::substreams::Clock};
 use proto::pb::evm::tokens::types::v1::{Algorithm, Contract, Events};
 use substreams_ethereum::pb::eth::v2::{Block, CallType};
 
@@ -23,6 +23,8 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                 events.contracts.push(Contract {
                     // -- transaction
                     transaction_id: trx.hash.clone(),
+                    from: trx.from.clone(),
+                    to: trx.to.clone(),
 
                     // -- ordering --
                     ordinal: code_change.ordinal,
@@ -41,5 +43,6 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
             }
         }
     }
+    log::info!("index: {:?}", index);
     Ok(events)
 }

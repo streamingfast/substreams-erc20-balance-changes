@@ -74,6 +74,10 @@ pub struct Contract {
     /// -- transaction --
     #[prost(bytes="vec", tag="5")]
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="6")]
+    pub from: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="7")]
+    pub to: ::prost::alloc::vec::Vec<u8>,
     /// -- ordinal --
     ///
     /// log.ordinal or call.begin_ordinal or trx.begin_ordinal

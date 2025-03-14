@@ -67,6 +67,8 @@ message Transfer {
 message Contract {
   // -- transaction --
   bytes transaction_id = 5;
+  bytes from = 6;
+  bytes to = 7;
 
   // -- ordinal --
   uint64 ordinal = 10; // log.ordinal or call.begin_ordinal or trx.begin_ordinal

@@ -101,6 +101,8 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
             .set("name", &contract.name)
             .set("symbol", &contract.symbol)
             .set("decimals", &contract.decimals.to_string())
+            .set("factory", bytes_to_hex(&contract.factory))
+            .set("deployer", bytes_to_hex(&contract.deployer))
 
             // -- debug --
             .set("algorithm", algorithm)

@@ -105,6 +105,8 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    name                 String,
    symbol               String,
    decimals             UInt8,
+   factory              FixedString(42),
+   deployer             FixedString(42),
 
    -- debug --
    algorithm            LowCardinality(String),
