@@ -98,10 +98,6 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    `from`               FixedString(42),
    `to`                 FixedString(42),
 
-   -- ordering --
-   ordinal              UInt64, -- code_change.ordinal
-   global_sequence      UInt64, -- latest global sequence of the transfer (block_num << 32 + index)
-
    -- contract --
    address              FixedString(42), -- code_changes.address
    name                 String,
@@ -121,8 +117,8 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    INDEX idx_contracts_decimals  (decimals)    TYPE bloom_filter GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
-PRIMARY KEY (date, block_num, ordinal)
-ORDER BY (date, block_num, ordinal);
+PRIMARY KEY (date, block_num, address)
+ORDER BY (date, block_num, address);
 
 -- latest balances by owner/contract --
 CREATE TABLE IF NOT EXISTS balances  (
@@ -191,9 +187,6 @@ CREATE TABLE IF NOT EXISTS contracts  (
    symbol               String,
    decimals             UInt8,
 
-   -- ordering --
-   global_sequence      UInt64, -- block_num << 32 + index
-
    -- indexes --
    INDEX idx_contracts_name         (name)      TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contracts_from         (`from`)    TYPE bloom_filter GRANULARITY 4,
@@ -201,7 +194,7 @@ CREATE TABLE IF NOT EXISTS contracts  (
    INDEX idx_contracts_symbol       (symbol)    TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contracts_decimals     (decimals)  TYPE bloom_filter GRANULARITY 4
 )
-ENGINE = ReplacingMergeTree(global_sequence)
+ENGINE = ReplacingMergeTree(block_num)
 PRIMARY KEY (address)
 ORDER BY (address);
 
