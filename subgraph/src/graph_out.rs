@@ -1,4 +1,4 @@
-use erc20::utils::clock_to_date;
+use common::clock_to_date;
 use proto::pb::evm::tokens::types::v1::Events;
 use substreams::{errors::Error, pb::substreams::Clock, Hex};
 use substreams_entity_change::pb::entity::EntityChanges;

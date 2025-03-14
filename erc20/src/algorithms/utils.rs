@@ -1,11 +1,9 @@
 use std::collections::HashMap;
+use common::{Address, Hash};
 use substreams::scalar::BigInt;
 use substreams::Hex;
 use substreams_abis::evm::token::erc20::events::Transfer;
 use substreams_ethereum::pb::eth::v2::{Call, StorageChange};
-
-pub type Address = Vec<u8>;
-pub type Hash = Vec<u8>;
 
 pub fn addresses_for_storage_keys(call: &Call) -> HashMap<Hash, Address> {
     let mut out = HashMap::new();

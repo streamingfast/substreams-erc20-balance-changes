@@ -4,6 +4,7 @@ members = [
   "contracts",
   "native",
   "proto",
+  "common",
   "clickhouse",
   "subgraph",
 ]

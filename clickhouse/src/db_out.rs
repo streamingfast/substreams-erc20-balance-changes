@@ -1,6 +1,6 @@
 use std::vec;
 
-use erc20::utils::clock_to_date;
+use common::clock_to_date;
 use proto::pb::evm::tokens::types::v1::Events;
 use substreams::{errors::Error, pb::substreams::Clock, Hex};
 use substreams_database_change::{pb::database::DatabaseChanges, tables::Row};
@@ -27,6 +27,7 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
     for balance_change in events.balance_changes {
         let algorithm = balance_change.algorithm().as_str_name();
         let key = [
+            ("date", clock_to_date(&clock)),
             ("block_num", clock.number.to_string()),
             ("ordinal", balance_change.ordinal.to_string()),
         ];
@@ -55,6 +56,7 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
     for transfer in events.transfers {
         let algorithm = transfer.algorithm().as_str_name();
         let key = [
+            ("date", clock_to_date(&clock)),
             ("block_num", clock.number.to_string()),
             ("ordinal", transfer.ordinal.to_string()),
         ];
@@ -62,7 +64,7 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
             // -- transaction --
             .set("transaction_id", bytes_to_hex(&transfer.transaction_id))
 
-            // -- indexing --
+            // -- ordering --
             .set("ordinal", transfer.ordinal)
             .set("global_sequence", transfer.global_sequence)
 
@@ -82,12 +84,17 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
     for contract in contracts.contracts {
         let algorithm = contract.algorithm().as_str_name();
         let key = [
-            ("address", bytes_to_hex(&contract.address)),
+            ("date", clock_to_date(&clock)),
             ("block_num", clock.number.to_string()),
+            ("ordinal", contract.ordinal.to_string()),
         ];
-        let row = tables.create_row("contracts", key)
+        let row = tables.create_row("contract_changes", key)
             // -- transaction --
             .set("transaction_id", bytes_to_hex(&contract.transaction_id))
+
+            // -- ordering --
+            .set("ordinal", contract.ordinal)
+            .set("global_sequence", contract.global_sequence)
 
             // -- contract --
             .set("address", bytes_to_hex(&contract.address))

@@ -11,4 +11,5 @@ crate-type = ["cdylib"]
 substreams = { workspace = true }
 substreams-entity-change = "2.0"
 erc20 = { path = "../erc20" }
+common = { path = "../common" }
 proto = { path = "../proto" }

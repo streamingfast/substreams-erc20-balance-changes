@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
+use common::{Address, Hash};
 use substreams_abis::evm::token::erc20::events::Transfer;
 use substreams_ethereum::pb::eth::v2::StorageChange;
 
-use super::utils::{get_keccak_address, is_erc20_valid_address, is_erc20_valid_balance, Address, Hash};
+use super::utils::{get_keccak_address, is_erc20_valid_address, is_erc20_valid_balance};
 
 pub fn get_owner_from_erc20_balance_change<'a>(
     transfer: &'a Transfer,

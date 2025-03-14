@@ -12,3 +12,4 @@ substreams = { workspace = true }
 substreams-database-change = "2.0"
 erc20 = { path = "../erc20" }
 proto = { path = "../proto" }
+common = { path = "../common" }

@@ -17,3 +17,4 @@ substreams = { workspace = true }
 substreams-ethereum = "0.10"
 substreams-abis = "0.1"
 proto = { path = "../proto" }
+common = { path = "../common" }

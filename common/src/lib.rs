@@ -1,5 +1,8 @@
 use substreams::pb::substreams::Clock;
 
+pub type Address = Vec<u8>;
+pub type Hash = Vec<u8>;
+
 // Timestamp to date conversion
 // ex: 2015-07-30T16:02:18Z => 2015-07-30
 pub fn clock_to_date(clock: &Clock) -> String {

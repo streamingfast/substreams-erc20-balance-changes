@@ -101,10 +101,18 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 name = "clickhouse"
 version = "0.0.0"
 dependencies = [
+ "common",
  "erc20",
  "proto",
  "substreams",
  "substreams-database-change",
+]
+
+[[package]]
+name = "common"
+version = "0.0.0"
+dependencies = [
+ "substreams",
 ]
 
 [[package]]
@@ -131,6 +139,7 @@ dependencies = [
 name = "contracts"
 version = "0.0.0"
 dependencies = [
+ "common",
  "proto",
  "substreams",
  "substreams-abis",
@@ -188,6 +197,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 name = "erc20"
 version = "0.0.0"
 dependencies = [
+ "common",
  "proto",
  "substreams",
  "substreams-abis",
@@ -548,7 +558,7 @@ checksum = "defc4c55412d89136f966bbb339008b474350e5e6e78d2714439c386b3137a03"
 name = "native"
 version = "0.0.0"
 dependencies = [
- "erc20",
+ "common",
  "proto",
  "substreams",
  "substreams-ethereum",
@@ -1064,6 +1074,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 name = "subgraph"
 version = "0.0.0"
 dependencies = [
+ "common",
  "erc20",
  "proto",
  "substreams",

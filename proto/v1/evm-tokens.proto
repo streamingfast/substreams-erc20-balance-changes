@@ -68,6 +68,10 @@ message Contract {
   // -- transaction --
   bytes transaction_id = 5;
 
+  // -- ordinal --
+  uint64 ordinal = 10; // log.ordinal or call.begin_ordinal or trx.begin_ordinal
+  uint64 global_sequence = 11; // latest global sequence of the transfer (block_num << 32 + index)
+
   // -- contract --
   bytes address = 20;
   string name = 21;

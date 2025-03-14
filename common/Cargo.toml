@@ -1,5 +1,5 @@
 [package]
-name = "proto"
+name = "common"
 description = { workspace = true }
 edition = { workspace = true }
 version = { workspace = true }
@@ -8,5 +8,4 @@ version = { workspace = true }
 crate-type = ["rlib"]
 
 [dependencies]
-prost = "0.13"
-prost-types = "0.13"
+substreams = { workspace = true }
