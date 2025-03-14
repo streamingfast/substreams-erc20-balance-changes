@@ -95,6 +95,8 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
 
    -- transaction --
    transaction_id       FixedString(66),
+   `from`               FixedString(42),
+   `to`                 FixedString(42),
 
    -- ordering --
    ordinal              UInt64, -- code_change.ordinal
@@ -105,8 +107,6 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    name                 String,
    symbol               String,
    decimals             UInt8,
-   factory              FixedString(42),
-   deployer             FixedString(42),
 
    -- debug --
    algorithm            LowCardinality(String),
@@ -114,6 +114,8 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
 
    -- indexes --
    INDEX idx_contracts_address   (address)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_from      (`from`)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_to        (`to`)        TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contracts_name      (name)        TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contracts_symbol    (symbol)      TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contracts_decimals  (decimals)    TYPE bloom_filter GRANULARITY 4,
@@ -176,6 +178,10 @@ CREATE TABLE IF NOT EXISTS contracts  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
+   -- transaction --
+   `from`               FixedString(42),
+   `to`                 FixedString(42),
+
    -- contract --
    address              FixedString(42), -- code_change.address
    name                 String,
@@ -186,9 +192,11 @@ CREATE TABLE IF NOT EXISTS contracts  (
    global_sequence      UInt64, -- block_num << 32 + index
 
    -- indexes --
-   INDEX idx_contracts_name (name)  TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_symbol (symbol)  TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_decimals (decimals)  TYPE bloom_filter GRANULARITY 4
+   INDEX idx_contracts_name         (name)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_from         (`from`)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_to           (`to`)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_symbol       (symbol)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_decimals     (decimals)  TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (address)

@@ -91,6 +91,8 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
         let row = tables.create_row("contract_changes", key)
             // -- transaction --
             .set("transaction_id", bytes_to_hex(&contract.transaction_id))
+            .set("from", bytes_to_hex(&contract.from))
+            .set("to", bytes_to_hex(&contract.to))
 
             // -- ordering --
             .set("ordinal", contract.ordinal)
@@ -101,8 +103,6 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
             .set("name", &contract.name)
             .set("symbol", &contract.symbol)
             .set("decimals", &contract.decimals.to_string())
-            .set("factory", bytes_to_hex(&contract.factory))
-            .set("deployer", bytes_to_hex(&contract.deployer))
 
             // -- debug --
             .set("algorithm", algorithm)
