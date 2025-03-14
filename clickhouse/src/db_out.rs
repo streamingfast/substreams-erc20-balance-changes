@@ -83,10 +83,11 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
 
     for contract in contracts.contracts {
         let algorithm = contract.algorithm().as_str_name();
+        let address = bytes_to_hex(&contract.address);
         let key = [
             ("date", clock_to_date(&clock)),
             ("block_num", clock.number.to_string()),
-            ("ordinal", contract.ordinal.to_string()),
+            ("address", address.to_string()),
         ];
         let row = tables.create_row("contract_changes", key)
             // -- transaction --
@@ -94,12 +95,8 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
             .set("from", bytes_to_hex(&contract.from))
             .set("to", bytes_to_hex(&contract.to))
 
-            // -- ordering --
-            .set("ordinal", contract.ordinal)
-            .set("global_sequence", contract.global_sequence)
-
             // -- contract --
-            .set("address", bytes_to_hex(&contract.address))
+            .set("address", &address)
             .set("name", &contract.name)
             .set("symbol", &contract.symbol)
             .set("decimals", &contract.decimals.to_string())
