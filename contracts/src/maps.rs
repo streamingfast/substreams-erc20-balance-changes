@@ -11,7 +11,7 @@ pub fn map_events(store_erc20_transfers: Deltas<DeltaBigInt>, store_contract_cre
     let mut index = 0;
 
     for deltas in store_erc20_transfers.deltas {
-        // must be the 2nd ERC20 token transfer event
+        // must be the 2nd block including ERC20 token transfer events per address
         // 1st transfer could be in the same block as contract creation which causes issues retrieving contract details
         if deltas.new_value != BigInt::from(2) { continue }
         let address = Hex::decode(&deltas.key).expect("invalid address");
