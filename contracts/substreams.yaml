@@ -1,8 +1,8 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens_contracts
-  version: v1.8.1
-  url: https://github.com/pinax-network/substreams-evm-tokens
+  version: v1.8.2
+  url: https://githubcom/pinax-network/substreams-evm-tokens
   description: EVM Token contracts
   image: ../image.png
 
@@ -19,9 +19,9 @@ modules:
     kind: map
     doc: ERC20 contracts
     inputs:
+      - source: sf.ethereum.type.v2.Block
       - store: store_erc20_transfers
         mode: deltas
-      - store: store_contract_creation
     output:
       type: proto:evm.tokens.types.v1.Events
 
@@ -30,14 +30,6 @@ modules:
     updatePolicy: add
     valueType: bigint
     inputs:
-      - source: sf.ethereum.type.v2.Block
-
-  - name: store_contract_creation
-    kind: store
-    updatePolicy: set
-    valueType: string
-    inputs:
-      - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
 
 network: mainnet

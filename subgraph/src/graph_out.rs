@@ -1,5 +1,5 @@
 use common::clock_to_date;
-use proto::pb::evm::tokens::types::v1::Events;
+use proto::pb::evm::tokens::types::v1::{BalanceChange, Events};
 use substreams::{errors::Error, pb::substreams::Clock, Hex};
 use substreams_entity_change::pb::entity::EntityChanges;
 
@@ -7,14 +7,10 @@ use substreams_entity_change::pb::entity::EntityChanges;
 pub fn graph_out(clock: Clock, erc20: Events, native: Events) -> Result<EntityChanges, Error> {
     let mut tables = substreams_entity_change::tables::Tables::new();
 
-    // merge erc20 + native events
-    let events = Events {
-        balance_changes: erc20.balance_changes.into_iter().chain(native.balance_changes).collect(),
-        transfers: vec![],
-        contracts: vec![],
-    };
+    // -- combine events (ERC-20 + Native) --
+    let balance_changes: Vec<BalanceChange> = erc20.balance_changes.into_iter().chain(native.balance_changes).collect();
 
-    for balance_change in events.balance_changes {
+    for balance_change in balance_changes {
         let contract = bytes_to_hex(&balance_change.contract);
         let owner = bytes_to_hex(&balance_change.owner);
         tables

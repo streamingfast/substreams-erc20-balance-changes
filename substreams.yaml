@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens
-  version: v1.8.1
+  version: v1.8.2
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: ERC-20 & Native token balances, transfers & contracts for EVM blockchains.
   image: image.png

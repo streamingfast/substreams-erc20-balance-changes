@@ -1,7 +1,5 @@
-use std::vec;
-
 use common::clock_to_date;
-use proto::pb::evm::tokens::types::v1::Events;
+use proto::pb::evm::tokens::types::v1::{BalanceChange, Events, Transfer};
 use substreams::{errors::Error, pb::substreams::Clock, Hex};
 use substreams_database_change::{pb::database::DatabaseChanges, tables::Row};
 
@@ -17,14 +15,12 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
 pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
-    // merge erc20 + native events
-    let events = Events {
-        balance_changes: erc20.balance_changes.into_iter().chain(native.balance_changes).collect(),
-        transfers: erc20.transfers.into_iter().chain(native.transfers).collect(),
-        contracts: vec![],
-    };
+    // -- combine events (ERC-20 + Native) --
+    let balance_changes: Vec<BalanceChange> = erc20.balance_changes.into_iter().chain(native.balance_changes).collect();
+    let transfers: Vec<Transfer> = erc20.transfers.into_iter().chain(native.transfers).collect();
 
-    for balance_change in events.balance_changes {
+    // -- balance changes --
+    for balance_change in balance_changes {
         let algorithm = balance_change.algorithm().as_str_name();
         let key = [
             ("date", clock_to_date(&clock)),
@@ -53,7 +49,8 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
         set_clock(&clock, row);
     }
 
-    for transfer in events.transfers {
+    // -- transfers --
+    for transfer in transfers {
         let algorithm = transfer.algorithm().as_str_name();
         let key = [
             ("date", clock_to_date(&clock)),
@@ -81,29 +78,37 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) ->
         set_clock(&clock, row);
     }
 
+    // -- contract changes --
     for contract in contracts.contracts {
-        let algorithm = contract.algorithm().as_str_name();
         let address = bytes_to_hex(&contract.address);
         let key = [
-            ("date", clock_to_date(&clock)),
-            ("block_num", clock.number.to_string()),
             ("address", address.to_string()),
+            ("block_num", clock.number.to_string()),
         ];
         let row = tables.create_row("contract_changes", key)
-            // -- transaction --
-            .set("transaction_id", bytes_to_hex(&contract.transaction_id))
-            .set("from", bytes_to_hex(&contract.from))
-            .set("to", bytes_to_hex(&contract.to))
-
             // -- contract --
             .set("address", &address)
             .set("name", &contract.name)
             .set("symbol", &contract.symbol)
-            .set("decimals", &contract.decimals.to_string())
+            .set("decimals", &contract.decimals.to_string());
 
-            // -- debug --
-            .set("algorithm", algorithm)
-            .set("algorithm_code", contract.algorithm);
+        set_clock(&clock, row);
+    }
+
+    // -- contract creations --
+    for row in contracts.contract_creations {
+        let address = bytes_to_hex(&row.address);
+        let key = [
+            ("address", address.to_string()),
+        ];
+        let row = tables.create_row("contract_creations", key)
+            // -- transaction --
+            .set("transaction_id", bytes_to_hex(&row.transaction_id))
+            .set("from", bytes_to_hex(&row.from))
+            .set("to", bytes_to_hex(&row.to))
+
+            // -- contract --
+            .set("address", &address);
 
         set_clock(&clock, row);
     }

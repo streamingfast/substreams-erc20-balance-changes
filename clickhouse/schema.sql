@@ -83,10 +83,31 @@ ENGINE = ReplacingMergeTree
 PRIMARY KEY (date, block_num, ordinal)
 ORDER BY (date, block_num, ordinal);
 
--------------------------------------------------
--- Contracts creation or updates               --
--------------------------------------------------
+-- ERC-20 contracts metadata events --
 CREATE TABLE IF NOT EXISTS contract_changes  (
+   -- block --
+   block_num            UInt32,
+   block_hash           FixedString(66),
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
+
+   -- contract --
+   address              FixedString(42),
+   name                 String,
+   symbol               String,
+   decimals             UInt8,
+
+   -- indexes --
+   INDEX idx_contracts_name      (name)        TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_symbol    (symbol)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_decimals  (decimals)    TYPE bloom_filter GRANULARITY 4,
+)
+ENGINE = ReplacingMergeTree
+PRIMARY KEY (address, block_num)
+ORDER BY (address, block_num);
+
+-- latest contract creations --
+CREATE TABLE IF NOT EXISTS contract_creations  (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),
@@ -99,26 +120,15 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    `to`                 FixedString(42),
 
    -- contract --
-   address              FixedString(42), -- code_changes.address
-   name                 String,
-   symbol               String,
-   decimals             UInt8,
-
-   -- debug --
-   algorithm            LowCardinality(String),
-   algorithm_code       UInt8,
+   address              FixedString(42),
 
    -- indexes --
-   INDEX idx_contracts_address   (address)     TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contracts_from      (`from`)      TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_to        (`to`)        TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_name      (name)        TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_symbol    (symbol)      TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_decimals  (decimals)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_to        (`to`)        TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
-PRIMARY KEY (date, block_num, address)
-ORDER BY (date, block_num, address);
+PRIMARY KEY (address)
+ORDER BY (address);
 
 -- latest balances by owner/contract --
 CREATE TABLE IF NOT EXISTS balances  (
@@ -171,26 +181,20 @@ TO balances_by_date AS
 SELECT * FROM balance_changes;
 
 
--- latest contracts --
+-- latest ERC-20 contracts --
 CREATE TABLE IF NOT EXISTS contracts  (
    block_num            UInt32,
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- transaction --
-   `from`               FixedString(42),
-   `to`                 FixedString(42),
-
    -- contract --
-   address              FixedString(42), -- code_change.address
+   address              FixedString(42),
    name                 String,
    symbol               String,
    decimals             UInt8,
 
    -- indexes --
    INDEX idx_contracts_name         (name)      TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_from         (`from`)    TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_to           (`to`)      TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contracts_symbol       (symbol)    TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contracts_decimals     (decimals)  TYPE bloom_filter GRANULARITY 4
 )

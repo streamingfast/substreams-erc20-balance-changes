@@ -9,6 +9,8 @@ pub struct Events {
     pub balance_changes: ::prost::alloc::vec::Vec<BalanceChange>,
     #[prost(message, repeated, tag="4")]
     pub contracts: ::prost::alloc::vec::Vec<Contract>,
+    #[prost(message, repeated, tag="5")]
+    pub contract_creations: ::prost::alloc::vec::Vec<ContractCreation>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -71,20 +73,6 @@ pub struct Transfer {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Contract {
-    /// -- block (contract creation) --
-    #[prost(uint32, tag="1")]
-    pub block_num: u32,
-    #[prost(bytes="vec", tag="2")]
-    pub block_hash: ::prost::alloc::vec::Vec<u8>,
-    #[prost(uint32, tag="3")]
-    pub timestamp: u32,
-    /// -- transaction (contract creation) --
-    #[prost(bytes="vec", tag="5")]
-    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="6")]
-    pub from: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="7")]
-    pub to: ::prost::alloc::vec::Vec<u8>,
     /// -- contract --
     #[prost(bytes="vec", tag="20")]
     pub address: ::prost::alloc::vec::Vec<u8>,
@@ -94,9 +82,20 @@ pub struct Contract {
     pub symbol: ::prost::alloc::string::String,
     #[prost(int32, tag="23")]
     pub decimals: i32,
-    /// -- debug --
-    #[prost(enumeration="Algorithm", tag="99")]
-    pub algorithm: i32,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ContractCreation {
+    /// -- transaction --
+    #[prost(bytes="vec", tag="5")]
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="6")]
+    pub from: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="7")]
+    pub to: ::prost::alloc::vec::Vec<u8>,
+    /// -- contract --
+    #[prost(bytes="vec", tag="20")]
+    pub address: ::prost::alloc::vec::Vec<u8>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -124,10 +123,6 @@ pub enum Algorithm {
     Transaction = 13,
     /// system contract
     System = 14,
-    /// Contracts
-    ///
-    /// contract creation
-    ContractCreation = 20,
 }
 impl Algorithm {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -146,7 +141,6 @@ impl Algorithm {
             Algorithm::Gas => "ALGORITHM_GAS",
             Algorithm::Transaction => "ALGORITHM_TRANSACTION",
             Algorithm::System => "ALGORITHM_SYSTEM",
-            Algorithm::ContractCreation => "ALGORITHM_CONTRACT_CREATION",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -162,7 +156,6 @@ impl Algorithm {
             "ALGORITHM_GAS" => Some(Self::Gas),
             "ALGORITHM_TRANSACTION" => Some(Self::Transaction),
             "ALGORITHM_SYSTEM" => Some(Self::System),
-            "ALGORITHM_CONTRACT_CREATION" => Some(Self::ContractCreation),
             _ => None,
         }
     }

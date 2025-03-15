@@ -6,6 +6,7 @@ message Events {
   repeated Transfer transfers = 2;
   repeated BalanceChange balance_changes = 3;
   repeated Contract contracts = 4;
+  repeated ContractCreation contract_creations = 5;
 }
 
 enum Algorithm {
@@ -23,9 +24,6 @@ enum Algorithm {
   ALGORITHM_GAS = 12; // gas fee consumed
   ALGORITHM_TRANSACTION = 13; // from transaction
   ALGORITHM_SYSTEM = 14; // system contract
-
-  // Contracts
-  ALGORITHM_CONTRACT_CREATION = 20; // contract creation
 }
 
 message BalanceChange {
@@ -65,22 +63,20 @@ message Transfer {
 }
 
 message Contract {
-  // -- block (contract creation) --
-  uint32 block_num = 1;
-  bytes block_hash = 2;
-  uint32 timestamp = 3;
+  // -- contract --
+  bytes address = 20;
+  string name = 21;
+  string symbol = 22;
+  int32 decimals = 23;
+}
 
-  // -- transaction (contract creation) --
+message ContractCreation {
+  // -- transaction --
   bytes transaction_id = 5;
   bytes from = 6;
   bytes to = 7;
 
   // -- contract --
   bytes address = 20;
-  string name = 21;
-  string symbol = 22;
-  int32 decimals = 23;
 
-  // -- debug --
-  Algorithm algorithm = 99;
 }

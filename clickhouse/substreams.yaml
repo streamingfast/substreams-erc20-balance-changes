@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens_clickhouse
-  version: v1.8.1
+  version: v1.8.2
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: EVM Tokens to Clickhouse
   image: ../image.png
