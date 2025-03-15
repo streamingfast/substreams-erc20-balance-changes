@@ -18,7 +18,3 @@ gui: build
 .PHONY: gui-base
 gui-base: build
 	substreams gui substreams.yaml map_events -e base.substreams.pinax.network:443 --network base -s 1100000 -t 1200000  --production-mode
-
-.PHONY: noop
-noop: build
-	substreams-sink-noop eth.substreams.pinax.network:443 substreams.yaml map_events

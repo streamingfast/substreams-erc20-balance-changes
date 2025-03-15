@@ -4,5 +4,6 @@ replay.log
 /.idea
 out/
 *state.yaml
+state.*.yaml
 .DS_Store
 build
