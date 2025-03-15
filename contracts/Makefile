@@ -13,7 +13,7 @@ parquet:
 
 .PHONY: gui
 gui: build
-	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 1130000 -t 1140000 --production-mode -H "X-Sf-Substreams-Parallel-Jobs: 600"
+	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 1130000 -t 1140000 --production-mode
 
 .PHONY: gui-base
 gui-base: build
@@ -21,4 +21,4 @@ gui-base: build
 
 .PHONY: noop
 noop: build
-	substreams-sink-noop eth.substreams.pinax.network:443 substreams.yaml map_events -H "X-Sf-Substreams-Parallel-Jobs: 600"
+	substreams-sink-noop eth.substreams.pinax.network:443 substreams.yaml map_events
