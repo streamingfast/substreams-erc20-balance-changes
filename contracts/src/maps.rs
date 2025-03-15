@@ -9,7 +9,7 @@ use crate::calls;
 #[substreams::handlers::map]
 pub fn map_events(block: Block, store_erc20_transfers: Deltas<DeltaBigInt> ) -> Result<Events, Error> {
     let mut events = Events::default();
-
+    // -- contract creations --
     for trx in block.transactions() {
         for call in &trx.calls {
             if call.call_type() != CallType::Create { continue }
@@ -27,9 +27,9 @@ pub fn map_events(block: Block, store_erc20_transfers: Deltas<DeltaBigInt> ) -> 
         }
     }
 
+    // -- contract events --
     for deltas in store_erc20_transfers.deltas {
-        // must be the 2nd block including ERC20 token transfer events per address
-        // 1st transfer could be in the same block as contract creation which causes issues retrieving contract details
+        // match using 1st block which includes ERC20 token transfer event per address
         if deltas.new_value != BigInt::one() { continue }
         let address = Hex::decode(&deltas.key).expect("invalid address");
         let contract = calls::get_contract(address.clone());

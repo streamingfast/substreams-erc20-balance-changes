@@ -6,13 +6,16 @@ package:
   description: EVM Token contracts
   image: ../image.png
 
-# imports:
-#   stores: https://github.com/pinax-network/substreams-evm-tokens/releases/download/v1.8.1/evm-tokens-contracts-v1.8.1.spkg
-
 binaries:
   default:
     type: wasm/rust-v1
     file: ../target/wasm32-unknown-unknown/release/contracts.wasm
+
+protobuf:
+  files:
+    - evm-tokens.proto
+  importPaths:
+    - ../proto/v1
 
 modules:
   - name: map_events
