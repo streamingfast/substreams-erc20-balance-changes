@@ -9,32 +9,35 @@ message Events {
 }
 
 message PairCreated {
-  bytes token0 = 1;
-  bytes token1 = 2;
-  bytes pair = 3;
-  bytes factory = 4;
+  // -- transaction --
+  bytes transaction_id = 1;
+  bytes from = 2;
+  bytes factory = 3; // trx.to
+
+  // -- pair created --
+  bytes token0 = 10;
+  bytes token1 = 11;
+  bytes pair = 12;
 }
 
 message Sync {
-  string reserve0 = 1;
-  string reserve1 = 2;
+  // -- transaction --
+  bytes transaction_id = 1;
+
+  // -- sync --
+  string reserve0 = 10;
+  string reserve1 = 11;
 }
 
 message Swap {
-  string amount0_in = 1;
-  string amount0_out = 2;
-  string amount1_in = 3;
-  string amount1_out = 4;
-  bytes sender = 5;
-  bytes to = 6;
-}
+  // -- transaction --
+  bytes transaction_id = 1;
 
-// message Price {
-//   bytes token = 1;
-//   string price_usd = 2;
-//   enum Source {
-//     SOURCE_UNSPECIFIED = 0;
-//     SOURCE_UNISWAP_V2 = 1;
-//   }
-//   Source source = 3;
-// }
+  // -- swap --
+  string amount0_in = 10;
+  string amount0_out = 11;
+  string amount1_in = 12;
+  string amount1_out = 13;
+  bytes sender = 14;
+  bytes to = 15;
+}

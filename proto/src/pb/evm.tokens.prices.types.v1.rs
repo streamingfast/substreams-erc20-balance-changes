@@ -13,37 +13,52 @@ pub struct Events {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PairCreated {
+    /// -- transaction --
     #[prost(bytes="vec", tag="1")]
-    pub token0: ::prost::alloc::vec::Vec<u8>,
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="2")]
-    pub token1: ::prost::alloc::vec::Vec<u8>,
+    pub from: ::prost::alloc::vec::Vec<u8>,
+    /// trx.to
     #[prost(bytes="vec", tag="3")]
-    pub pair: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="4")]
     pub factory: ::prost::alloc::vec::Vec<u8>,
+    /// -- pair created --
+    #[prost(bytes="vec", tag="10")]
+    pub token0: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="11")]
+    pub token1: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="12")]
+    pub pair: ::prost::alloc::vec::Vec<u8>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Sync {
-    #[prost(string, tag="1")]
+    /// -- transaction --
+    #[prost(bytes="vec", tag="1")]
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
+    /// -- sync --
+    #[prost(string, tag="10")]
     pub reserve0: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
+    #[prost(string, tag="11")]
     pub reserve1: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Swap {
-    #[prost(string, tag="1")]
+    /// -- transaction --
+    #[prost(bytes="vec", tag="1")]
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
+    /// -- swap --
+    #[prost(string, tag="10")]
     pub amount0_in: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
+    #[prost(string, tag="11")]
     pub amount0_out: ::prost::alloc::string::String,
-    #[prost(string, tag="3")]
+    #[prost(string, tag="12")]
     pub amount1_in: ::prost::alloc::string::String,
-    #[prost(string, tag="4")]
+    #[prost(string, tag="13")]
     pub amount1_out: ::prost::alloc::string::String,
-    #[prost(bytes="vec", tag="5")]
+    #[prost(bytes="vec", tag="14")]
     pub sender: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="6")]
+    #[prost(bytes="vec", tag="15")]
     pub to: ::prost::alloc::vec::Vec<u8>,
 }
 // @@protoc_insertion_point(module)
