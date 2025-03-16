@@ -5,7 +5,7 @@ members = [
   "native",
   "proto",
   "common",
-  "evm-tokens"
+  "clickhouse"
 ]
 resolver = "2"
 

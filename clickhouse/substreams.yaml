@@ -1,17 +1,21 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens
-  version: v1.8.2
+  version: v1.9.0
   url: https://github.com/pinax-network/substreams-evm-tokens
-  description: EVM Tokens
+  description: Substreams for tracking ERC-20 & Native tokens for EVM blockchains.
   image: ../image.png
 
 imports:
+  # SQL Sink Substreams
   database_changes: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v2.0.0/substreams-database-change-v2.0.0.spkg
   sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
-  erc20: ../erc20/substreams.yaml
-  native: ../native/substreams.yaml
-  contracts: ../contracts/substreams.yaml
+
+  # EVM Tokens Substreams
+  erc20: https://github.com/pinax-network/substreams-evm-tokens/releases/download/v1.8.0/evm-tokens-erc20-v1.8.0.spkg
+  native: https://github.com/pinax-network/substreams-evm-tokens/releases/download/v1.8.0/evm-tokens-native-v1.8.0.spkg
+  contracts: https://github.com/pinax-network/substreams-evm-tokens/releases/download/v1.8.2/evm-tokens-contracts-v1.8.2.spkg
+  # prices: ./prices/substreams.yaml
 
 binaries:
   default:

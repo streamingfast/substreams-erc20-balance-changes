@@ -92,6 +92,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "clickhouse"
+version = "0.0.0"
+dependencies = [
+ "common",
+ "erc20",
+ "proto",
+ "substreams",
+ "substreams-database-change",
+]
+
+[[package]]
 name = "common"
 version = "0.0.0"
 dependencies = [
@@ -284,17 +295,6 @@ dependencies = [
  "impl-serde 0.4.0",
  "primitive-types 0.12.2",
  "uint",
-]
-
-[[package]]
-name = "evm-tokens"
-version = "0.0.0"
-dependencies = [
- "common",
- "erc20",
- "proto",
- "substreams",
- "substreams-database-change",
 ]
 
 [[package]]
