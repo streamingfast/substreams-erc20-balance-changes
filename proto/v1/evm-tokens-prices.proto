@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package evm.tokens.prices.types.v1;
+
+message Events {
+  repeated Swap swaps = 1;
+  repeated Sync syncs = 2;
+  repeated PairCreated pairs_created = 3;
+}
+
+message PairCreated {
+  bytes token0 = 1;
+  bytes token1 = 2;
+  bytes pair = 3;
+  bytes factory = 4;
+}
+
+message Sync {
+  string reserve0 = 1;
+  string reserve1 = 2;
+}
+
+message Swap {
+  string amount0_in = 1;
+  string amount0_out = 2;
+  string amount1_in = 3;
+  string amount1_out = 4;
+  bytes sender = 5;
+  bytes to = 6;
+}
+
+// message Price {
+//   bytes token = 1;
+//   string price_usd = 2;
+//   enum Source {
+//     SOURCE_UNSPECIFIED = 0;
+//     SOURCE_UNISWAP_V2 = 1;
+//   }
+//   Source source = 3;
+// }

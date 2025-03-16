@@ -5,6 +5,7 @@ members = [
   "native",
   "proto",
   "common",
+  "prices",
   "clickhouse"
 ]
 resolver = "2"

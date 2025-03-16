@@ -1,5 +1,6 @@
 use common::clock_to_date;
 use proto::pb::evm::tokens::types::v1::{BalanceChange, Events, Transfer};
+use proto::pb::evm::tokens::contracts::types::v1::Events as EventsContracts;
 use substreams::{errors::Error, pb::substreams::Clock, Hex};
 use substreams_database_change::{pb::database::DatabaseChanges, tables::Row};
 
@@ -12,7 +13,7 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
 }
 
 #[substreams::handlers::map]
-pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: Events) -> Result<DatabaseChanges, Error> {
+pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsContracts) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
     // -- combine events (ERC-20 + Native) --

@@ -1,6 +1,6 @@
 
 use substreams::{errors::Error, scalar::BigInt, Hex};
-use proto::pb::evm::tokens::types::v1::{Contract, ContractCreation, Events};
+use proto::pb::evm::tokens::contracts::types::v1::{Contract, ContractCreation, Events};
 use substreams::store::{Deltas, DeltaBigInt};
 use substreams_ethereum::pb::eth::v2::{Block, CallType};
 

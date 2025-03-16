@@ -725,6 +725,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "prices"
+version = "0.0.0"
+dependencies = [
+ "common",
+ "proto",
+ "substreams",
+ "substreams-abis",
+ "substreams-ethereum",
+]
+
+[[package]]
 name = "primitive-types"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1090,9 +1101,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-abis"
-version = "0.1.0"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a205224a0a73c5c59637c05e7a264d0b613ba118f2b8934f06c55e6e6a0883d5"
+checksum = "ce0e24bb359b9a0d4537173528225541dbc5a27e28208b78859539177b51c2ac"
 dependencies = [
  "anyhow",
  "ethabi 18.0.0",

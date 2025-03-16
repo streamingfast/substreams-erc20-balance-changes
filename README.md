@@ -1,6 +1,6 @@
 # EVM-Tokens: `Substreams`
 
-Substreams for tracking `ERC-20` & `Native` tokens for EVM blockchains.
+`ERC-20` & `Native` tokens for EVM blockchains.
 
 > Ethereum, Base, BSC, Polygon, ArbitrumOne, Optimism, etc..
 
@@ -17,6 +17,7 @@ Substreams for tracking `ERC-20` & `Native` tokens for EVM blockchains.
 - [ ] EVM Token Prices
   - [ ] Uniswap V2 factories
 - [ ] ERC-20 Supply
+- [ ] ENS Reverse Resolution
 
 ## Substreams Graph
 

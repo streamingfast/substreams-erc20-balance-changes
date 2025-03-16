@@ -3,10 +3,8 @@ syntax = "proto3";
 package evm.tokens.types.v1;
 
 message Events {
-  repeated Transfer transfers = 2;
-  repeated BalanceChange balance_changes = 3;
-  repeated Contract contracts = 4;
-  repeated ContractCreation contract_creations = 5;
+  repeated Transfer transfers = 1;
+  repeated BalanceChange balance_changes = 2;
 }
 
 enum Algorithm {
@@ -60,22 +58,4 @@ message Transfer {
 
   // -- debug --
   Algorithm algorithm = 99;
-}
-
-message Contract {
-  // -- contract --
-  bytes address = 20;
-  string name = 21;
-  string symbol = 22;
-  int32 decimals = 23;
-}
-
-message ContractCreation {
-  // -- transaction --
-  bytes transaction_id = 5;
-  bytes from = 6;
-  bytes to = 7;
-
-  // -- contract --
-  bytes address = 20;
 }

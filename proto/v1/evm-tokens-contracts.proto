@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package evm.tokens.contracts.types.v1;
+
+message Events {
+  repeated Contract contracts = 1;
+  repeated ContractCreation contract_creations = 2;
+}
+
+message Contract {
+  // -- contract --
+  bytes address = 20;
+  string name = 21;
+  string symbol = 22;
+  int32 decimals = 23;
+}
+
+message ContractCreation {
+  // -- transaction --
+  bytes transaction_id = 5;
+  bytes from = 6;
+  bytes to = 7;
+
+  // -- contract --
+  bytes address = 20;
+}
