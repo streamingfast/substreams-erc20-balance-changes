@@ -6,16 +6,19 @@ package:
   description: EVM Token contracts
   image: ../image.png
 
+imports:
+  v1_8_2: https://github.com/pinax-network/substreams-evm-tokens/releases/download/v1.8.2/evm-tokens-contracts-v1.8.2.spkg
+
 binaries:
   default:
     type: wasm/rust-v1
     file: ../target/wasm32-unknown-unknown/release/contracts.wasm
 
-protobuf:
-  files:
-    - evm-tokens.proto
-  importPaths:
-    - ../proto/v1
+# protobuf:
+#   files:
+#     - evm-tokens.proto
+#   importPaths:
+#     - ../proto/v1
 
 modules:
   - name: map_events
@@ -23,16 +26,16 @@ modules:
     doc: ERC20 contracts
     inputs:
       - source: sf.ethereum.type.v2.Block
-      - store: store_erc20_transfers
+      - store: v1_8_2:store_erc20_transfers
         mode: deltas
     output:
       type: proto:evm.tokens.types.v1.Events
 
-  - name: store_erc20_transfers
-    kind: store
-    updatePolicy: add
-    valueType: bigint
-    inputs:
-      - source: sf.ethereum.type.v2.Block
+  # - name: store_erc20_transfers
+  #   kind: store
+  #   updatePolicy: add
+  #   valueType: bigint
+  #   inputs:
+  #     - source: sf.ethereum.type.v2.Block
 
 network: mainnet

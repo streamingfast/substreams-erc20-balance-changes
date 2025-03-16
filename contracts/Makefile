@@ -9,11 +9,11 @@ build:
 
 .PHONY: parquet
 parquet:
-	rm -f state.yaml && substreams-sink-files run base.substreams.pinax.network:443 ./substreams.yaml map_events "./out" 24400000: --encoder parquet --file-block-count 1000
+	rm -f state.yaml && substreams-sink-files run eth.substreams.pinax.network:443 ./substreams.yaml map_events "./out" 4634747: --encoder parquet --file-block-count 100
 
 .PHONY: gui
 gui: build
-	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 1130000 -t 1140000 --production-mode
+	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 4634748 -t +1 --production-mode
 
 .PHONY: gui-base
 gui-base: build

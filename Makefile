@@ -16,6 +16,10 @@ build:
 protogen:
 	buf generate
 
+.PHONY: gui
+gui: build
+	substreams gui substreams.yaml db_out -e eth.substreams.pinax.network:443 -s 1 -t 0 --network eth --production-mode
+
 .PHONY: noop
 noop: build
 	substreams-sink-noop eth.substreams.pinax.network:443 substreams.yaml db_out --state-store state.eth.yaml
