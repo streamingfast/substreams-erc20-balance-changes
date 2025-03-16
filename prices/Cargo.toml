@@ -1,0 +1,19 @@
+[package]
+name = "prices"
+description = { workspace = true }
+edition = { workspace = true }
+version = { workspace = true }
+authors = [
+    "Denis <denis@pinax.network>",
+    "Harsh Agarwal <@harsh9200>"
+]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+substreams = { workspace = true }
+substreams-ethereum = "0.10"
+substreams-abis = "0.1.2"
+proto = { path = "../proto" }
+common = { path = "../common" }

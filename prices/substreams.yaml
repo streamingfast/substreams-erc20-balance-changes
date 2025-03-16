@@ -1,0 +1,28 @@
+specVersion: v0.1.0
+package:
+  name: evm_tokens_prices
+  version: v1.9.0
+  url: https://githubcom/pinax-network/substreams-evm-tokens
+  description: EVM Token prices
+  image: ../image.png
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ../target/wasm32-unknown-unknown/release/prices.wasm
+
+protobuf:
+  files:
+    - evm-tokens-prices.proto
+  importPaths:
+    - ../proto/v1
+
+modules:
+  - name: map_events
+    kind: map
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:evm.tokens.prices.types.v1.Events
+
+network: mainnet
