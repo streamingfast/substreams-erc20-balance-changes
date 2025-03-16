@@ -5,12 +5,10 @@ all:
 .PHONY: build
 build:
 	cargo build --target wasm32-unknown-unknown --release
-	substreams pack ./
 	substreams pack ./erc20
 	substreams pack ./native
 	substreams pack ./contracts
-	substreams pack ./clickhouse
-	substreams pack ./subgraph
+	substreams pack ./evm-tokens
 
 .PHONY: protogen
 protogen:

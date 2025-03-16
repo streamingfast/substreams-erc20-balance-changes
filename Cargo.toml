@@ -5,8 +5,7 @@ members = [
   "native",
   "proto",
   "common",
-  "evm-tokens",
-  "subgraph",
+  "evm-tokens"
 ]
 resolver = "2"
 
