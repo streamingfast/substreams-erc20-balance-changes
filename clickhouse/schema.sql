@@ -178,9 +178,6 @@ CREATE TABLE IF NOT EXISTS balances_by_date  (
 
    -- ordering --
    global_sequence      UInt64, -- block_num << 32 + index
-
-   -- indexes --
-   INDEX idx_balances_by_date_contract (contract)  TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (owner, contract, date)
