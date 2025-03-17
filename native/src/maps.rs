@@ -1,5 +1,5 @@
-use common::{to_global_sequence, Address};
-use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
+use common::{to_global_sequence, Address, NATIVE_ADDRESS};
+use proto::pb::evm::tokens::balances::types::v1::{Algorithm, BalanceChange, Events, Transfer};
 use substreams::{errors::Error, scalar::BigInt};
 
 use substreams::pb::substreams::Clock;
@@ -29,7 +29,7 @@ pub fn to_balance_change<'a>(
         transaction_id: trx.hash.clone(),
 
         // -- balance change --
-        contract: "native".to_string().into_bytes(),
+        contract: NATIVE_ADDRESS.to_vec(),
         owner: balance_change.address.clone(),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
@@ -63,7 +63,7 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: Tr
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
-        contract: "native".to_string().into_bytes(),
+        contract: NATIVE_ADDRESS.to_vec(),
         from: transfer.from,
         to: transfer.to,
         value: transfer.value.to_string(),

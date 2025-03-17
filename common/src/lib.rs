@@ -1,7 +1,9 @@
-use substreams::pb::substreams::Clock;
+use substreams::{hex, pb::substreams::Clock};
 
 pub type Address = Vec<u8>;
 pub type Hash = Vec<u8>;
+pub const NULL_ADDRESS: [u8; 20] = hex!("0000000000000000000000000000000000000000");
+pub const NATIVE_ADDRESS: [u8; 20] = hex!("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
 
 // Timestamp to date conversion
 // ex: 2015-07-30T16:02:18Z => 2015-07-30
