@@ -136,46 +136,46 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
         );
     }
 
-        // -- prices syncs --
-        for event in prices.syncs {
-            let key = [
-                ("date", clock_to_date(&clock)),
-                ("block_num", clock.number.to_string()),
-                ("ordinal", event.ordinal.to_string()),
-            ];
-            set_clock(&clock, tables.create_row("sync_changes", key)
-                // -- transaction --
-                .set("transaction_id", bytes_to_hex(&event.transaction_id))
-                // -- log --
-                .set("address", bytes_to_hex(&event.address))
-                // -- ordinal --
-                .set("ordinal", event.ordinal)
-                .set("global_sequence", event.global_sequence)
-                // -- log --
-                .set("reserve0", &event.reserve0.to_string())
-                .set("reserve1", &event.reserve1.to_string())
-            );
-        }
+    // -- prices syncs --
+    for event in prices.syncs {
+        let key = [
+            ("date", clock_to_date(&clock)),
+            ("block_num", clock.number.to_string()),
+            ("ordinal", event.ordinal.to_string()),
+        ];
+        set_clock(&clock, tables.create_row("sync_changes", key)
+            // -- transaction --
+            .set("transaction_id", bytes_to_hex(&event.transaction_id))
+            // -- log --
+            .set("address", bytes_to_hex(&event.address))
+            // -- ordinal --
+            .set("ordinal", event.ordinal)
+            .set("global_sequence", event.global_sequence)
+            // -- log --
+            .set("reserve0", &event.reserve0.to_string())
+            .set("reserve1", &event.reserve1.to_string())
+        );
+    }
 
-        // -- prices created pairs --
-        for event in prices.pairs_created {
-            let key = [
-                ("factory", bytes_to_hex(&event.to)),
-                ("pair", bytes_to_hex(&event.pair)),
-            ];
-            set_clock(&clock, tables.create_row("pairs_created", key)
-                // -- transaction --
-                .set("transaction_id", bytes_to_hex(&event.transaction_id))
-                .set("creator", bytes_to_hex(&event.creator)) // trx.from
-                .set("to", bytes_to_hex(&event.to))
-                // -- log --
-                .set("factory", bytes_to_hex(&event.factory)) // log.address
-                // -- pair created --
-                .set("token0", bytes_to_hex(&event.token0))
-                .set("token1", bytes_to_hex(&event.token1))
-                .set("pair", bytes_to_hex(&event.pair))
-            );
-        }
+    // -- prices created pairs --
+    for event in prices.pairs_created {
+        let key = [
+            ("factory", bytes_to_hex(&event.to)),
+            ("pair", bytes_to_hex(&event.pair)),
+        ];
+        set_clock(&clock, tables.create_row("pairs_created", key)
+            // -- transaction --
+            .set("transaction_id", bytes_to_hex(&event.transaction_id))
+            .set("creator", bytes_to_hex(&event.creator)) // trx.from
+            .set("to", bytes_to_hex(&event.to))
+            // -- log --
+            .set("factory", bytes_to_hex(&event.factory)) // log.address
+            // -- pair created --
+            .set("token0", bytes_to_hex(&event.token0))
+            .set("token1", bytes_to_hex(&event.token1))
+            .set("pair", bytes_to_hex(&event.pair))
+        );
+    }
 
     Ok(tables.to_database_changes())
 }

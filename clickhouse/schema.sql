@@ -327,11 +327,14 @@ CREATE TABLE IF NOT EXISTS syncs  (
    -- sync --
    reserve0             FixedString(42),
    reserve1             FixedString(42),
+
+   INDEX idx_syncs_reserve0           (reserve0)           TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_syncs_reserve1           (reserve1)           TYPE bloom_filter GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree(global_sequence)
-PRIMARY KEY (address, reserve0, reserve1)
-ORDER BY (address, reserve0, reserve1);
+PRIMARY KEY (address)
+ORDER BY (address);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS syncs_mv
 TO syncs AS
-SELECT * FROM sync_changes;
+SELECT * FROM sync_changes
