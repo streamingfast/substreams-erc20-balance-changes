@@ -40,8 +40,9 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    algorithm_code       UInt8,
 
    -- indexes --
-   INDEX idx_balance_changes_contract (contract)  TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_balance_changes_owner    (owner)     TYPE bloom_filter GRANULARITY 4
+   INDEX idx_balance_changes_transaction_id     (transaction_id)  TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_balance_changes_contract           (contract)        TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_balance_changes_owner              (owner)           TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (date, block_num, ordinal)
@@ -75,6 +76,7 @@ CREATE TABLE IF NOT EXISTS transfers  (
    algorithm_code       UInt8,
 
    -- indexes --
+   INDEX idx_transfers_transaction_id     (transaction_id)     TYPE bloom_filter GRANULARITY 4,
    INDEX idx_transfers_contract     (contract)     TYPE bloom_filter GRANULARITY 4,
    INDEX idx_transfers_from         (`from`)       TYPE bloom_filter GRANULARITY 4,
    INDEX idx_transfers_to           (`to`)         TYPE bloom_filter GRANULARITY 4,
@@ -98,9 +100,9 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    decimals             UInt8,
 
    -- indexes --
-   INDEX idx_contracts_name      (name)        TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_symbol    (symbol)      TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_decimals  (decimals)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contract_changes_name      (name)        TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contract_changes_symbol    (symbol)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contract_changes_decimals  (decimals)    TYPE bloom_filter GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (address, block_num)
@@ -123,8 +125,9 @@ CREATE TABLE IF NOT EXISTS contract_creations  (
    address              FixedString(42),
 
    -- indexes --
-   INDEX idx_contracts_from      (`from`)      TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_to        (`to`)        TYPE bloom_filter GRANULARITY 4
+   INDEX idx_contract_creations_transaction_id      (transaction_id)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contract_creations_from      (`from`)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contract_creations_to        (`to`)        TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (address)
@@ -132,6 +135,7 @@ ORDER BY (address);
 
 -- latest balances by owner/contract --
 CREATE TABLE IF NOT EXISTS balances  (
+   -- block --
    block_num            UInt32,
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
@@ -157,6 +161,7 @@ SELECT * FROM balance_changes;
 
 -- latest balances by owner/contract/date --
 CREATE TABLE IF NOT EXISTS balances_by_date  (
+   -- block --
    block_num            UInt32,
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
@@ -180,9 +185,9 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_date_mv
 TO balances_by_date AS
 SELECT * FROM balance_changes;
 
-
 -- latest ERC-20 contracts --
 CREATE TABLE IF NOT EXISTS contracts  (
+   -- block --
    block_num            UInt32,
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
@@ -229,8 +234,10 @@ CREATE TABLE IF NOT EXISTS pairs_created  (
    pair                 FixedString(42),
 
    -- indexes --
-   INDEX idx_contracts_token0      (token0)      TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_token1      (token1)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_pairs_created_transaction_id    (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_pairs_created_token0            (token0)             TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_pairs_created_token1            (token1)             TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_pairs_created_creator           (creator)            TYPE bloom_filter GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (factory, pair)
@@ -246,23 +253,22 @@ CREATE TABLE IF NOT EXISTS sync_changes  (
 
    -- transaction --
    transaction_id       FixedString(66),
-   creator              FixedString(42),
-   `to`                 FixedString(42),
+
+   -- log --
+   address              FixedString(42),
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
-   -- log --
-   address              FixedString(42),
-
-   -- syncs --
+   -- sync --
    reserve0             FixedString(42),
    reserve1             FixedString(42),
 
    -- indexes --
-   INDEX idx_contracts_reserve0      (reserve0)      TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_reserve1      (reserve1)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_sync_changes_transaction_id     (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_sync_changes_reserve0           (reserve0)           TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_sync_changes_reserve1           (reserve1)           TYPE bloom_filter GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (date, block_num, ordinal)
@@ -278,15 +284,13 @@ CREATE TABLE IF NOT EXISTS swaps  (
 
    -- transaction --
    transaction_id       FixedString(66),
-   creator              FixedString(42),
-   `to`                 FixedString(42),
+
+   -- log --
+   address              FixedString(42),
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
-
-   -- log --
-   address              FixedString(42),
 
    -- swaps --
    amount0_in           UInt256,
@@ -294,12 +298,40 @@ CREATE TABLE IF NOT EXISTS swaps  (
    amount1_in           UInt256,
    amount1_out          UInt256,
    sender               FixedString(42),
-   `to`                   FixedString(42),
+   `to`                 FixedString(42),
 
    -- indexes --
-   INDEX idx_contracts_sender       (sender)    TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_contracts_to           (`to`)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_swaps_transaction_id   (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_swaps_address          (address)            TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_swaps_sender           (sender)             TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_swaps_to               (`to`)               TYPE bloom_filter GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (date, block_num, ordinal)
 ORDER BY (date, block_num, ordinal);
+
+
+-- latest Uniswap V2 liquidity pool syncs --
+CREATE TABLE IF NOT EXISTS syncs  (
+   -- block --
+   block_num            UInt32,
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
+
+   -- log --
+   address              FixedString(42),
+
+   -- ordering --
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- sync --
+   reserve0             FixedString(42),
+   reserve1             FixedString(42),
+)
+ENGINE = ReplacingMergeTree(global_sequence)
+PRIMARY KEY (address, reserve0, reserve1)
+ORDER BY (address, reserve0, reserve1);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS syncs_mv
+TO syncs AS
+SELECT * FROM sync_changes;

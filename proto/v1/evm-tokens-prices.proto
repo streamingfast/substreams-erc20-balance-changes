@@ -44,7 +44,7 @@ message Swap {
   bytes transaction_id = 1;
 
   // -- log --
-  bytes address = 5;
+  bytes address = 5; // log.address
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
