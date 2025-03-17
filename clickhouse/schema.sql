@@ -205,3 +205,101 @@ ORDER BY (address);
 CREATE MATERIALIZED VIEW IF NOT EXISTS contracts_mv
 TO contracts AS
 SELECT * FROM contract_changes;
+
+
+-- prices pairs created --
+CREATE TABLE IF NOT EXISTS pairs_created  (
+   -- block --
+   block_num            UInt32,
+   block_hash           FixedString(66),
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
+
+   -- transaction --
+   transaction_id       FixedString(66),
+   creator              FixedString(42),
+   `to`                 FixedString(42),
+
+   -- log --
+   factory              FixedString(42),
+
+   -- pair created --
+   token0               FixedString(42),
+   token1               FixedString(42),
+   pair                 FixedString(42),
+
+   -- indexes --
+   INDEX idx_contracts_token0      (token0)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_token1      (token1)      TYPE bloom_filter GRANULARITY 4,
+)
+ENGINE = ReplacingMergeTree
+PRIMARY KEY (factory, pair)
+ORDER BY (factory, pair);
+
+-- prices sync changes --
+CREATE TABLE IF NOT EXISTS sync_changes  (
+   -- block --
+   block_num            UInt32,
+   block_hash           FixedString(66),
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
+
+   -- transaction --
+   transaction_id       FixedString(66),
+   creator              FixedString(42),
+   `to`                 FixedString(42),
+
+   -- ordering --
+   ordinal              UInt64, -- log.ordinal
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- log --
+   address              FixedString(42),
+
+   -- syncs --
+   reserve0             FixedString(42),
+   reserve1             FixedString(42),
+
+   -- indexes --
+   INDEX idx_contracts_reserve0      (reserve0)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_reserve1      (reserve1)      TYPE bloom_filter GRANULARITY 4,
+)
+ENGINE = ReplacingMergeTree
+PRIMARY KEY (date, block_num, ordinal)
+ORDER BY (date, block_num, ordinal);
+
+-- prices swaps --
+CREATE TABLE IF NOT EXISTS swaps  (
+   -- block --
+   block_num            UInt32,
+   block_hash           FixedString(66),
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
+
+   -- transaction --
+   transaction_id       FixedString(66),
+   creator              FixedString(42),
+   `to`                 FixedString(42),
+
+   -- ordering --
+   ordinal              UInt64, -- log.ordinal
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- log --
+   address              FixedString(42),
+
+   -- swaps --
+   amount0_in           UInt256,
+   amount0_out          UInt256,
+   amount1_in           UInt256,
+   amount1_out          UInt256,
+   sender               FixedString(42),
+   `to`                   FixedString(42),
+
+   -- indexes --
+   INDEX idx_contracts_sender       (sender)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_contracts_to           (`to`)      TYPE bloom_filter GRANULARITY 4,
+)
+ENGINE = ReplacingMergeTree
+PRIMARY KEY (date, block_num, ordinal)
+ORDER BY (date, block_num, ordinal);

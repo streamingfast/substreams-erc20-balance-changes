@@ -143,7 +143,7 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
                 ("block_num", clock.number.to_string()),
                 ("ordinal", event.ordinal.to_string()),
             ];
-            set_clock(&clock, tables.create_row("syncs", key)
+            set_clock(&clock, tables.create_row("sync_changes", key)
                 // -- transaction --
                 .set("transaction_id", bytes_to_hex(&event.transaction_id))
                 // -- log --
