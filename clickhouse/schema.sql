@@ -160,7 +160,7 @@ SELECT * FROM balance_changes;
 CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_contract
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (contract, owner)
-ORDER BY (contract, owner)
+ORDER BY (contract, owner, new_balance)
 AS
 SELECT * FROM balances;
 
