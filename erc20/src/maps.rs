@@ -5,7 +5,7 @@ use crate::algorithms::algorithm2_child_calls::get_all_child_call_storage_change
 use crate::algorithms::transfers::get_erc20_transfer;
 use crate::algorithms::utils::addresses_for_storage_keys;
 use common::{to_global_sequence, Address, Hash};
-use proto::pb::evm::tokens::types::v1::{Algorithm, BalanceChange, Events, Transfer};
+use proto::pb::evm::tokens::balances::types::v1::{Algorithm, BalanceChange, Events, Transfer};
 use substreams::log;
 use substreams::errors::Error;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package evm.tokens.types.v1;
+package evm.tokens.balances.types.v1;
 
 message Events {
   repeated Transfer transfers = 1;

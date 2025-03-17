@@ -12,7 +12,10 @@ message PairCreated {
   // -- transaction --
   bytes transaction_id = 1;
   bytes from = 2;
-  bytes factory = 3; // trx.to
+  bytes to = 3;
+
+  // -- log --
+  bytes address = 5;
 
   // -- pair created --
   bytes token0 = 10;
@@ -24,6 +27,9 @@ message Sync {
   // -- transaction --
   bytes transaction_id = 1;
 
+  // -- log --
+  bytes address = 5;
+
   // -- sync --
   string reserve0 = 10;
   string reserve1 = 11;
@@ -32,6 +38,9 @@ message Sync {
 message Swap {
   // -- transaction --
   bytes transaction_id = 1;
+
+  // -- log --
+  bytes address = 5;
 
   // -- swap --
   string amount0_in = 10;

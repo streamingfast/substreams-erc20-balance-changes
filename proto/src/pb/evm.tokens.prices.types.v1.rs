@@ -18,9 +18,11 @@ pub struct PairCreated {
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="2")]
     pub from: ::prost::alloc::vec::Vec<u8>,
-    /// trx.to
     #[prost(bytes="vec", tag="3")]
-    pub factory: ::prost::alloc::vec::Vec<u8>,
+    pub to: ::prost::alloc::vec::Vec<u8>,
+    /// -- log --
+    #[prost(bytes="vec", tag="5")]
+    pub address: ::prost::alloc::vec::Vec<u8>,
     /// -- pair created --
     #[prost(bytes="vec", tag="10")]
     pub token0: ::prost::alloc::vec::Vec<u8>,
@@ -35,6 +37,9 @@ pub struct Sync {
     /// -- transaction --
     #[prost(bytes="vec", tag="1")]
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
+    /// -- log --
+    #[prost(bytes="vec", tag="5")]
+    pub address: ::prost::alloc::vec::Vec<u8>,
     /// -- sync --
     #[prost(string, tag="10")]
     pub reserve0: ::prost::alloc::string::String,
@@ -47,6 +52,9 @@ pub struct Swap {
     /// -- transaction --
     #[prost(bytes="vec", tag="1")]
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
+    /// -- log --
+    #[prost(bytes="vec", tag="5")]
+    pub address: ::prost::alloc::vec::Vec<u8>,
     /// -- swap --
     #[prost(string, tag="10")]
     pub amount0_in: ::prost::alloc::string::String,

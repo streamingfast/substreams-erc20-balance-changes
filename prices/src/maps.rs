@@ -16,14 +16,22 @@ pub fn map_events(block: Block ) -> Result<Events, Error> {
             // Syncs
             if let Some(event) = SyncAbi::match_and_decode(log) {
                 events.syncs.push(Sync{
+                    // -- transaction --
                     transaction_id: trx.hash.clone(),
+                    // -- log --
+                    address: log.address.clone(),
+                    // -- sync --
                     reserve0: event.reserve0.to_string(),
                     reserve1: event.reserve1.to_string(),
                 })
             // Swaps
             } else if let Some(event) = SwapAbi::match_and_decode(log) {
                 events.swaps.push(Swap{
+                    // -- transaction --
                     transaction_id: trx.hash.clone(),
+                    // -- log --
+                    address: log.address.clone(),
+                    // -- swap --
                     amount0_in: event.amount0_in.to_string(),
                     amount0_out: event.amount0_out.to_string(),
                     amount1_in: event.amount1_in.to_string(),
@@ -34,9 +42,13 @@ pub fn map_events(block: Block ) -> Result<Events, Error> {
             // PairCreated
             } else if let Some(event) = PairCreatedAbi::match_and_decode(log) {
                 events.pairs_created.push(PairCreated{
+                    // -- transaction --
                     transaction_id: trx.hash.clone(),
                     from: trx.from.clone(),
-                    factory: trx.to.clone(),
+                    to: trx.to.clone(),
+                    // -- log --
+                    address: log.address.clone(),
+                    // -- pair created --
                     pair: event.pair,
                     token0: event.token0,
                     token1: event.token1,

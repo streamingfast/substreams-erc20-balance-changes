@@ -1,6 +1,7 @@
 use common::clock_to_date;
-use proto::pb::evm::tokens::types::v1::{BalanceChange, Events, Transfer};
+use proto::pb::evm::tokens::balances::types::v1::{BalanceChange, Events, Transfer};
 use proto::pb::evm::tokens::contracts::types::v1::Events as EventsContracts;
+use proto::pb::evm::tokens::prices::types::v1::Events as EventsPrices;
 use substreams::{errors::Error, pb::substreams::Clock, Hex};
 use substreams_database_change::{pb::database::DatabaseChanges, tables::Row};
 
@@ -13,7 +14,7 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
 }
 
 #[substreams::handlers::map]
-pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsContracts) -> Result<DatabaseChanges, Error> {
+pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsContracts, prices: EventsPrices) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
     // -- combine events (ERC-20 + Native) --
@@ -110,6 +111,28 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
 
             // -- contract --
             .set("address", &address);
+
+        set_clock(&clock, row);
+    }
+
+    // -- prices swaps --
+    for row in prices.swaps {
+        let address = bytes_to_hex(&row.address);
+        let key = [
+            ("address", address.to_string()),
+        ];
+        let row = tables.create_row("swaps", key)
+            // -- transaction --
+            .set("transaction_id", bytes_to_hex(&row.transaction_id))
+            // -- log --
+            .set("address", &address)
+            .set("amount0_in", &row.amount0_in.to_string())
+            .set("amount0_out", &row.amount0_out.to_string())
+            .set("amount1_in", &row.amount1_in.to_string())
+            .set("amount1_out", &row.amount1_out.to_string())
+            .set("sender", &bytes_to_hex(&row.sender))
+            .set("to", &bytes_to_hex(&row.to));
+
 
         set_clock(&clock, row);
     }

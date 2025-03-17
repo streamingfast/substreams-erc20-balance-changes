@@ -30,6 +30,7 @@ modules:
       - map: erc20:map_events
       - map: native:map_events
       - map: contracts:map_events
+      - map: prices:map_events
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 
