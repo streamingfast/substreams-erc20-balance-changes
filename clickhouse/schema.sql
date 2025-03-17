@@ -147,9 +147,6 @@ CREATE TABLE IF NOT EXISTS balances  (
 
    -- ordering --
    global_sequence      UInt64, -- block_num << 32 + index
-
-   -- indexes --
-   INDEX idx_balances_contract (contract)  TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (owner, contract)
@@ -158,6 +155,14 @@ ORDER BY (owner, contract);
 CREATE MATERIALIZED VIEW IF NOT EXISTS balances_mv
 TO balances AS
 SELECT * FROM balance_changes;
+
+-- latest balances by contract/owner --
+CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_contract
+ENGINE = ReplacingMergeTree(global_sequence)
+PRIMARY KEY (contract, owner)
+ORDER BY (contract, owner)
+AS
+SELECT * FROM balances;
 
 -- latest balances by owner/contract/date --
 CREATE TABLE IF NOT EXISTS balances_by_date  (
