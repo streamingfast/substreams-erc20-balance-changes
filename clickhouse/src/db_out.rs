@@ -1,8 +1,8 @@
-use common::clock_to_date;
+use common::{bytes_to_hex, clock_to_date};
 use proto::pb::evm::tokens::balances::types::v1::{BalanceChange, Events, Transfer};
 use proto::pb::evm::tokens::contracts::types::v1::Events as EventsContracts;
 use proto::pb::evm::tokens::prices::types::v1::Events as EventsPrices;
-use substreams::{errors::Error, pb::substreams::Clock, Hex};
+use substreams::{errors::Error, pb::substreams::Clock};
 use substreams_database_change::{pb::database::DatabaseChanges, tables::Row};
 
 pub fn set_clock(clock: &Clock, row: &mut Row) {
@@ -22,130 +22,160 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
     let transfers: Vec<Transfer> = erc20.transfers.into_iter().chain(native.transfers).collect();
 
     // -- balance changes --
-    for balance_change in balance_changes {
-        let algorithm = balance_change.algorithm().as_str_name();
+    for event in balance_changes {
+        let algorithm = event.algorithm().as_str_name();
         let key = [
             ("date", clock_to_date(&clock)),
             ("block_num", clock.number.to_string()),
-            ("ordinal", balance_change.ordinal.to_string()),
+            ("ordinal", event.ordinal.to_string()),
         ];
-        let row = tables
+        set_clock(&clock, tables
             .create_row("balance_changes", key)
             // -- transaction --
-            .set("transaction_id", bytes_to_hex(&balance_change.transaction_id))
+            .set("transaction_id", bytes_to_hex(&event.transaction_id))
 
             // -- ordinal --
-            .set("ordinal", balance_change.ordinal)
-            .set("global_sequence", balance_change.global_sequence)
+            .set("ordinal", event.ordinal)
+            .set("global_sequence", event.global_sequence)
 
             // -- balance change --
-            .set("contract", bytes_to_hex(&balance_change.contract))
-            .set("owner", bytes_to_hex(&balance_change.owner))
-            .set("old_balance", balance_change.old_balance)
-            .set("new_balance", balance_change.new_balance)
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("owner", bytes_to_hex(&event.owner))
+            .set("old_balance", event.old_balance)
+            .set("new_balance", event.new_balance)
 
             // -- debug --
             .set("algorithm", algorithm)
-            .set("algorithm_code", balance_change.algorithm);
-
-        set_clock(&clock, row);
+            .set("algorithm_code", event.algorithm)
+        );
     }
 
     // -- transfers --
-    for transfer in transfers {
-        let algorithm = transfer.algorithm().as_str_name();
+    for event in transfers {
+        let algorithm = event.algorithm().as_str_name();
         let key = [
             ("date", clock_to_date(&clock)),
             ("block_num", clock.number.to_string()),
-            ("ordinal", transfer.ordinal.to_string()),
+            ("ordinal", event.ordinal.to_string()),
         ];
-        let row = tables.create_row("transfers", key)
+        set_clock(&clock, tables.create_row("transfers", key)
             // -- transaction --
-            .set("transaction_id", bytes_to_hex(&transfer.transaction_id))
+            .set("transaction_id", bytes_to_hex(&event.transaction_id))
 
             // -- ordering --
-            .set("ordinal", transfer.ordinal)
-            .set("global_sequence", transfer.global_sequence)
+            .set("ordinal", event.ordinal)
+            .set("global_sequence", event.global_sequence)
 
             // -- transfer --
-            .set("contract", bytes_to_hex(&transfer.contract))
-            .set("from", bytes_to_hex(&transfer.from))
-            .set("to", bytes_to_hex(&transfer.to))
-            .set("value", &transfer.value)
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("from", bytes_to_hex(&event.from))
+            .set("to", bytes_to_hex(&event.to))
+            .set("value", &event.value)
 
             // -- debug --
             .set("algorithm", algorithm)
-            .set("algorithm_code", transfer.algorithm);
-
-        set_clock(&clock, row);
+            .set("algorithm_code", event.algorithm)
+        );
     }
 
     // -- contract changes --
-    for contract in contracts.contracts {
-        let address = bytes_to_hex(&contract.address);
+    for event in contracts.contracts {
+        let address = bytes_to_hex(&event.address);
         let key = [
             ("address", address.to_string()),
             ("block_num", clock.number.to_string()),
         ];
-        let row = tables.create_row("contract_changes", key)
+        set_clock(&clock, tables.create_row("contract_changes", key)
             // -- contract --
             .set("address", &address)
-            .set("name", &contract.name)
-            .set("symbol", &contract.symbol)
-            .set("decimals", &contract.decimals.to_string());
-
-        set_clock(&clock, row);
+            .set("name", &event.name)
+            .set("symbol", &event.symbol)
+            .set("decimals", &event.decimals.to_string())
+        );
     }
 
     // -- contract creations --
-    for row in contracts.contract_creations {
-        let address = bytes_to_hex(&row.address);
+    for event in contracts.contract_creations {
+        let address = bytes_to_hex(&event.address);
         let key = [
             ("address", address.to_string()),
         ];
-        let row = tables.create_row("contract_creations", key)
+        set_clock(&clock, tables.create_row("contract_creations", key)
             // -- transaction --
-            .set("transaction_id", bytes_to_hex(&row.transaction_id))
-            .set("from", bytes_to_hex(&row.from))
-            .set("to", bytes_to_hex(&row.to))
+            .set("transaction_id", bytes_to_hex(&event.transaction_id))
+            .set("from", bytes_to_hex(&event.from))
+            .set("to", bytes_to_hex(&event.to))
 
             // -- contract --
-            .set("address", &address);
-
-        set_clock(&clock, row);
+            .set("address", &address)
+        );
     }
 
     // -- prices swaps --
-    for row in prices.swaps {
-        let address = bytes_to_hex(&row.address);
+    for event in prices.swaps {
         let key = [
-            ("address", address.to_string()),
+            ("date", clock_to_date(&clock)),
+            ("block_num", clock.number.to_string()),
+            ("ordinal", event.ordinal.to_string()),
         ];
-        let row = tables.create_row("swaps", key)
+        set_clock(&clock, tables.create_row("swaps", key)
             // -- transaction --
-            .set("transaction_id", bytes_to_hex(&row.transaction_id))
+            .set("transaction_id", bytes_to_hex(&event.transaction_id))
             // -- log --
-            .set("address", &address)
-            .set("amount0_in", &row.amount0_in.to_string())
-            .set("amount0_out", &row.amount0_out.to_string())
-            .set("amount1_in", &row.amount1_in.to_string())
-            .set("amount1_out", &row.amount1_out.to_string())
-            .set("sender", &bytes_to_hex(&row.sender))
-            .set("to", &bytes_to_hex(&row.to));
-
-
-        set_clock(&clock, row);
+            .set("address", bytes_to_hex(&event.address))
+            // -- ordinal --
+            .set("ordinal", event.ordinal)
+            .set("global_sequence", event.global_sequence)
+            // -- swaps --
+            .set("amount0_in", &event.amount0_in.to_string())
+            .set("amount0_out", &event.amount0_out.to_string())
+            .set("amount1_in", &event.amount1_in.to_string())
+            .set("amount1_out", &event.amount1_out.to_string())
+            .set("sender", &bytes_to_hex(&event.sender))
+            .set("to", &bytes_to_hex(&event.to))
+        );
     }
+
+        // -- prices syncs --
+        for event in prices.syncs {
+            let key = [
+                ("date", clock_to_date(&clock)),
+                ("block_num", clock.number.to_string()),
+                ("ordinal", event.ordinal.to_string()),
+            ];
+            set_clock(&clock, tables.create_row("syncs", key)
+                // -- transaction --
+                .set("transaction_id", bytes_to_hex(&event.transaction_id))
+                // -- log --
+                .set("address", bytes_to_hex(&event.address))
+                // -- ordinal --
+                .set("ordinal", event.ordinal)
+                .set("global_sequence", event.global_sequence)
+                // -- log --
+                .set("reserve0", &event.reserve0.to_string())
+                .set("reserve1", &event.reserve1.to_string())
+            );
+        }
+
+        // -- prices created pairs --
+        for event in prices.pairs_created {
+            let key = [
+                ("factory", bytes_to_hex(&event.to)),
+                ("pair", bytes_to_hex(&event.pair)),
+            ];
+            set_clock(&clock, tables.create_row("pairs_created", key)
+                // -- transaction --
+                .set("transaction_id", bytes_to_hex(&event.transaction_id))
+                .set("creator", bytes_to_hex(&event.creator)) // trx.from
+                .set("to", bytes_to_hex(&event.to))
+                // -- log --
+                .set("factory", bytes_to_hex(&event.factory)) // log.address
+                // -- pair created --
+                .set("token0", bytes_to_hex(&event.token0))
+                .set("token1", bytes_to_hex(&event.token1))
+                .set("pair", bytes_to_hex(&event.pair))
+            );
+        }
 
     Ok(tables.to_database_changes())
-}
-
-pub fn bytes_to_hex(bytes: &Vec<u8>) -> String {
-    if bytes.is_empty() {
-        return "".to_string();
-    } else if "native".to_string().into_bytes() == *bytes {
-        return "native".to_string();
-    } else {
-        format! {"0x{}", Hex::encode(bytes)}.to_string()
-    }
 }

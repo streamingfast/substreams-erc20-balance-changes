@@ -1,4 +1,4 @@
-use substreams::{hex, pb::substreams::Clock};
+use substreams::{hex, pb::substreams::Clock, Hex};
 
 pub type Address = Vec<u8>;
 pub type Hash = Vec<u8>;
@@ -20,4 +20,8 @@ pub fn clock_to_date(clock: &Clock) -> String {
 // max(toUInt64(block_num) * 2^32 + index) AS version
 pub fn to_global_sequence(clock: &Clock, index: &u64) -> u64 {
     (clock.number << 32) + index
+}
+
+pub fn bytes_to_hex(bytes: &Vec<u8>) -> String {
+    format! {"0x{}", Hex::encode(bytes)}.to_string()
 }

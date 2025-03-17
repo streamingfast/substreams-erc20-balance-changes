@@ -21,6 +21,7 @@ modules:
   - name: map_events
     kind: map
     inputs:
+      - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:evm.tokens.prices.types.v1.Events

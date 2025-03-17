@@ -11,16 +11,16 @@ message Events {
 message PairCreated {
   // -- transaction --
   bytes transaction_id = 1;
-  bytes from = 2;
-  bytes to = 3;
+  bytes creator = 2; // trx.from
+  bytes to = 3; // trx.to
 
   // -- log --
-  bytes address = 5;
+  bytes factory = 5; // log.address
 
   // -- pair created --
-  bytes token0 = 10;
-  bytes token1 = 11;
-  bytes pair = 12;
+  bytes token0 = 20;
+  bytes token1 = 21;
+  bytes pair = 22;
 }
 
 message Sync {
@@ -30,9 +30,13 @@ message Sync {
   // -- log --
   bytes address = 5;
 
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 global_sequence = 11; // latest global sequence (block_num << 32 + index)
+
   // -- sync --
-  string reserve0 = 10;
-  string reserve1 = 11;
+  string reserve0 = 20;
+  string reserve1 = 21;
 }
 
 message Swap {
@@ -42,11 +46,15 @@ message Swap {
   // -- log --
   bytes address = 5;
 
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 global_sequence = 11; // latest global sequence (block_num << 32 + index)
+
   // -- swap --
-  string amount0_in = 10;
-  string amount0_out = 11;
-  string amount1_in = 12;
-  string amount1_out = 13;
-  bytes sender = 14;
-  bytes to = 15;
+  string amount0_in = 20;
+  string amount0_out = 21;
+  string amount1_in = 22;
+  string amount1_out = 23;
+  bytes sender = 24;
+  bytes to = 25;
 }
