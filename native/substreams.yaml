@@ -13,7 +13,7 @@ binaries:
 
 protobuf:
   files:
-    - evm-tokens.proto
+    - evm-tokens-balances.proto
   importPaths:
     - ../proto/v1
 
@@ -25,6 +25,6 @@ modules:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.tokens.types.v1.Events
+      type: proto:evm.tokens.balances.types.v1.Events
 
 network: mainnet

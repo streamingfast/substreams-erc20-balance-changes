@@ -9,6 +9,7 @@ build:
 	substreams pack ./erc20
 	substreams pack ./native
 	substreams pack ./contracts
+	substreams pack ./prices
 
 .PHONY: protogen
 protogen:
