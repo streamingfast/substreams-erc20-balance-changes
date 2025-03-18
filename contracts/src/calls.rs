@@ -3,44 +3,25 @@ use substreams_abis::evm::token::erc20;
 
 // ETH Call to retrieve ERC20 token Name
 pub fn get_contract_name(address: Vec<u8>) -> Option<String> {
-    let method = erc20::functions::Name{};
-    method.call(address)
+    erc20::functions::Name {}.call(address)
 }
 
 // ETH Call to retrieve ERC20 token Symbol
 pub fn get_contract_symbol(address: Vec<u8>) -> Option<String> {
-    let method = erc20::functions::Symbol{};
-    method.call(address)
+    erc20::functions::Symbol {}.call(address)
 }
 
 // ETH Call to retrieve ERC20 token Decimal
 pub fn get_contract_decimals(address: Vec<u8>) -> Option<BigInt> {
-    let method = erc20::functions::Decimals{};
-
     // decimals must be uint8 range
-    // UInt256 value has maximum digits of 78
-    match method.call(address) {
-        Some(decimals) => {
-            if decimals >= BigInt::from(0) && decimals <= BigInt::from(255) {
-                Some(decimals)
-            } else {
-                None
-            }
-        }
-        None => None,
-    }
+    erc20::functions::Decimals {}
+        .call(address)
+        .filter(|decimals| *decimals >= BigInt::from(0) && *decimals <= BigInt::from(255))
 }
 
 pub fn get_contract(address: Vec<u8>) -> Option<(String, String, BigInt)> {
-    let name = get_contract_name(address.clone());
-    let symbol = get_contract_symbol(address.clone());
-    let decimals = get_contract_decimals(address.clone());
-
-    // all must be required to be a valid ERC20 token contract
-    match (name, symbol, decimals) {
-        (Some(name), Some(symbol), Some(decimals)) => {
-            Some((name, symbol, decimals))
-        }
-        _ => None,
-    }
+    // exit early if name call fails
+    get_contract_name(address.clone())
+        .and_then(|name| get_contract_symbol(address.clone()).map(|symbol| (name, symbol)))
+        .and_then(|(name, symbol)| get_contract_decimals(address).map(|decimals| (name, symbol, decimals)))
 }
