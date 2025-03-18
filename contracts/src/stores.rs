@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use erc20::algorithms::transfers::get_erc20_transfer;
 use substreams::scalar::BigInt;
-use substreams::store::{StoreNew, StoreAdd, StoreAddBigInt};
+use substreams::store::{StoreAdd, StoreAddBigInt, StoreNew};
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::Block;
 
