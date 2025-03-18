@@ -64,7 +64,7 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: Tr
         transaction_id: trx.hash.to_vec(),
 
         // -- ordering --
-        ordinal: transfer.ordinal.into(),
+        ordinal: transfer.ordinal,
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
@@ -105,21 +105,15 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
     // iterate over successful transactions
     for trx in block.transactions() {
         // find all transfers from transactions
-        match get_transfer_from_transaction(trx) {
-            Some(transfer) => {
-                events.transfers.push(to_transfer(clock, trx, transfer, &index));
-                index += 1;
-            }
-            None => {}
+        if let Some(transfer) = get_transfer_from_transaction(trx) {
+            events.transfers.push(to_transfer(clock, trx, transfer, &index));
+            index += 1;
         }
         // find all transfers from calls
         for call_view in trx.calls() {
-            match get_transfer_from_call(call_view.call) {
-                Some(transfer) => {
-                    events.transfers.push(to_transfer(clock, trx, transfer, &index));
-                    index += 1;
-                }
-                None => {}
+            if let Some(transfer) = get_transfer_from_call(call_view.call) {
+                events.transfers.push(to_transfer(clock, trx, transfer, &index));
+                index += 1;
             }
         }
     }

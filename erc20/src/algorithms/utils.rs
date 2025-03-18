@@ -30,7 +30,7 @@ pub fn addresses_for_storage_keys(call: &Call) -> HashMap<Hash, Address> {
     out
 }
 
-pub fn get_keccak_address<'a, 'b>(keccak_address_map: &'a HashMap<Hash, Address>, storage_change: &'b StorageChange) -> Option<&'a Address> {
+pub fn get_keccak_address<'a>(keccak_address_map: &'a HashMap<Hash, Address>, storage_change: &StorageChange) -> Option<&'a Address> {
     keccak_address_map.get(&storage_change.key)
 }
 

@@ -7,7 +7,7 @@ use crate::{
     utils::{is_failed_call, is_failed_transaction},
 };
 
-pub fn get_transfer_from_transaction<'a>(trx: &'a TransactionTrace) -> Option<TransferStruct> {
+pub fn get_transfer_from_transaction(trx: &TransactionTrace) -> Option<TransferStruct> {
     if is_failed_transaction(trx) {
         return None;
     }
@@ -26,7 +26,7 @@ pub fn get_transfer_from_transaction<'a>(trx: &'a TransactionTrace) -> Option<Tr
     })
 }
 
-pub fn get_transfer_from_call<'a>(call: &'a Call) -> Option<TransferStruct> {
+pub fn get_transfer_from_call(call: &Call) -> Option<TransferStruct> {
     if is_failed_call(call) {
         return None;
     }
