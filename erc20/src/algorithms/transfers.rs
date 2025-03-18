@@ -5,10 +5,7 @@ use substreams_ethereum::Event;
 use super::fishing::is_fishing_transfer;
 
 pub fn get_erc20_transfer(trx: &TransactionTrace, call: &Call, log: &Log) -> Option<Transfer> {
-    let transfer = match Transfer::match_and_decode(log) {
-        Some(transfer) => transfer,
-        None => return None,
-    };
+    let transfer = Transfer::match_and_decode(log)?;
     if transfer.value.is_zero() {
         return None;
     }

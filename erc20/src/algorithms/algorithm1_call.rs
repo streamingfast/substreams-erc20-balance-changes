@@ -15,7 +15,7 @@ pub fn get_owner_from_erc20_balance_change<'a>(
     let owner = get_keccak_address(keccak_address_map, storage_change)?;
 
     // Ensure owner is either the sender or receiver
-    if !is_erc20_valid_address(&owner, transfer) {
+    if !is_erc20_valid_address(owner, transfer) {
         return None;
     }
 
@@ -24,5 +24,5 @@ pub fn get_owner_from_erc20_balance_change<'a>(
     if !is_erc20_valid_balance(transfer, storage_change) {
         return None;
     }
-    Some(owner)
+    Some(owner.clone())
 }

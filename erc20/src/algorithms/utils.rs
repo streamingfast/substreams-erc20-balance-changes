@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use common::{Address, Hash};
+use std::collections::HashMap;
 use substreams::scalar::BigInt;
 use substreams::Hex;
 use substreams_abis::evm::token::erc20::events::Transfer;
@@ -30,15 +30,8 @@ pub fn addresses_for_storage_keys(call: &Call) -> HashMap<Hash, Address> {
     out
 }
 
-pub fn get_keccak_address<'a>(keccak_address_map: &'a HashMap<Hash, Address>, storage_change: &'a StorageChange) -> Option<Address> {
-    let keccak_address = keccak_address_map.get(&storage_change.key);
-    match keccak_address {
-        Some(address) => Some(address.clone()),
-        _ => {
-            // log::info!("storage change does not match any owner address key={}", Hex(&storage_change.key));
-            None
-        }
-    }
+pub fn get_keccak_address<'a>(keccak_address_map: &'a HashMap<Hash, Address>, storage_change: &StorageChange) -> Option<&'a Address> {
+    keccak_address_map.get(&storage_change.key)
 }
 
 pub fn is_erc20_valid_address(address: &Address, transfer: &Transfer) -> bool {
