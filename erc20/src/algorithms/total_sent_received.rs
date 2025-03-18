@@ -22,7 +22,7 @@ pub fn compute_total_sent_received<'a>(
                 None => continue,
             };
 
-            if !is_erc20_valid_address(&owner, transfer) {
+            if !is_erc20_valid_address(owner, transfer) {
                 log::info!(
                     "owner={} does not match transfer from={} to={}",
                     Hex(owner),

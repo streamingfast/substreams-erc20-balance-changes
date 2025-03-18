@@ -6,8 +6,8 @@ use crate::algorithms::transfers::get_erc20_transfer;
 use crate::algorithms::utils::addresses_for_storage_keys;
 use common::{to_global_sequence, Address, Hash};
 use proto::pb::evm::tokens::balances::types::v1::{Algorithm, BalanceChange, Events, Transfer};
-use substreams::log;
 use substreams::errors::Error;
+use substreams::log;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
 
 use substreams::pb::substreams::Clock;
@@ -18,23 +18,27 @@ use substreams_ethereum::pb::eth::v2::{Block, Call, Log, StorageChange, Transact
 pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
     let mut events = Events::default();
     insert_events(&clock, &block, &mut events);
-    log::info!(format!("transfers: {} balance_changes: {}", events.transfers.len(), events.balance_changes.len()));
+    log::info!(format!(
+        "transfers: {} balance_changes: {}",
+        events.transfers.len(),
+        events.balance_changes.len()
+    ));
     Ok(events)
 }
 
 pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log, transfer: &'a TransferAbi, algorithm: Algorithm, index: &u64) -> Transfer {
     Transfer {
         // -- transaction --
-        transaction_id: trx.hash.clone(),
+        transaction_id: trx.hash.to_vec(),
 
         // -- ordering --
         ordinal: log.ordinal,
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
-        contract: log.address.clone(),
-        from: transfer.from.clone(),
-        to: transfer.to.clone(),
+        contract: log.address.to_vec(),
+        from: transfer.from.to_vec(),
+        to: transfer.to.to_vec(),
         value: transfer.value.to_string(),
 
         // -- debug --
@@ -55,10 +59,10 @@ pub fn to_balance_change<'a>(
 
     BalanceChange {
         // -- transaction
-        transaction_id: trx.hash.clone(),
+        transaction_id: trx.hash.to_vec(),
 
         // -- balance change --
-        contract: storage_change.address.clone(),
+        contract: storage_change.address.to_vec(),
         owner,
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
@@ -74,9 +78,10 @@ pub fn to_balance_change<'a>(
 
 pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events) {
     // We memoize the keccak address map by call because it is expensive to compute
-    let mut keccak_address_map = HashMap::new();
-    let mut index = 0;  // relative index for ordering
-    let mut last_balance_changes: HashMap<Vec<u8>, BalanceChange> = HashMap::new();
+    // Pre-allocate HashMaps to avoid initial reallocations
+    let mut keccak_address_map = HashMap::with_capacity(block.transactions().count() * 2);
+    let mut last_balance_changes: HashMap<Vec<u8>, BalanceChange> = HashMap::with_capacity(block.transactions().count() * 2);
+    let mut index = 0; // relative index for ordering
 
     // Iterates over successful transactions
     for trx in block.transactions() {
@@ -99,19 +104,23 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             for (owner, storage_change, change_type) in balance_changes {
                 let balance_change = to_balance_change(clock, trx, owner, storage_change, change_type, &index);
 
+                // Create key with pre-allocated capacity
+                let mut key = Vec::with_capacity(balance_change.contract.len() + balance_change.owner.len());
+                key.extend_from_slice(&balance_change.contract);
+                key.extend_from_slice(&balance_change.owner);
+
                 // overwrite balance change if it already exists
-                // key = contract + owner
-                let key = balance_change.contract.iter().chain(balance_change.owner.iter()).copied().collect();
-                last_balance_changes.insert(key, balance_change.clone());
+                last_balance_changes.insert(key, balance_change);
                 index += 1;
             }
         }
     }
 
+    // Reserve capacity for the balance changes to avoid reallocations
+    events.balance_changes.reserve(last_balance_changes.len());
+
     // insert only the last balance change for each contract + owner per block
-    for balance_change in last_balance_changes.values() {
-        events.balance_changes.push(balance_change.clone());
-    }
+    events.balance_changes.extend(last_balance_changes.into_values());
 }
 
 pub fn iter_balance_changes_algorithms<'a>(
@@ -119,27 +128,16 @@ pub fn iter_balance_changes_algorithms<'a>(
     call: &'a Call,
     transfer: &'a TransferAbi,
     keccak_address_map: &'a HashMap<Hash, Address>,
-) -> Vec<(Address, &'a StorageChange, Algorithm)> {
-    let mut out = Vec::new();
+) -> impl Iterator<Item = (Address, &'a StorageChange, Algorithm)> + 'a {
+    // First iterator - algorithm #1 (normal case)
+    let normal_changes = call.storage_changes.iter().filter_map(move |storage_change| {
+        get_owner_from_erc20_balance_change(transfer, storage_change, keccak_address_map).map(|owner| (owner, storage_change, Algorithm::Call))
+    });
 
-    // algorithm #1 (normal case)
-    for storage_change in call.storage_changes.iter() {
-        match get_owner_from_erc20_balance_change(transfer, storage_change, keccak_address_map) {
-            Some(owner) => {
-                out.push((owner, storage_change, Algorithm::Call));
-            }
-            None => continue,
-        }
-    };
+    // Second iterator - algorithm #2 (child calls)
+    let child_changes = get_all_child_call_storage_changes(call, trx).filter_map(move |storage_change| {
+        get_owner_from_erc20_balance_change(transfer, storage_change, keccak_address_map).map(|owner| (owner, storage_change, Algorithm::ChildCalls))
+    });
 
-    // algorithm #2 (case where storage changes are not in the same call as the transfer event)
-    for storage_change in get_all_child_call_storage_changes(call, trx) {
-        match get_owner_from_erc20_balance_change(transfer, storage_change, keccak_address_map) {
-            Some(owner) => {
-                out.push((owner, storage_change, Algorithm::ChildCalls));
-            }
-            None => continue,
-        }
-    };
-    out
+    normal_changes.chain(child_changes)
 }

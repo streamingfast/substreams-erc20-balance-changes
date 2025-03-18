@@ -1,15 +1,14 @@
-
 use common::to_global_sequence;
+use proto::pb::evm::tokens::prices::types::v1::{Events, PairCreated, Swap, Sync};
 use substreams::errors::Error;
-use proto::pb::evm::tokens::prices::types::v1::{Events, Sync, PairCreated, Swap};
 use substreams::pb::substreams::Clock;
-use substreams_abis::evm::uniswap::v2::pair::events::{Swap as SwapAbi, Sync as SyncAbi};
 use substreams_abis::evm::uniswap::v2::factory::events::PairCreated as PairCreatedAbi;
+use substreams_abis::evm::uniswap::v2::pair::events::{Swap as SwapAbi, Sync as SyncAbi};
 use substreams_ethereum::pb::eth::v2::Block;
 use substreams_ethereum::Event;
 
 #[substreams::handlers::map]
-pub fn map_events(clock: Clock, block: Block ) -> Result<Events, Error> {
+pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
     let mut events = Events::default();
     let mut index = 0;
 
@@ -18,11 +17,11 @@ pub fn map_events(clock: Clock, block: Block ) -> Result<Events, Error> {
         for (log, _) in trx.logs_with_calls() {
             // Syncs
             if let Some(event) = SyncAbi::match_and_decode(log) {
-                events.syncs.push(Sync{
+                events.syncs.push(Sync {
                     // -- transaction --
-                    transaction_id: trx.hash.clone(),
+                    transaction_id: trx.hash.to_vec(),
                     // -- log --
-                    address: log.address.clone(),
+                    address: log.address.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
                     global_sequence: to_global_sequence(&clock, &index),
@@ -33,11 +32,11 @@ pub fn map_events(clock: Clock, block: Block ) -> Result<Events, Error> {
                 index += 1;
             // Swaps
             } else if let Some(event) = SwapAbi::match_and_decode(log) {
-                events.swaps.push(Swap{
+                events.swaps.push(Swap {
                     // -- transaction --
-                    transaction_id: trx.hash.clone(),
+                    transaction_id: trx.hash.to_vec(),
                     // -- log --
-                    address: log.address.clone(),
+                    address: log.address.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
                     global_sequence: to_global_sequence(&clock, &index),
@@ -52,13 +51,13 @@ pub fn map_events(clock: Clock, block: Block ) -> Result<Events, Error> {
                 index += 1;
             // PairCreated
             } else if let Some(event) = PairCreatedAbi::match_and_decode(log) {
-                events.pairs_created.push(PairCreated{
+                events.pairs_created.push(PairCreated {
                     // -- transaction --
-                    transaction_id: trx.hash.clone(),
-                    creator: trx.from.clone(),
-                    to: trx.to.clone(),
+                    transaction_id: trx.hash.to_vec(),
+                    creator: trx.from.to_vec(),
+                    to: trx.to.to_vec(),
                     // -- log --
-                    factory: log.address.clone(),
+                    factory: log.address.to_vec(),
                     // -- pair created --
                     pair: event.pair,
                     token0: event.token0,
