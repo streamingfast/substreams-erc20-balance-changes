@@ -10,7 +10,7 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
     row.set("block_num", clock.number.to_string())
         .set("block_hash", format!("0x{}", &clock.id))
         .set("timestamp", clock.timestamp.expect("missing timestamp").seconds.to_string())
-        .set("date", clock_to_date(&clock));
+        .set("date", clock_to_date(clock));
 }
 
 #[substreams::handlers::map]
@@ -55,7 +55,7 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
                 .set("address", &address)
                 .set("name", &event.name)
                 .set("symbol", &event.symbol)
-                .set("decimals", &event.decimals.to_string()),
+                .set("decimals", event.decimals.to_string()),
         );
     }
 
@@ -88,12 +88,12 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
             .set("ordinal", event.ordinal)
             .set("global_sequence", event.global_sequence)
             // -- swaps --
-            .set("amount0_in", &event.amount0_in.to_string())
-            .set("amount0_out", &event.amount0_out.to_string())
-            .set("amount1_in", &event.amount1_in.to_string())
-            .set("amount1_out", &event.amount1_out.to_string())
-            .set("sender", &bytes_to_hex(&event.sender))
-            .set("to", &bytes_to_hex(&event.to));
+            .set("amount0_in", event.amount0_in.to_string())
+            .set("amount0_out", event.amount0_out.to_string())
+            .set("amount1_in", event.amount1_in.to_string())
+            .set("amount1_out", event.amount1_out.to_string())
+            .set("sender", bytes_to_hex(&event.sender))
+            .set("to", bytes_to_hex(&event.to));
     }
 
     // -- prices syncs --
@@ -108,8 +108,8 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
             .set("ordinal", event.ordinal)
             .set("global_sequence", event.global_sequence)
             // -- log --
-            .set("reserve0", &event.reserve0.to_string())
-            .set("reserve1", &event.reserve1.to_string());
+            .set("reserve0", event.reserve0.to_string())
+            .set("reserve1", event.reserve1.to_string());
     }
 
     // -- prices created pairs --
