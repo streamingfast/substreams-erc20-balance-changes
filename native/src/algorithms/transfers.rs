@@ -12,7 +12,7 @@ pub fn get_transfer_from_transaction<'a>(trx: &'a TransactionTrace) -> Option<Tr
         return None;
     }
 
-    let value = BigInt::from_unsigned_bytes_be(trx.value.as_ref().unwrap().bytes.as_ref());
+    let value = BigInt::from_unsigned_bytes_be(trx.value.as_ref()?.bytes.as_ref());
     if value.le(&BigInt::zero()) {
         return None;
     }
@@ -31,7 +31,7 @@ pub fn get_transfer_from_call<'a>(call: &'a Call) -> Option<TransferStruct> {
         return None;
     }
 
-    let value = BigInt::from_unsigned_bytes_be(call.value.as_ref().unwrap().bytes.as_ref());
+    let value = BigInt::from_unsigned_bytes_be(call.value.as_ref()?.bytes.as_ref());
     if value.le(&BigInt::zero()) {
         return None;
     }
