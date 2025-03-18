@@ -123,10 +123,15 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
         for call_view in trx.calls() {
             // balance changes
             for balance_change in &call_view.call.balance_changes {
-                let algorithm = if is_failed_transaction(trx) {
-                    Algorithm::Failed
-                } else if is_gas_balance_change(balance_change) {
+                let is_failed = is_failed_transaction(trx);
+
+                // failed transactions with gas balance changes are still considered as valid balance changes
+                let algorithm = if is_failed && is_gas_balance_change(balance_change){
                     Algorithm::Gas
+                // skip failed transactions
+                } else if is_failed {
+                    continue;
+                // valid balance change
                 } else {
                     Algorithm::Call
                 };
