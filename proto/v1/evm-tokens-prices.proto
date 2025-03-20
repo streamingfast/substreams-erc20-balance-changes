@@ -11,11 +11,16 @@ message Events {
 message PairCreated {
   // -- transaction --
   bytes transaction_id = 1;
-  bytes creator = 2; // trx.from
+  bytes from = 2; // trx.from (creator)
   bytes to = 3; // trx.to
 
   // -- log --
-  bytes factory = 5; // log.address
+  bytes address = 5; // log.address (factory)
+
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- pair created --
   bytes token0 = 20;

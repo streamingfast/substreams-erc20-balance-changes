@@ -56,10 +56,14 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                 events.pairs_created.push(PairCreated {
                     // -- transaction --
                     transaction_id: trx.hash.to_vec(),
-                    creator: trx.from.to_vec(),
+                    from: trx.from.to_vec(),
                     to: trx.to.to_vec(),
                     // -- log --
-                    factory: log.address.to_vec(),
+                    address: log.address.to_vec(),
+                    // -- ordering --
+                    ordinal: log.ordinal,
+                    index,
+                    global_sequence: to_global_sequence(&clock, &index),
                     // -- pair created --
                     pair: event.pair,
                     token0: event.token0,

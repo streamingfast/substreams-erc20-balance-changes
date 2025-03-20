@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens_contracts
-  version: v1.9.0
+  version: v1.10.0
   url: https://githubcom/pinax-network/substreams-evm-tokens
   description: EVM Token contracts
   image: ../image.png
@@ -24,6 +24,7 @@ modules:
   - name: map_events
     kind: map
     inputs:
+      - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
       - store: v1_8_2:store_erc20_transfers
         mode: deltas

@@ -4,13 +4,31 @@
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Events {
     #[prost(message, repeated, tag="1")]
-    pub contracts: ::prost::alloc::vec::Vec<Contract>,
+    pub contract_changes: ::prost::alloc::vec::Vec<ContractChange>,
     #[prost(message, repeated, tag="2")]
     pub contract_creations: ::prost::alloc::vec::Vec<ContractCreation>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Contract {
+pub struct ContractChange {
+    /// -- transaction --
+    #[prost(bytes="vec", tag="5")]
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="6")]
+    pub from: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="7")]
+    pub to: ::prost::alloc::vec::Vec<u8>,
+    /// -- ordering --
+    ///
+    /// log.ordinal
+    #[prost(uint64, tag="10")]
+    pub ordinal: u64,
+    /// relative index
+    #[prost(uint64, tag="11")]
+    pub index: u64,
+    /// latest global sequence (block_num << 32 + index)
+    #[prost(uint64, tag="12")]
+    pub global_sequence: u64,
     /// -- contract --
     #[prost(bytes="vec", tag="20")]
     pub address: ::prost::alloc::vec::Vec<u8>,
@@ -31,6 +49,17 @@ pub struct ContractCreation {
     pub from: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="7")]
     pub to: ::prost::alloc::vec::Vec<u8>,
+    /// -- ordering --
+    ///
+    /// log.ordinal
+    #[prost(uint64, tag="10")]
+    pub ordinal: u64,
+    /// relative index
+    #[prost(uint64, tag="11")]
+    pub index: u64,
+    /// latest global sequence (block_num << 32 + index)
+    #[prost(uint64, tag="12")]
+    pub global_sequence: u64,
     /// -- contract --
     #[prost(bytes="vec", tag="20")]
     pub address: ::prost::alloc::vec::Vec<u8>,

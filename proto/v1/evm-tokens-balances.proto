@@ -33,7 +33,7 @@ message BalanceChange {
   // -- ordering --
   uint64 ordinal = 10; // storage_change.ordinal or balance_change.ordinal
   uint64 index = 11; // relative index
-  uint64 global_sequence = 12; // latest global sequence of the balance change (block_num << 32 + index)
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- balance change --
   bytes contract = 20; // storage_change.address
@@ -52,7 +52,7 @@ message Transfer {
   // -- ordinal --
   uint64 ordinal = 10; // log.ordinal or call.begin_ordinal or trx.begin_ordinal
   uint64 index = 11; // relative index
-  uint64 global_sequence = 12; // latest global sequence of the transfer (block_num << 32 + index)
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- transfer --
   bytes contract = 20; // log.address

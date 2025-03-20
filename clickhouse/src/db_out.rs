@@ -47,13 +47,23 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
     }
 
     // -- contract changes --
-    for event in contracts.contracts {
+    for event in contracts.contract_changes {
         let address = bytes_to_hex(&event.address);
         let key = [("address", address.to_string()), ("block_num", clock.number.to_string())];
         set_clock(
             &clock,
             tables
                 .create_row("contract_changes", key)
+                // -- transaction --
+                .set("transaction_id", bytes_to_hex(&event.transaction_id))
+                .set("from", bytes_to_hex(&event.from))
+                .set("to", bytes_to_hex(&event.to))
+
+                // -- ordering --
+                .set("ordinal", event.ordinal)
+                .set("index", event.index)
+                .set("global_sequence", event.global_sequence)
+
                 // -- contract --
                 .set("address", &address)
                 .set("name", &event.name)
@@ -87,7 +97,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
         row.set("transaction_id", bytes_to_hex(&event.transaction_id))
             // -- log --
             .set("address", bytes_to_hex(&event.address))
-            // -- ordinal --
+            // -- ordering --
             .set("ordinal", event.ordinal)
             .set("index", event.index)
             .set("global_sequence", event.global_sequence)
@@ -108,7 +118,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
         row.set("transaction_id", bytes_to_hex(&event.transaction_id))
             // -- log --
             .set("address", bytes_to_hex(&event.address))
-            // -- ordinal --
+            // -- ordering --
             .set("ordinal", event.ordinal)
             .set("index", event.index)
             .set("global_sequence", event.global_sequence)
@@ -126,10 +136,10 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
                 .create_row("pairs_created", key)
                 // -- transaction --
                 .set("transaction_id", bytes_to_hex(&event.transaction_id))
-                .set("creator", bytes_to_hex(&event.creator)) // trx.from
+                .set("from", bytes_to_hex(&event.from)) // trx.from
                 .set("to", bytes_to_hex(&event.to))
                 // -- log --
-                .set("factory", bytes_to_hex(&event.factory)) // log.address
+                .set("address", bytes_to_hex(&event.address)) // log.address
                 // -- pair created --
                 .set("token0", bytes_to_hex(&event.token0))
                 .set("token1", bytes_to_hex(&event.token1))
@@ -164,7 +174,7 @@ fn process_balance_change(tables: &mut substreams_database_change::tables::Table
 
     // -- transaction --
     row.set("transaction_id", bytes_to_hex(&event.transaction_id))
-        // -- ordinal --
+        // -- ordering --
         .set("ordinal", event.ordinal)
         .set("index", event.index)
         .set("global_sequence", event.global_sequence)

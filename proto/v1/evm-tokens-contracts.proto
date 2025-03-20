@@ -3,11 +3,21 @@ syntax = "proto3";
 package evm.tokens.contracts.types.v1;
 
 message Events {
-  repeated Contract contracts = 1;
+  repeated ContractChange contract_changes = 1;
   repeated ContractCreation contract_creations = 2;
 }
 
-message Contract {
+message ContractChange {
+  // -- transaction --
+  bytes transaction_id = 5;
+  bytes from = 6;
+  bytes to = 7;
+
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
+
   // -- contract --
   bytes address = 20;
   string name = 21;
@@ -20,6 +30,11 @@ message ContractCreation {
   bytes transaction_id = 5;
   bytes from = 6;
   bytes to = 7;
+
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- contract --
   bytes address = 20;
