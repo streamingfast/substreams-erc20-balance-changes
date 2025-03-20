@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
 
    -- ordering --
    ordinal              UInt64, -- storage_change.ordinal or balance_change.ordinal
+   `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest version of the balance change (block_num << 32 + index)
 
    -- balance change --
@@ -45,8 +46,8 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    INDEX idx_balance_changes_owner              (owner)           TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
-PRIMARY KEY (date, block_num, ordinal)
-ORDER BY (date, block_num, ordinal);
+PRIMARY KEY (date, block_num, `index`)
+ORDER BY (date, block_num, `index`);
 
 -------------------------------------------------
 -- Transfer events                      --
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS transfers  (
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
+   `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence of the transfer (block_num << 32 + index)
 
    -- transfer --
@@ -77,13 +79,13 @@ CREATE TABLE IF NOT EXISTS transfers  (
 
    -- indexes --
    INDEX idx_transfers_transaction_id     (transaction_id)     TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_transfers_contract     (contract)     TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_transfers_from         (`from`)       TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_transfers_to           (`to`)         TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_contract           (contract)           TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_from               (`from`)             TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transfers_to                 (`to`)               TYPE bloom_filter GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
-PRIMARY KEY (date, block_num, ordinal)
-ORDER BY (date, block_num, ordinal);
+PRIMARY KEY (date, block_num, `index`)
+ORDER BY (date, block_num, `index`);
 
 -- ERC-20 contracts metadata events --
 CREATE TABLE IF NOT EXISTS contract_changes  (
@@ -261,6 +263,7 @@ CREATE TABLE IF NOT EXISTS sync_changes  (
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
+   `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- sync --
@@ -292,6 +295,7 @@ CREATE TABLE IF NOT EXISTS swaps  (
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
+   `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- swaps --
@@ -324,6 +328,8 @@ CREATE TABLE IF NOT EXISTS syncs  (
    address              FixedString(42),
 
    -- ordering --
+   ordinal              UInt64, -- log.ordinal
+   `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- sync --

@@ -25,3 +25,11 @@ pub fn to_global_sequence(clock: &Clock, index: &u64) -> u64 {
 pub fn bytes_to_hex(bytes: &Vec<u8>) -> String {
     format! {"0x{}", Hex::encode(bytes)}.to_string()
 }
+
+pub fn extend_from_address(address1: &Address, address2: &Address) -> Vec<u8> {
+    // Create key with pre-allocated capacity
+    let mut key = Vec::with_capacity(address1.len() + address2.len());
+    key.extend_from_slice(&address1);
+    key.extend_from_slice(&address2);
+    key
+}

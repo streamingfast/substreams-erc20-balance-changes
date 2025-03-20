@@ -49,8 +49,11 @@ pub struct Sync {
     /// log.ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
-    /// latest global sequence (block_num << 32 + index)
+    /// relative index
     #[prost(uint64, tag="11")]
+    pub index: u64,
+    /// latest global sequence (block_num << 32 + index)
+    #[prost(uint64, tag="12")]
     pub global_sequence: u64,
     /// -- sync --
     #[prost(string, tag="20")]
@@ -65,6 +68,8 @@ pub struct Swap {
     #[prost(bytes="vec", tag="1")]
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
     /// -- log --
+    ///
+    /// log.address
     #[prost(bytes="vec", tag="5")]
     pub address: ::prost::alloc::vec::Vec<u8>,
     /// -- ordering --
@@ -72,8 +77,11 @@ pub struct Swap {
     /// log.ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
-    /// latest global sequence (block_num << 32 + index)
+    /// relative index
     #[prost(uint64, tag="11")]
+    pub index: u64,
+    /// latest global sequence (block_num << 32 + index)
+    #[prost(uint64, tag="12")]
     pub global_sequence: u64,
     /// -- swap --
     #[prost(string, tag="20")]

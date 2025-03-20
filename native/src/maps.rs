@@ -33,15 +33,16 @@ pub fn to_balance_change<'a>(
         // -- transaction
         transaction_id: trx.hash.to_vec(),
 
+        // -- ordering --
+        ordinal: balance_change.ordinal,
+        index: *index,
+        global_sequence: to_global_sequence(clock, index),
+
         // -- balance change --
         contract: NATIVE_ADDRESS.to_vec(),
         owner: balance_change.address.to_vec(),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
-
-        // -- ordering --
-        ordinal: balance_change.ordinal,
-        global_sequence: to_global_sequence(clock, index),
 
         // -- debug --
         algorithm: algorithm.into(),
@@ -65,6 +66,7 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: Tr
 
         // -- ordering --
         ordinal: transfer.ordinal,
+        index: *index,
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --

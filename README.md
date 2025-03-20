@@ -14,9 +14,9 @@
 - [x] ERC-20 Balances & Transfers
 - [x] Native Balances & Transfers
 - [x] ERC-20 Contract Metadata
-- [ ] EVM Token Prices
-  - [ ] Uniswap V2 factories
-- [ ] ERC-20 Supply
+- [x] EVM Token Prices
+  - [x] Uniswap V2 factories
+- [x] ERC-20 Circulating Supply
 - [ ] ENS Reverse Resolution
 
 ## Substreams Graph
@@ -25,8 +25,8 @@
 graph TD;
   Block[source: sf.ethereum.type.v2.Block]
 
-  Block --> erc20:map_events --> db_out;
-  Block --> native:map_events --> db_out;
-  Block --> contracts:map_events --> db_out;
-  Block --> prices:map_events --> db_out;
+  Block --> erc20[erc20 + RPC] --> db_out;
+  Block --> native --> db_out;
+  Block --> contracts[contracts + RPC] --> db_out;
+  Block --> prices --> db_out;
 ```

@@ -14,7 +14,7 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
 }
 
 #[substreams::handlers::map]
-pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsContracts, prices: EventsPrices) -> Result<DatabaseChanges, Error> {
+pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, contracts: EventsContracts, prices: EventsPrices) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
     // Pre-compute frequently used values
@@ -24,6 +24,9 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
     // -- balance changes --
     // Process ERC-20 balance changes
     for event in erc20.balance_changes {
+        process_balance_change(&mut tables, &clock, &block_num, &date, event);
+    }
+    for event in erc20_rpc.balance_changes {
         process_balance_change(&mut tables, &clock, &block_num, &date, event);
     }
 
@@ -86,6 +89,7 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
             .set("address", bytes_to_hex(&event.address))
             // -- ordinal --
             .set("ordinal", event.ordinal)
+            .set("index", event.index)
             .set("global_sequence", event.global_sequence)
             // -- swaps --
             .set("amount0_in", event.amount0_in.to_string())
@@ -106,6 +110,7 @@ pub fn db_out(clock: Clock, erc20: Events, native: Events, contracts: EventsCont
             .set("address", bytes_to_hex(&event.address))
             // -- ordinal --
             .set("ordinal", event.ordinal)
+            .set("index", event.index)
             .set("global_sequence", event.global_sequence)
             // -- log --
             .set("reserve0", event.reserve0.to_string())
@@ -161,6 +166,7 @@ fn process_balance_change(tables: &mut substreams_database_change::tables::Table
     row.set("transaction_id", bytes_to_hex(&event.transaction_id))
         // -- ordinal --
         .set("ordinal", event.ordinal)
+        .set("index", event.index)
         .set("global_sequence", event.global_sequence)
         // -- balance change --
         .set("contract", bytes_to_hex(&event.contract))
@@ -181,6 +187,7 @@ fn process_transfer(tables: &mut substreams_database_change::tables::Tables, clo
     row.set("transaction_id", bytes_to_hex(&event.transaction_id))
         // -- ordering --
         .set("ordinal", event.ordinal)
+        .set("index", event.index)
         .set("global_sequence", event.global_sequence)
         // -- transfer --
         .set("contract", bytes_to_hex(&event.contract))

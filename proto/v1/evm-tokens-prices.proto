@@ -32,7 +32,8 @@ message Sync {
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
-  uint64 global_sequence = 11; // latest global sequence (block_num << 32 + index)
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- sync --
   string reserve0 = 20;
@@ -48,7 +49,8 @@ message Swap {
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
-  uint64 global_sequence = 11; // latest global sequence (block_num << 32 + index)
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- swap --
   string amount0_in = 20;

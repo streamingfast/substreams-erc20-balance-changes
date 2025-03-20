@@ -4,7 +4,7 @@ use crate::algorithms::algorithm1_call::get_owner_from_erc20_balance_change;
 use crate::algorithms::algorithm2_child_calls::get_all_child_call_storage_changes;
 use crate::algorithms::transfers::get_erc20_transfer;
 use crate::algorithms::utils::addresses_for_storage_keys;
-use common::{to_global_sequence, Address, Hash};
+use common::{extend_from_address, to_global_sequence, Address, Hash};
 use proto::pb::evm::tokens::balances::types::v1::{Algorithm, BalanceChange, Events, Transfer};
 use substreams::errors::Error;
 use substreams::log;
@@ -33,6 +33,7 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log
 
         // -- ordering --
         ordinal: log.ordinal,
+        index: *index,
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
@@ -61,15 +62,16 @@ pub fn to_balance_change<'a>(
         // -- transaction
         transaction_id: trx.hash.to_vec(),
 
+        // -- ordering --
+        ordinal: storage_change.ordinal,
+        index: *index,
+        global_sequence: to_global_sequence(clock, index),
+
         // -- balance change --
         contract: storage_change.address.to_vec(),
         owner,
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
-
-        // -- ordering --
-        ordinal: storage_change.ordinal,
-        global_sequence: to_global_sequence(clock, index),
 
         // -- debug --
         algorithm: algorithm.into(),
@@ -103,11 +105,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
             for (owner, storage_change, change_type) in balance_changes {
                 let balance_change = to_balance_change(clock, trx, owner, storage_change, change_type, &index);
-
-                // Create key with pre-allocated capacity
-                let mut key = Vec::with_capacity(balance_change.contract.len() + balance_change.owner.len());
-                key.extend_from_slice(&balance_change.contract);
-                key.extend_from_slice(&balance_change.owner);
+                let key = extend_from_address(&balance_change.contract, &balance_change.owner);
 
                 // overwrite balance change if it already exists
                 last_balance_changes.insert(key, balance_change);

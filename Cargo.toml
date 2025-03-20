@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "erc20",
+  "erc20-rpc",
   "contracts",
   "native",
   "proto",

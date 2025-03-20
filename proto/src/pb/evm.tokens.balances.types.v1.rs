@@ -19,8 +19,11 @@ pub struct BalanceChange {
     /// storage_change.ordinal or balance_change.ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
-    /// latest global sequence of the balance change (block_num << 32 + index)
+    /// relative index
     #[prost(uint64, tag="11")]
+    pub index: u64,
+    /// latest global sequence of the balance change (block_num << 32 + index)
+    #[prost(uint64, tag="12")]
     pub global_sequence: u64,
     /// -- balance change --
     ///
@@ -48,8 +51,11 @@ pub struct Transfer {
     /// log.ordinal or call.begin_ordinal or trx.begin_ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
-    /// latest global sequence of the transfer (block_num << 32 + index)
+    /// relative index
     #[prost(uint64, tag="11")]
+    pub index: u64,
+    /// latest global sequence of the transfer (block_num << 32 + index)
+    #[prost(uint64, tag="12")]
     pub global_sequence: u64,
     /// -- transfer --
     ///
@@ -80,6 +86,10 @@ pub enum Algorithm {
     ChildCalls = 3,
     /// which the balances grow over time due to accrued interest
     RebasingToken = 4,
+    /// RPC call
+    Rpc = 5,
+    /// RPC call missing
+    RpcMissing = 6,
     /// Native (ETH)
     ///
     /// block balance changes
@@ -105,6 +115,8 @@ impl Algorithm {
             Algorithm::Call => "ALGORITHM_CALL",
             Algorithm::ChildCalls => "ALGORITHM_CHILD_CALLS",
             Algorithm::RebasingToken => "ALGORITHM_REBASING_TOKEN",
+            Algorithm::Rpc => "ALGORITHM_RPC",
+            Algorithm::RpcMissing => "ALGORITHM_RPC_MISSING",
             Algorithm::Block => "ALGORITHM_BLOCK",
             Algorithm::Failed => "ALGORITHM_FAILED",
             Algorithm::Gas => "ALGORITHM_GAS",
@@ -120,6 +132,8 @@ impl Algorithm {
             "ALGORITHM_CALL" => Some(Self::Call),
             "ALGORITHM_CHILD_CALLS" => Some(Self::ChildCalls),
             "ALGORITHM_REBASING_TOKEN" => Some(Self::RebasingToken),
+            "ALGORITHM_RPC" => Some(Self::Rpc),
+            "ALGORITHM_RPC_MISSING" => Some(Self::RpcMissing),
             "ALGORITHM_BLOCK" => Some(Self::Block),
             "ALGORITHM_FAILED" => Some(Self::Failed),
             "ALGORITHM_GAS" => Some(Self::Gas),

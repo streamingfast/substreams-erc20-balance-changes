@@ -24,6 +24,7 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                     address: log.address.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
+                    index,
                     global_sequence: to_global_sequence(&clock, &index),
                     // -- sync --
                     reserve0: event.reserve0.to_string(),
@@ -39,6 +40,7 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                     address: log.address.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
+                    index,
                     global_sequence: to_global_sequence(&clock, &index),
                     // -- swap --
                     amount0_in: event.amount0_in.to_string(),
@@ -62,7 +64,8 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                     pair: event.pair,
                     token0: event.token0,
                     token1: event.token1,
-                })
+                });
+                index += 1;
             }
         }
     }

@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens
-  version: v1.9.0
+  version: v1.10.0
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: ERC-20 & Native tokens for EVM blockchains.
   image: ../image.png
@@ -13,6 +13,7 @@ imports:
 
   # EVM Tokens Substreams
   erc20: ../erc20/substreams.yaml
+  erc20_rpc: ../erc20-rpc/substreams.yaml
   native: ../native/substreams.yaml
   contracts: ../contracts/substreams.yaml
   prices: ../prices/substreams.yaml
@@ -28,6 +29,7 @@ modules:
     inputs:
       - source: sf.substreams.v1.Clock
       - map: erc20:map_events
+      - map: erc20_rpc:map_events
       - map: native:map_events
       - map: contracts:map_events
       - map: prices:map_events

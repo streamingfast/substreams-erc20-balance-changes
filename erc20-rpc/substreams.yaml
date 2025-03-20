@@ -1,29 +1,32 @@
 specVersion: v0.1.0
 package:
-  name: evm_tokens_native
+  name: evm_tokens_erc20_rpc
   version: v1.10.0
   url: https://github.com/pinax-network/substreams-evm-tokens
-  description: Native balance changes & transfers
+  description: ERC20 balance changes via RPC
   image: ../image.png
+
+imports:
+  erc20: ../erc20/substreams.yaml
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/native.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc20_rpc.wasm
 
-protobuf:
-  files:
-    - evm-tokens-balances.proto
-  importPaths:
-    - ../proto/v1
+# protobuf:
+#   files:
+#     - evm-tokens-balances.proto
+#   importPaths:
+#     - ../proto/v1
 
 modules:
   - name: map_events
     kind: map
-    doc: Native balance changes & transfers
+    doc: ERC20 balance changes via RPC
     inputs:
       - source: sf.substreams.v1.Clock
-      - source: sf.ethereum.type.v2.Block
+      - map: erc20:map_events
     output:
       type: proto:evm.tokens.balances.types.v1.Events
 
