@@ -22,19 +22,19 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- transaction --
-   transaction_id       FixedString(66),
-
    -- ordering --
    ordinal              UInt64, -- storage_change.ordinal or balance_change.ordinal
    `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
+   -- transaction --
+   transaction_id       FixedString(66),
+
    -- balance change --
-   contract             FixedString(42),
-   owner                FixedString(42),
-   old_balance          UInt256,
-   new_balance          UInt256,
+   contract             FixedString(42) COMMENT 'ERC-20 contract address',
+   owner                FixedString(42) COMMENT 'ERC-20 owner address',
+   old_balance          UInt256 COMMENT 'ERC-20 owner old balance',
+   new_balance          UInt256 COMMENT 'ERC-20 owner new balance',
 
    -- debug --
    algorithm            LowCardinality(String),
@@ -62,13 +62,13 @@ CREATE TABLE IF NOT EXISTS transfers  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- transaction --
-   transaction_id       FixedString(66),
-
    -- ordering --
    ordinal              UInt64, -- log.ordinal
    `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- transaction --
+   transaction_id       FixedString(66),
 
    -- transfer --
    contract             FixedString(42) COMMENT 'ERC-20 contract address', -- log.address
@@ -100,13 +100,15 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- transaction --
-   transaction_id       FixedString(66),
-
    -- ordering --
    ordinal              UInt64, -- log.ordinal
    `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- transaction --
+   transaction_id       FixedString(66) COMMENT 'NOT IMPLEMENTED',
+   `from`               FixedString(42) COMMENT 'NOT IMPLEMENTED: ERC-20 creator/modifier address',
+   `to`                 FixedString(42) COMMENT 'NOT IMPLEMENTED',
 
    -- contract --
    address              FixedString(42) COMMENT 'ERC-20 contract address',
@@ -114,12 +116,17 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    symbol               String COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
    decimals             UInt8 COMMENT 'ERC-20 contract decimals (18 by default)',
 
+   -- debug --
+   algorithm            LowCardinality(String),
+   algorithm_code       UInt8,
+
    -- indexes --
    INDEX idx_transaction_id      (transaction_id)     TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address             (address)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_name                (name)               TYPE bloom_filter GRANULARITY 4,
    INDEX idx_symbol              (symbol)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_decimals            (decimals)           TYPE minmax GRANULARITY 4,
+   INDEX idx_algorithm           (algorithm)          TYPE set(2) GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (date, block_num, `index`)
@@ -133,18 +140,18 @@ CREATE TABLE IF NOT EXISTS contract_creations  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- transaction --
-   transaction_id       FixedString(66),
-   `from`               FixedString(42),
-   `to`                 FixedString(42),
-
    -- ordering --
    ordinal              UInt64, -- storage_change.ordinal or balance_change.ordinal
    `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
+   -- transaction --
+   transaction_id       FixedString(66),
+   `from`               FixedString(42) COMMENT 'ERC-20 creator address',
+   `to`                 FixedString(42),
+
    -- contract --
-   address              FixedString(42),
+   address              FixedString(42) COMMENT 'ERC-20 contract address',
 
    -- indexes --
    INDEX idx_block_num          (block_num)           TYPE minmax GRANULARITY 4,
@@ -165,13 +172,13 @@ CREATE TABLE IF NOT EXISTS balances  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- balance change --
-   contract             FixedString(42),
-   owner                FixedString(42),
-   new_balance          UInt256,
-
    -- ordering --
    global_sequence      UInt64, -- block_num << 32 + index
+
+   -- balance change --
+   contract             FixedString(42) COMMENT 'ERC-20 contract address',
+   owner                FixedString(42) COMMENT 'ERC-20 owner address',
+   new_balance          UInt256 COMMENT 'ERC-20 owner new balance',
 
    -- indexes --
    INDEX idx_block_num     (block_num)       TYPE minmax GRANULARITY 4,
@@ -202,13 +209,13 @@ CREATE TABLE IF NOT EXISTS balances_by_date  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- balance change --
-   contract             FixedString(42),
-   owner                FixedString(42),
-   new_balance          UInt256,
-
    -- ordering --
    global_sequence      UInt64, -- block_num << 32 + index
+
+   -- balance change --
+   contract             FixedString(42) COMMENT 'ERC-20 contract address',
+   owner                FixedString(42) COMMENT 'ERC-20 owner address',
+   new_balance          UInt256 COMMENT 'ERC-20 owner new balance',
 
    -- indexes --
    INDEX idx_block_num     (block_num)       TYPE minmax GRANULARITY 4,
@@ -231,14 +238,15 @@ CREATE TABLE IF NOT EXISTS contracts  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
+   -- ordering --
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
    -- contract --
    address              FixedString(42) COMMENT 'ERC-20 contract address',
    name                 String COMMENT 'ERC-20 contract name (typically 3-8 characters)',
    symbol               String COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
    decimals             UInt8 COMMENT 'ERC-20 contract decimals (18 by default)',
 
-   -- ordering --
-   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- indexes --
    INDEX idx_block_num     (block_num)       TYPE minmax GRANULARITY 4,
@@ -265,15 +273,15 @@ CREATE TABLE IF NOT EXISTS pairs_created (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- transaction --
-   transaction_id       FixedString(66),
-   `from`               FixedString(42) COMMENT 'UniswapV2Pair creator address',
-   `to`                 FixedString(42),
-
    -- ordering --
    ordinal              UInt64, -- log.ordinal
    `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- transaction --
+   transaction_id       FixedString(66),
+   `from`               FixedString(42) COMMENT 'UniswapV2Pair creator address',
+   `to`                 FixedString(42),
 
    -- log --
    address              FixedString(42) COMMENT 'UniswapV2Pair factory address',
@@ -305,20 +313,20 @@ CREATE TABLE IF NOT EXISTS sync_changes  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- transaction --
-   transaction_id       FixedString(66),
-
-   -- log --
-   address              FixedString(42), -- log.address
-
    -- ordering --
    ordinal              UInt64, -- log.ordinal
    `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
+   -- transaction --
+   transaction_id       FixedString(66),
+
+   -- log --
+   address              FixedString(42) COMMENT 'UniswapV2Pair pair address', -- log.address
+
    -- sync --
-   reserve0             UInt256,
-   reserve1             UInt256,
+   reserve0             UInt256 COMMENT 'UniswapV2Pair token0 reserve',
+   reserve1             UInt256 COMMENT 'UniswapV2Pair token1 reserve',
 
    -- indexes --
    INDEX idx_sync_changes_transaction_id     (transaction_id)  TYPE bloom_filter GRANULARITY 4,
@@ -337,16 +345,16 @@ CREATE TABLE IF NOT EXISTS swaps (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
+   -- ordering --
+   ordinal              UInt64, -- log.ordinal
+   `index`              UInt64, -- relative index
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
    -- transaction --
    transaction_id       FixedString(66),
 
    -- log --
    address              FixedString(42) COMMENT 'UniswapV2Pair pair address', -- log.address
-
-   -- ordering --
-   ordinal              UInt64, -- log.ordinal
-   `index`              UInt64, -- relative index
-   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- swaps --
    amount0_in           UInt256 COMMENT 'UniswapV2Pair token0 amount in',
@@ -378,11 +386,11 @@ CREATE TABLE IF NOT EXISTS syncs  (
    timestamp            DateTime(0, 'UTC'),
    date                 Date,
 
-   -- log --
-   address              FixedString(42),
-
    -- ordering --
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- log --
+   address              FixedString(42),
 
    -- sync --
    reserve0             UInt256,

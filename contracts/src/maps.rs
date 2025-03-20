@@ -1,7 +1,7 @@
 use std::vec;
 
 use common::to_global_sequence;
-use proto::pb::evm::tokens::contracts::types::v1::{ContractChange, ContractCreation, Events};
+use proto::pb::evm::tokens::contracts::types::v1::{Algorithm, ContractChange, ContractCreation, Events};
 use substreams::pb::substreams::Clock;
 use substreams::store::{DeltaBigInt, Deltas};
 use substreams::{errors::Error, scalar::BigInt, Hex};
@@ -28,7 +28,7 @@ pub fn map_events(clock: Clock, block: Block, store_erc20_transfers: Deltas<Delt
 
                     // -- ordering --
                     ordinal: 0,
-                    index: 0,
+                    index,
                     global_sequence: to_global_sequence(&clock, &index),
 
                     // -- contract --
@@ -38,8 +38,13 @@ pub fn map_events(clock: Clock, block: Block, store_erc20_transfers: Deltas<Delt
             }
         }
     }
+    // TO-DO: pull from known symbol & name contract updates
+    // - setMetadata
+    // - setNameAndTicker
+    // - setName
+    // https://github.com/pinax-network/substreams-evm-tokens/issues/13
 
-    // -- contract events --
+    // -- fetch contract metadata via RPC --
     for deltas in store_erc20_transfers.deltas {
         // match using 1st block which includes ERC20 token transfer event per address
         // or every 10,000 blocks (~24h ETH, ~6h BSC, ~4h Base)
@@ -61,7 +66,7 @@ pub fn map_events(clock: Clock, block: Block, store_erc20_transfers: Deltas<Delt
 
             // -- ordering --
             ordinal: 0,
-            index: 0,
+            index,
             global_sequence: to_global_sequence(&clock, &index),
 
             // -- contract --
@@ -69,6 +74,9 @@ pub fn map_events(clock: Clock, block: Block, store_erc20_transfers: Deltas<Delt
             name,
             symbol,
             decimals: decimals.into(),
+
+            // -- debug --
+            algorithm: Algorithm::Rpc.into(),
         });
         index += 1;
     }

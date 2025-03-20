@@ -68,7 +68,11 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
                 .set("address", &address)
                 .set("name", &event.name)
                 .set("symbol", &event.symbol)
-                .set("decimals", event.decimals.to_string()),
+                .set("decimals", event.decimals.to_string())
+
+                // -- debug --
+                .set("algorithm", event.algorithm().as_str_name())
+                .set("algorithm_code", event.algorithm.to_string())
         );
     }
 

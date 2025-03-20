@@ -7,6 +7,15 @@ message Events {
   repeated ContractCreation contract_creations = 2;
 }
 
+// TO-DO: import from `evem-tokens-balances.proto`
+enum Algorithm {
+  ALGORITHM_UNSPECIFIED = 0;
+
+  // ERC-20
+  ALGORITHM_LOG = 1; // log event
+  ALGORITHM_RPC = 5; // RPC call
+}
+
 message ContractChange {
   // -- transaction --
   bytes transaction_id = 5;
@@ -23,6 +32,9 @@ message ContractChange {
   string name = 21;
   string symbol = 22;
   int32 decimals = 23;
+
+  // -- debug --
+  Algorithm algorithm = 99;
 }
 
 message ContractCreation {
