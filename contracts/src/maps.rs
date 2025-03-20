@@ -42,7 +42,8 @@ pub fn map_events(clock: Clock, block: Block, store_erc20_transfers: Deltas<Delt
     // -- contract events --
     for deltas in store_erc20_transfers.deltas {
         // match using 1st block which includes ERC20 token transfer event per address
-        if deltas.new_value != BigInt::one() {
+        // or every 10,000 blocks (~24h ETH, ~6h BSC, ~4h Base)
+        if deltas.new_value != BigInt::one() && deltas.new_value.to_u64() % 10000 != 0 {
             continue;
         }
         let address = Hex::decode(&deltas.key).expect("invalid address");

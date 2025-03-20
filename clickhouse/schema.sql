@@ -322,7 +322,7 @@ PRIMARY KEY (date, block_num, ordinal)
 ORDER BY (date, block_num, ordinal);
 
 -- prices swaps --
-CREATE TABLE IF NOT EXISTS swaps  (
+CREATE TABLE IF NOT EXISTS swaps (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),
@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS swaps  (
    transaction_id       FixedString(66),
 
    -- log --
-   address              FixedString(42),
+   address              FixedString(42) COMMENT 'UniswapV2Pair address',
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
@@ -341,12 +341,12 @@ CREATE TABLE IF NOT EXISTS swaps  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- swaps --
-   amount0_in           UInt256,
-   amount0_out          UInt256,
-   amount1_in           UInt256,
-   amount1_out          UInt256,
-   sender               FixedString(42),
-   `to`                 FixedString(42),
+   amount0_in           UInt256 COMMENT 'UniswapV2Pair token0 amount in',
+   amount0_out          UInt256 COMMENT 'UniswapV2Pair token0 amount out',
+   amount1_in           UInt256 COMMENT 'UniswapV2Pair token1 amount in',
+   amount1_out          UInt256 COMMENT 'UniswapV2Pair token1 amount out',
+   sender               FixedString(42) COMMENT 'UniswapV2Pair sender address',
+   `to`                 FixedString(42) COMMENT 'UniswapV2Pair recipient address',
 
    -- indexes --
    INDEX idx_transaction_id   (transaction_id)     TYPE bloom_filter GRANULARITY 4,
