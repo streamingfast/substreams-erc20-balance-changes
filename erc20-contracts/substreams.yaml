@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: evm_tokens_contracts
+  name: evm_tokens_erc20_contracts
   version: v1.10.0
   url: https://githubcom/pinax-network/substreams-evm-tokens
   description: EVM Token contracts
@@ -12,7 +12,7 @@ imports:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/contracts.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc20_contracts.wasm
 
 protobuf:
   files:

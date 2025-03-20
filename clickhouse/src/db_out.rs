@@ -14,7 +14,7 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
 }
 
 #[substreams::handlers::map]
-pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, contracts: EventsContracts, prices: EventsPrices) -> Result<DatabaseChanges, Error> {
+pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, erc20_contracts: EventsContracts, prices_uniswap_v2: EventsPrices) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
     // Pre-compute frequently used values
@@ -47,7 +47,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
     }
 
     // -- contract changes --
-    for event in contracts.contract_changes {
+    for event in erc20_contracts.contract_changes {
         let address = bytes_to_hex(&event.address);
         let key = [("address", address.to_string()), ("block_num", clock.number.to_string())];
         set_clock(
@@ -77,7 +77,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
     }
 
     // -- contract creations --
-    for event in contracts.contract_creations {
+    for event in erc20_contracts.contract_creations {
         let address = bytes_to_hex(&event.address);
         let key = [("address", address.to_string())];
         set_clock(
@@ -100,7 +100,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
     }
 
     // -- prices swaps --
-    for event in prices.swaps {
+    for event in prices_uniswap_v2.swaps {
         let row = create_row_with_common_values(&mut tables, "swaps", &clock, &block_num, &date, event.ordinal);
 
         // -- transaction --
@@ -121,7 +121,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
     }
 
     // -- prices syncs --
-    for event in prices.syncs {
+    for event in prices_uniswap_v2.syncs {
         let row = create_row_with_common_values(&mut tables, "sync_changes", &clock, &block_num, &date, event.ordinal);
 
         // -- transaction --
@@ -138,7 +138,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
     }
 
     // -- prices created pairs --
-    for event in prices.pairs_created {
+    for event in prices_uniswap_v2.pairs_created {
         let key = [("factory", bytes_to_hex(&event.to)), ("pair", bytes_to_hex(&event.pair))];
         set_clock(
             &clock,

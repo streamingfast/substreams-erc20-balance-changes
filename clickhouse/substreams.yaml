@@ -14,9 +14,9 @@ imports:
   # EVM Tokens Substreams
   erc20: ../erc20/substreams.yaml
   erc20_rpc: ../erc20-rpc/substreams.yaml
+  erc20_contracts: ../erc20-contracts/substreams.yaml
   native: ../native/substreams.yaml
-  contracts: ../contracts/substreams.yaml
-  prices: ../prices/substreams.yaml
+  prices_uniswap_v2: ../prices-uniswap-v2/substreams.yaml
 
 binaries:
   default:
@@ -30,9 +30,9 @@ modules:
       - source: sf.substreams.v1.Clock
       - map: erc20:map_events
       - map: erc20_rpc:map_events
+      - map: erc20_contracts:map_events
       - map: native:map_events
-      - map: contracts:map_events
-      - map: prices:map_events
+      - map: prices_uniswap_v2:map_events
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 

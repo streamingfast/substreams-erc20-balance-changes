@@ -12,10 +12,12 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
     let mut events = Events::default();
     let mut index = 0;
 
-    // -- Uniswap V2 --
+    // === Uniswap::V2 ===
+    // https://github.com/Uniswap/v2-core
+    // https://github.com/pinax-network/substreams-abis/tree/main/abi/evm/uniswap/v2
     for trx in block.transactions() {
         for (log, _) in trx.logs_with_calls() {
-            // Syncs
+            // Uniswap::V2::Pair:Sync
             if let Some(event) = SyncAbi::match_and_decode(log) {
                 events.syncs.push(Sync {
                     // -- transaction --
@@ -31,7 +33,7 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                     reserve1: event.reserve1.to_string(),
                 });
                 index += 1;
-            // Swaps
+            // Uniswap::V2::Pair:Swap
             } else if let Some(event) = SwapAbi::match_and_decode(log) {
                 events.swaps.push(Swap {
                     // -- transaction --
@@ -51,7 +53,7 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                     to: event.to,
                 });
                 index += 1;
-            // PairCreated
+            // Uniswap::V2::Factory:PairCreated
             } else if let Some(event) = PairCreatedAbi::match_and_decode(log) {
                 events.pairs_created.push(PairCreated {
                     // -- transaction --
