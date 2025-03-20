@@ -237,15 +237,18 @@ CREATE TABLE IF NOT EXISTS contracts  (
    symbol               String COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
    decimals             UInt8 COMMENT 'ERC-20 contract decimals (18 by default)',
 
+   -- ordering --
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
    -- indexes --
    INDEX idx_block_num     (block_num)       TYPE minmax GRANULARITY 4,
    INDEX idx_timestamp     (timestamp)       TYPE minmax GRANULARITY 4,
    INDEX idx_date          (date)            TYPE minmax GRANULARITY 4,
-   INDEX idx_name         (name)             TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_symbol       (symbol)           TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_decimals     (decimals)         TYPE minmax GRANULARITY 4,
+   INDEX idx_name          (name)             TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_symbol        (symbol)           TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_decimals      (decimals)         TYPE minmax GRANULARITY 4,
 )
-ENGINE = ReplacingMergeTree(block_num)
+ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (address)
 ORDER BY (address);
 
@@ -266,6 +269,11 @@ CREATE TABLE IF NOT EXISTS pairs_created (
    transaction_id       FixedString(66),
    `from`               FixedString(42) COMMENT 'UniswapV2Pair creator address',
    `to`                 FixedString(42),
+
+   -- ordering --
+   ordinal              UInt64, -- log.ordinal
+   `index`              UInt64, -- relative index
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- log --
    address              FixedString(42) COMMENT 'UniswapV2Pair factory address',
@@ -301,7 +309,7 @@ CREATE TABLE IF NOT EXISTS sync_changes  (
    transaction_id       FixedString(66),
 
    -- log --
-   address              FixedString(42),
+   address              FixedString(42), -- log.address
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
@@ -333,7 +341,7 @@ CREATE TABLE IF NOT EXISTS swaps (
    transaction_id       FixedString(66),
 
    -- log --
-   address              FixedString(42) COMMENT 'UniswapV2Pair address',
+   address              FixedString(42) COMMENT 'UniswapV2Pair pair address', -- log.address
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal

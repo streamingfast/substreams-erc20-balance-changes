@@ -84,6 +84,12 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
                 .set("transaction_id", bytes_to_hex(&event.transaction_id))
                 .set("from", bytes_to_hex(&event.from))
                 .set("to", bytes_to_hex(&event.to))
+
+                // -- ordering --
+                .set("ordinal", event.ordinal)
+                .set("index", event.index)
+                .set("global_sequence", event.global_sequence)
+
                 // -- contract --
                 .set("address", &address),
         );
@@ -140,6 +146,10 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, co
                 .set("to", bytes_to_hex(&event.to))
                 // -- log --
                 .set("address", bytes_to_hex(&event.address)) // log.address
+                // -- ordering --
+                .set("ordinal", event.ordinal)
+                .set("index", event.index)
+                .set("global_sequence", event.global_sequence)
                 // -- pair created --
                 .set("token0", bytes_to_hex(&event.token0))
                 .set("token1", bytes_to_hex(&event.token1))
