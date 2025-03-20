@@ -16,7 +16,7 @@ enum Algorithm {
   ALGORITHM_CHILD_CALLS = 3; // child calls
   ALGORITHM_REBASING_TOKEN = 4; // which the balances grow over time due to accrued interest
   ALGORITHM_RPC = 5; // RPC call
-  ALGORITHM_RPC_MISSING = 6; // RPC call missing
+  ALGORITHM_RPC_FAIL = 6; // RPC call missing
 
   // Native (ETH)
   ALGORITHM_BLOCK = 10; // block balance changes

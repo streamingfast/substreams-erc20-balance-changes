@@ -89,7 +89,7 @@ pub enum Algorithm {
     /// RPC call
     Rpc = 5,
     /// RPC call missing
-    RpcMissing = 6,
+    RpcFail = 6,
     /// Native (ETH)
     ///
     /// block balance changes
@@ -116,7 +116,7 @@ impl Algorithm {
             Algorithm::ChildCalls => "ALGORITHM_CHILD_CALLS",
             Algorithm::RebasingToken => "ALGORITHM_REBASING_TOKEN",
             Algorithm::Rpc => "ALGORITHM_RPC",
-            Algorithm::RpcMissing => "ALGORITHM_RPC_MISSING",
+            Algorithm::RpcFail => "ALGORITHM_RPC_FAIL",
             Algorithm::Block => "ALGORITHM_BLOCK",
             Algorithm::Failed => "ALGORITHM_FAILED",
             Algorithm::Gas => "ALGORITHM_GAS",
@@ -133,7 +133,7 @@ impl Algorithm {
             "ALGORITHM_CHILD_CALLS" => Some(Self::ChildCalls),
             "ALGORITHM_REBASING_TOKEN" => Some(Self::RebasingToken),
             "ALGORITHM_RPC" => Some(Self::Rpc),
-            "ALGORITHM_RPC_MISSING" => Some(Self::RpcMissing),
+            "ALGORITHM_RPC_FAIL" => Some(Self::RpcFail),
             "ALGORITHM_BLOCK" => Some(Self::Block),
             "ALGORITHM_FAILED" => Some(Self::Failed),
             "ALGORITHM_GAS" => Some(Self::Gas),

@@ -98,7 +98,7 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
                     global_sequence: to_global_sequence(&clock, &index),
 
                     // -- debug --
-                    algorithm: Algorithm::Rpc.into(),
+                    algorithm: Algorithm::RpcFail.into(),
                 };
                 fail_rpc += 1;
                 events.balance_changes.push(balance_change);
