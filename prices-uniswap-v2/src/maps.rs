@@ -27,7 +27,7 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                     // -- ordering --
                     ordinal: log.ordinal,
                     index,
-                    global_sequence: to_global_sequence(&clock, &index),
+                    global_sequence: to_global_sequence(&clock, index),
                     // -- sync --
                     reserve0: event.reserve0.to_string(),
                     reserve1: event.reserve1.to_string(),
@@ -43,7 +43,7 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                     // -- ordering --
                     ordinal: log.ordinal,
                     index,
-                    global_sequence: to_global_sequence(&clock, &index),
+                    global_sequence: to_global_sequence(&clock, index),
                     // -- swap --
                     amount0_in: event.amount0_in.to_string(),
                     amount0_out: event.amount0_out.to_string(),
@@ -65,7 +65,7 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                     // -- ordering --
                     ordinal: log.ordinal,
                     index,
-                    global_sequence: to_global_sequence(&clock, &index),
+                    global_sequence: to_global_sequence(&clock, index),
                     // -- pair created --
                     pair: event.pair,
                     token0: event.token0,

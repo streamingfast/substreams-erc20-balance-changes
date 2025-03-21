@@ -26,14 +26,14 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
     Ok(events)
 }
 
-pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log, transfer: &'a TransferAbi, algorithm: Algorithm, index: &u64) -> Transfer {
+pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log, transfer: &'a TransferAbi, algorithm: Algorithm, index: u64) -> Transfer {
     Transfer {
         // -- transaction --
         transaction_id: trx.hash.to_vec(),
 
         // -- ordering --
         ordinal: log.ordinal,
-        index: *index,
+        index,
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
@@ -53,7 +53,7 @@ pub fn to_balance_change<'a>(
     owner: Address,
     storage_change: &'a StorageChange,
     algorithm: Algorithm,
-    index: &u64,
+    index: u64,
 ) -> BalanceChange {
     let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
     let new_balance = BigInt::from_unsigned_bytes_be(&storage_change.new_value);
@@ -64,7 +64,7 @@ pub fn to_balance_change<'a>(
 
         // -- ordering --
         ordinal: storage_change.ordinal,
-        index: *index,
+        index,
         global_sequence: to_global_sequence(clock, index),
 
         // -- balance change --
@@ -97,14 +97,14 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
                 Some(transfer) => transfer,
                 None => continue,
             };
-            events.transfers.push(to_transfer(clock, trx, log, &transfer, Algorithm::Log, &index));
+            events.transfers.push(to_transfer(clock, trx, log, &transfer, Algorithm::Log, index));
             index += 1;
 
             // -- Balance Changes --
             keccak_address_map.extend(addresses_for_storage_keys(call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
             for (owner, storage_change, change_type) in balance_changes {
-                let balance_change = to_balance_change(clock, trx, owner, storage_change, change_type, &index);
+                let balance_change = to_balance_change(clock, trx, owner, storage_change, change_type, index);
                 let key = extend_from_address(&balance_change.contract, &balance_change.owner);
 
                 // overwrite balance change if it already exists
@@ -113,9 +113,6 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             }
         }
     }
-
-    // Reserve capacity for the balance changes to avoid reallocations
-    events.balance_changes.reserve(last_balance_changes.len());
 
     // insert only the last balance change for each contract + owner per block
     events.balance_changes.extend(last_balance_changes.into_values());

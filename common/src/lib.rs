@@ -18,11 +18,11 @@ pub fn clock_to_date(clock: &Clock) -> String {
 // So we typically combine (block_num, index) into a single monotonic integer.
 // For example, if each of block_num and index fits in 32 bits, we can do:
 // max(toUInt64(block_num) * 2^32 + index) AS version
-pub fn to_global_sequence(clock: &Clock, index: &u64) -> u64 {
+pub fn to_global_sequence(clock: &Clock, index: u64) -> u64 {
     (clock.number << 32) + index
 }
 
-pub fn bytes_to_hex(bytes: &Vec<u8>) -> String {
+pub fn bytes_to_hex(bytes: &[u8]) -> String {
     format! {"0x{}", Hex::encode(bytes)}.to_string()
 }
 
