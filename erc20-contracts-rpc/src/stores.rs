@@ -15,7 +15,7 @@ pub fn store_erc20_transfers(block: Block, store: StoreAddBigInt) {
         for (log, call_view) in trx.logs_with_calls() {
             let call = call_view.call;
             if get_erc20_transfer(trx, call, log).is_some() {
-                transfers.insert(log.address.clone());
+                transfers.insert(log.address.to_vec());
             }
         }
     }
