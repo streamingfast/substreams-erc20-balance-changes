@@ -67,6 +67,7 @@ pub struct ContractCreation {
     #[prost(bytes="vec", tag="20")]
     pub address: ::prost::alloc::vec::Vec<u8>,
 }
+/// TO-DO: import from `evem-tokens-balances.proto`
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum Algorithm {
@@ -76,7 +77,7 @@ pub enum Algorithm {
     /// log event
     Log = 1,
     /// RPC call
-    Rpc = 4,
+    Rpc = 5,
 }
 impl Algorithm {
     /// String value of the enum field names used in the ProtoBuf definition.

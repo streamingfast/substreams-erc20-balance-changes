@@ -266,7 +266,7 @@ SELECT * FROM contract_changes;
 
 
 -- prices pairs created --
-CREATE TABLE IF NOT EXISTS pairs_created (
+CREATE TABLE IF NOT EXISTS uniswap_v2_pairs_created (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),
@@ -284,7 +284,7 @@ CREATE TABLE IF NOT EXISTS pairs_created (
    `to`                 FixedString(42),
 
    -- log --
-   address              FixedString(42) COMMENT 'UniswapV2Pair factory address',
+   address              FixedString(42) COMMENT 'UniswapV2Pair factory address', -- log.address
 
    -- pair created --
    token0               FixedString(42) COMMENT 'UniswapV2Pair token0 address',
@@ -305,8 +305,8 @@ ENGINE = ReplacingMergeTree
 PRIMARY KEY (address, pair)
 ORDER BY (address, pair);
 
--- prices sync changes --
-CREATE TABLE IF NOT EXISTS sync_changes  (
+-- Uniswap::V2::Pair:Sync --
+CREATE TABLE IF NOT EXISTS uniswap_v2_sync_changes  (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),
@@ -337,8 +337,8 @@ ENGINE = ReplacingMergeTree
 PRIMARY KEY (date, block_num, ordinal)
 ORDER BY (date, block_num, ordinal);
 
--- prices swaps --
-CREATE TABLE IF NOT EXISTS swaps (
+-- Uniswap::V2::Pair:Swap --
+CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),
@@ -379,8 +379,8 @@ PRIMARY KEY (date, block_num, ordinal)
 ORDER BY (date, block_num, ordinal);
 
 
--- latest Uniswap V2 liquidity pool syncs --
-CREATE TABLE IF NOT EXISTS syncs  (
+-- latest Uniswap::V2::Pair:Sync --
+CREATE TABLE IF NOT EXISTS uniswap_v2_syncs  (
    -- block --
    block_num            UInt32,
    timestamp            DateTime(0, 'UTC'),
@@ -404,6 +404,35 @@ ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (address)
 ORDER BY (address);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS syncs_mv
-TO syncs AS
-SELECT * FROM sync_changes
+CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_syncs_mv
+TO uniswap_v2_syncs AS
+SELECT * FROM uniswap_v2_sync_changes;
+
+-- latest by date Uniswap::V2::Pair:Sync --
+CREATE TABLE IF NOT EXISTS uniswap_v2_syncs_by_date  (
+   -- block --
+   block_num            UInt32,
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
+
+   -- ordering --
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- log --
+   address              FixedString(42),
+
+   -- sync --
+   reserve0             UInt256,
+   reserve1             UInt256,
+
+   -- indexes --
+   INDEX idx_reserve0       (reserve0)         TYPE minmax       GRANULARITY 4,
+   INDEX idx_reserve1       (reserve1)         TYPE minmax       GRANULARITY 4,
+)
+ENGINE = ReplacingMergeTree(global_sequence)
+PRIMARY KEY (address, date)
+ORDER BY (address, date);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_syncs_by_date_mv
+TO uniswap_v2_syncs_by_date AS
+SELECT * FROM uniswap_v2_syncs;

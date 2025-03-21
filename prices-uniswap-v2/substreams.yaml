@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: evm_tokens_prices
+  name: evm_tokens_prices_uniswap_v2
   version: v1.10.0
   url: https://githubcom/pinax-network/substreams-evm-tokens
   description: EVM Token prices
@@ -9,7 +9,7 @@ package:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/prices.wasm
+    file: ../target/wasm32-unknown-unknown/release/prices_uniswap_v2.wasm
 
 protobuf:
   files:

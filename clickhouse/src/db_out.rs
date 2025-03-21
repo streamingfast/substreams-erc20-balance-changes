@@ -49,31 +49,28 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, er
     // -- contract changes --
     for event in erc20_contracts.contract_changes {
         let address = bytes_to_hex(&event.address);
-        let key = [("address", address.to_string()), ("block_num", clock.number.to_string())];
-        set_clock(
-            &clock,
-            tables
-                .create_row("contract_changes", key)
-                // -- transaction --
-                .set("transaction_id", bytes_to_hex(&event.transaction_id))
-                .set("from", bytes_to_hex(&event.from))
-                .set("to", bytes_to_hex(&event.to))
+        let row = create_row_with_common_values(&mut tables, "contract_changes", &clock, &block_num, &date, event.ordinal);
 
-                // -- ordering --
-                .set("ordinal", event.ordinal)
-                .set("index", event.index)
-                .set("global_sequence", event.global_sequence)
+        // -- transaction --
+        row
+            .set("transaction_id", bytes_to_hex(&event.transaction_id))
+            .set("from", bytes_to_hex(&event.from))
+            .set("to", bytes_to_hex(&event.to))
 
-                // -- contract --
-                .set("address", &address)
-                .set("name", &event.name)
-                .set("symbol", &event.symbol)
-                .set("decimals", event.decimals.to_string())
+            // -- ordering --
+            .set("ordinal", event.ordinal)
+            .set("index", event.index)
+            .set("global_sequence", event.global_sequence)
 
-                // -- debug --
-                .set("algorithm", event.algorithm().as_str_name())
-                .set("algorithm_code", event.algorithm.to_string())
-        );
+            // -- contract --
+            .set("address", &address)
+            .set("name", &event.name)
+            .set("symbol", &event.symbol)
+            .set("decimals", event.decimals.to_string())
+
+            // -- debug --
+            .set("algorithm", event.algorithm().as_str_name())
+            .set("algorithm_code", event.algorithm.to_string());
     }
 
     // -- contract creations --
@@ -99,9 +96,9 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, er
         );
     }
 
-    // -- prices swaps --
+    // -- Uniswap V2: prices swaps --
     for event in prices_uniswap_v2.swaps {
-        let row = create_row_with_common_values(&mut tables, "swaps", &clock, &block_num, &date, event.ordinal);
+        let row = create_row_with_common_values(&mut tables, "uniswap_v2_swaps", &clock, &block_num, &date, event.ordinal);
 
         // -- transaction --
         row.set("transaction_id", bytes_to_hex(&event.transaction_id))
@@ -120,9 +117,9 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, er
             .set("to", bytes_to_hex(&event.to));
     }
 
-    // -- prices syncs --
+    // -- Uniswap V2: prices syncs --
     for event in prices_uniswap_v2.syncs {
-        let row = create_row_with_common_values(&mut tables, "sync_changes", &clock, &block_num, &date, event.ordinal);
+        let row = create_row_with_common_values(&mut tables, "uniswap_v2_sync_changes", &clock, &block_num, &date, event.ordinal);
 
         // -- transaction --
         row.set("transaction_id", bytes_to_hex(&event.transaction_id))
@@ -137,13 +134,13 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, er
             .set("reserve1", event.reserve1.to_string());
     }
 
-    // -- prices created pairs --
+    // -- Uniswap V2: prices created pairs --
     for event in prices_uniswap_v2.pairs_created {
-        let key = [("factory", bytes_to_hex(&event.to)), ("pair", bytes_to_hex(&event.pair))];
+        let key = [("address", bytes_to_hex(&event.to)), ("pair", bytes_to_hex(&event.pair))];
         set_clock(
             &clock,
             tables
-                .create_row("pairs_created", key)
+                .create_row("uniswap_v2_pairs_created", key)
                 // -- transaction --
                 .set("transaction_id", bytes_to_hex(&event.transaction_id))
                 .set("from", bytes_to_hex(&event.from)) // trx.from

@@ -735,7 +735,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "prices"
+name = "prices-uniswap-v2"
 version = "0.0.0"
 dependencies = [
  "common",
