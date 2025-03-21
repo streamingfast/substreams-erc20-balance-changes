@@ -14,7 +14,7 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
 }
 
 #[substreams::handlers::map]
-pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, native: Events, erc20_contracts: EventsContracts, prices_uniswap_v2: EventsPrices) -> Result<DatabaseChanges, Error> {
+pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: EventsContracts, native: Events, prices_uniswap_v2: EventsPrices) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
     // Pre-compute frequently used values

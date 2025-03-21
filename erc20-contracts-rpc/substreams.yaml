@@ -1,15 +1,19 @@
 specVersion: v0.1.0
 package:
-  name: evm_tokens_contracts
-  version: v1.8.2
+  name: evm_tokens_erc20_contracts_rpc
+  version: v1.10.0
   url: https://githubcom/pinax-network/substreams-evm-tokens
-  description: EVM Token contracts
+  description: EVM Token contracts via RPC
   image: ../image.png
+
+imports:
+  # using imports to leverage using Substreams caching since store logic has not changed since this release
+  v1_8_2: https://github.com/pinax-network/substreams-evm-tokens/releases/download/v1.8.2/evm-tokens-contracts-v1.8.2.spkg
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/contracts.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc20_contracts.wasm
 
 protobuf:
   files:
@@ -21,6 +25,7 @@ modules:
   - name: map_events
     kind: map
     inputs:
+      - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
       - store: v1_8_2:store_erc20_transfers
         mode: deltas

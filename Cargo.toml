@@ -3,6 +3,7 @@ members = [
   "erc20",
   "erc20-rpc",
   "erc20-contracts",
+  "erc20-contracts-rpc",
   "native",
   "prices-uniswap-v2",
   "proto",
