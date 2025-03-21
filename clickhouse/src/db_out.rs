@@ -1,6 +1,6 @@
 use common::{bytes_to_hex, clock_to_date};
 use proto::pb::evm::tokens::balances::types::v1::{BalanceChange, Events, Transfer};
-use proto::pb::evm::tokens::contracts::types::v1::Events as EventsContracts;
+use proto::pb::evm::tokens::contracts::types::v1::{ContractChange, ContractCreation, Events as EventsContracts};
 use proto::pb::evm::tokens::prices::types::v1::Events as EventsPrices;
 use substreams::{errors::Error, pb::substreams::Clock};
 use substreams_database_change::{pb::database::DatabaseChanges, tables::Row};
@@ -14,7 +14,7 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
 }
 
 #[substreams::handlers::map]
-pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: EventsContracts, native: Events, prices_uniswap_v2: EventsPrices) -> Result<DatabaseChanges, Error> {
+pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: EventsContracts, erc20_contracts_rpc: EventsContracts, native: Events, prices_uniswap_v2: EventsPrices) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
     // Pre-compute frequently used values
@@ -48,52 +48,18 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: E
 
     // -- contract changes --
     for event in erc20_contracts.contract_changes {
-        let address = bytes_to_hex(&event.address);
-        let row = create_row_with_common_values(&mut tables, "contract_changes", &clock, &block_num, &date, event.ordinal);
-
-        // -- transaction --
-        row
-            .set("transaction_id", bytes_to_hex(&event.transaction_id))
-            .set("from", bytes_to_hex(&event.from))
-            .set("to", bytes_to_hex(&event.to))
-
-            // -- ordering --
-            .set("ordinal", event.ordinal)
-            .set("index", event.index)
-            .set("global_sequence", event.global_sequence)
-
-            // -- contract --
-            .set("address", &address)
-            .set("name", &event.name)
-            .set("symbol", &event.symbol)
-            .set("decimals", event.decimals.to_string())
-
-            // -- debug --
-            .set("algorithm", event.algorithm().as_str_name())
-            .set("algorithm_code", event.algorithm.to_string());
+        process_contract_change(&mut tables, &clock, &block_num, &date, event);
+    }
+    for event in erc20_contracts_rpc.contract_changes {
+        process_contract_change(&mut tables, &clock, &block_num, &date, event);
     }
 
     // -- contract creations --
     for event in erc20_contracts.contract_creations {
-        let address = bytes_to_hex(&event.address);
-        let key = [("address", address.to_string())];
-        set_clock(
-            &clock,
-            tables
-                .create_row("contract_creations", key)
-                // -- transaction --
-                .set("transaction_id", bytes_to_hex(&event.transaction_id))
-                .set("from", bytes_to_hex(&event.from))
-                .set("to", bytes_to_hex(&event.to))
-
-                // -- ordering --
-                .set("ordinal", event.ordinal)
-                .set("index", event.index)
-                .set("global_sequence", event.global_sequence)
-
-                // -- contract --
-                .set("address", &address),
-        );
+        process_contract_creation(&mut tables, &clock, event);
+    }
+    for event in erc20_contracts_rpc.contract_creations {
+        process_contract_creation(&mut tables, &clock, event);
     }
 
     // -- Uniswap V2: prices swaps --
@@ -172,7 +138,6 @@ fn create_row_with_common_values<'a>(
 ) -> &'a mut Row {
     let ordinal_str = ordinal.to_string();
     let key = [("date", date.to_string()), ("block_num", block_num.to_string()), ("ordinal", ordinal_str)];
-
     let row = tables.create_row(table_name, key);
     set_clock(clock, row);
     row
@@ -218,4 +183,54 @@ fn process_transfer(tables: &mut substreams_database_change::tables::Tables, clo
         // -- debug --
         .set("algorithm", algorithm)
         .set("algorithm_code", event.algorithm);
+}
+
+// Helper function to process a single contract_changes
+fn process_contract_change(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, block_num: &str, date: &str, event: ContractChange) {
+    let address = bytes_to_hex(&event.address);
+    let row = create_row_with_common_values(tables, "contract_changes", &clock, &block_num, &date, event.ordinal);
+
+    // -- transaction --
+    row
+        .set("transaction_id", bytes_to_hex(&event.transaction_id))
+        .set("from", bytes_to_hex(&event.from))
+        .set("to", bytes_to_hex(&event.to))
+
+        // -- ordering --
+        .set("ordinal", event.ordinal)
+        .set("index", event.index)
+        .set("global_sequence", event.global_sequence)
+
+        // -- contract --
+        .set("address", &address)
+        .set("name", &event.name)
+        .set("symbol", &event.symbol)
+        .set("decimals", event.decimals.to_string())
+
+        // -- debug --
+        .set("algorithm", event.algorithm().as_str_name())
+        .set("algorithm_code", event.algorithm.to_string());
+}
+
+// Helper function to process a single contract_changes
+fn process_contract_creation(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: ContractCreation) {
+    let address = bytes_to_hex(&event.address);
+    let key = [("address", address.to_string())];
+    set_clock(
+        &clock,
+        tables
+            .create_row("contract_creations", key)
+            // -- transaction --
+            .set("transaction_id", bytes_to_hex(&event.transaction_id))
+            .set("from", bytes_to_hex(&event.from))
+            .set("to", bytes_to_hex(&event.to))
+
+            // -- ordering --
+            .set("ordinal", event.ordinal)
+            .set("index", event.index)
+            .set("global_sequence", event.global_sequence)
+
+            // -- contract --
+            .set("address", &address),
+    );
 }
