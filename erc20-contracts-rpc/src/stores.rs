@@ -13,7 +13,7 @@ pub fn store_erc20_transfers(block: Block, store: StoreAddBigInt) {
         .transactions()
         .flat_map(|trx| {
             trx.logs_with_calls()
-                .filter_map(move |(log, call_view)| get_erc20_transfer(trx, call_view.call, log).map(|_| &log.address[..]))
+                .filter_map(move |(log, call_view)| get_erc20_transfer(trx, call_view.call, log).map(|_| log.address.as_ref()))
         })
         .collect();
 
