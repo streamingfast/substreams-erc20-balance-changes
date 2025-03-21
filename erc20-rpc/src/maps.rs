@@ -82,26 +82,26 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
             }
             None => {
                 log::info!(format!("missing balance: contract={} owner={}", common::bytes_to_hex(&contract), common::bytes_to_hex(&owner)));
-                let balance_change = BalanceChange {
-                    // -- transaction --
-                    transaction_id: vec![],
+                // let balance_change = BalanceChange {
+                //     // -- transaction --
+                //     transaction_id: vec![],
 
-                    // -- balance change --
-                    contract,
-                    owner,
-                    old_balance: "".to_string(), // cannot determine old balance from RPC call
-                    new_balance: "".to_string(),
+                //     // -- balance change --
+                //     contract,
+                //     owner,
+                //     old_balance: "".to_string(), // cannot determine old balance from RPC call
+                //     new_balance: "".to_string(),
 
-                    // -- ordering --
-                    ordinal,
-                    index,
-                    global_sequence: to_global_sequence(&clock, &index),
+                //     // -- ordering --
+                //     ordinal,
+                //     index,
+                //     global_sequence: to_global_sequence(&clock, &index),
 
-                    // -- debug --
-                    algorithm: Algorithm::RpcFail.into(),
-                };
+                //     // -- debug --
+                //     algorithm: Algorithm::RpcFail.into(),
+                // };
                 fail_rpc += 1;
-                events.balance_changes.push(balance_change);
+                // events.balance_changes.push(balance_change);
             }
         }
     }
