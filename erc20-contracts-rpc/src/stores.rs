@@ -8,18 +8,16 @@ use substreams_ethereum::pb::eth::v2::Block;
 
 #[substreams::handlers::store]
 pub fn store_erc20_transfers(block: Block, store: StoreAddBigInt) {
-    let mut transfers = HashSet::new();
+    // Find all contracts with transfers
+    let transfers: HashSet<&[u8]> = block
+        .transactions()
+        .flat_map(|trx| {
+            trx.logs_with_calls()
+                .filter_map(move |(log, call_view)| get_erc20_transfer(trx, call_view.call, log).map(|_| &log.address[..]))
+        })
+        .collect();
 
-    // find all ERC-20 transfers in the block
-    for trx in block.transactions() {
-        for (log, call_view) in trx.logs_with_calls() {
-            let call = call_view.call;
-            if get_erc20_transfer(trx, call, log).is_some() {
-                transfers.insert(log.address.to_vec());
-            }
-        }
-    }
-    // increment the count for each new ERC-20 address per block
+    // flag token contracts with transfers in store
     for address in transfers {
         store.add(0, Hex::encode(address), BigInt::one());
     }

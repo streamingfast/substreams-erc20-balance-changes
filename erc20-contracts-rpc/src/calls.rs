@@ -19,9 +19,9 @@ pub fn get_contract_decimals(address: Vec<u8>) -> Option<BigInt> {
         .filter(|decimals| *decimals >= BigInt::from(0) && *decimals <= BigInt::from(255))
 }
 
-pub fn get_contract(address: Vec<u8>) -> Option<(String, String, BigInt)> {
+pub fn get_contract(address: &[u8]) -> Option<(String, String, BigInt)> {
     // exit early if name call fails
-    get_contract_name(address.clone())
-        .and_then(|name| get_contract_symbol(address.clone()).map(|symbol| (name, symbol)))
-        .and_then(|(name, symbol)| get_contract_decimals(address).map(|decimals| (name, symbol, decimals)))
+    get_contract_name(address.into())
+        .and_then(|name| get_contract_symbol(address.into()).map(|symbol| (name, symbol)))
+        .and_then(|(name, symbol)| get_contract_decimals(address.into()).map(|decimals| (name, symbol, decimals)))
 }
