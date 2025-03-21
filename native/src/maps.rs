@@ -25,7 +25,7 @@ pub fn to_balance_change<'a>(
     trx: &'a TransactionTrace,
     balance_change: &'a BalanceChangeAbi,
     algorithm: Algorithm,
-    index: &u64,
+    index: u64,
 ) -> BalanceChange {
     let (old_balance, new_balance) = get_balances(balance_change);
 
@@ -35,7 +35,7 @@ pub fn to_balance_change<'a>(
 
         // -- ordering --
         ordinal: balance_change.ordinal,
-        index: *index,
+        index,
         global_sequence: to_global_sequence(clock, index),
 
         // -- balance change --
@@ -59,14 +59,14 @@ pub struct TransferStruct {
     pub algorithm: Algorithm,
 }
 
-pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: TransferStruct, index: &u64) -> Transfer {
+pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: TransferStruct, index: u64) -> Transfer {
     Transfer {
         // -- transaction --
         transaction_id: trx.hash.to_vec(),
 
         // -- ordering --
         ordinal: transfer.ordinal,
-        index: *index,
+        index,
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
@@ -90,7 +90,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
     for balance_change in &block.balance_changes {
         events
             .balance_changes
-            .push(to_balance_change(clock, &default_trace, balance_change, Algorithm::Block, &index));
+            .push(to_balance_change(clock, &default_trace, balance_change, Algorithm::Block, index));
         index += 1;
     }
 
@@ -99,7 +99,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
         for balance_change in &call.balance_changes {
             events
                 .balance_changes
-                .push(to_balance_change(clock, &default_trace, balance_change, Algorithm::System, &index));
+                .push(to_balance_change(clock, &default_trace, balance_change, Algorithm::System, index));
             index += 1;
         }
     }
@@ -108,13 +108,13 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
     for trx in block.transactions() {
         // find all transfers from transactions
         if let Some(transfer) = get_transfer_from_transaction(trx) {
-            events.transfers.push(to_transfer(clock, trx, transfer, &index));
+            events.transfers.push(to_transfer(clock, trx, transfer, index));
             index += 1;
         }
         // find all transfers from calls
         for call_view in trx.calls() {
             if let Some(transfer) = get_transfer_from_call(call_view.call) {
-                events.transfers.push(to_transfer(clock, trx, transfer, &index));
+                events.transfers.push(to_transfer(clock, trx, transfer, index));
                 index += 1;
             }
         }
@@ -128,7 +128,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
                 let is_failed = is_failed_transaction(trx);
 
                 // failed transactions with gas balance changes are still considered as valid balance changes
-                let algorithm = if is_failed && is_gas_balance_change(balance_change){
+                let algorithm = if is_failed && is_gas_balance_change(balance_change) {
                     Algorithm::Gas
                 // skip failed transactions
                 } else if is_failed {
@@ -139,7 +139,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
                 };
 
                 // balance change
-                events.balance_changes.push(to_balance_change(clock, trx, balance_change, algorithm, &index));
+                events.balance_changes.push(to_balance_change(clock, trx, balance_change, algorithm, index));
                 index += 1;
             }
         }

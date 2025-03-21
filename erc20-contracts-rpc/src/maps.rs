@@ -24,7 +24,7 @@ pub fn map_events(clock: Clock, store_erc20_transfers: Deltas<DeltaBigInt>) -> R
                     ContractChange {
                         // -- ordering --
                         index: idx as u64,
-                        global_sequence: to_global_sequence(&clock, &(idx as u64)),
+                        global_sequence: to_global_sequence(&clock, idx as u64),
 
                         // -- contract --
                         address,

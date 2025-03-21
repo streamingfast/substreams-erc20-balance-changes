@@ -73,7 +73,7 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
                     // -- ordering --
                     ordinal,
                     index,
-                    global_sequence: to_global_sequence(&clock, &index),
+                    global_sequence: to_global_sequence(&clock, index),
 
                     // -- debug --
                     algorithm: Algorithm::Rpc.into(),
@@ -81,7 +81,11 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
                 events.balance_changes.push(balance_change);
             }
             None => {
-                log::info!(format!("missing balance: contract={} owner={}", common::bytes_to_hex(&contract), common::bytes_to_hex(&owner)));
+                log::info!(format!(
+                    "missing balance: contract={} owner={}",
+                    common::bytes_to_hex(&contract),
+                    common::bytes_to_hex(&owner)
+                ));
                 // let balance_change = BalanceChange {
                 //     // -- transaction --
                 //     transaction_id: vec![],
@@ -95,7 +99,7 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
                 //     // -- ordering --
                 //     ordinal,
                 //     index,
-                //     global_sequence: to_global_sequence(&clock, &index),
+                //     global_sequence: to_global_sequence(&clock, index),
 
                 //     // -- debug --
                 //     algorithm: Algorithm::RpcFail.into(),

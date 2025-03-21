@@ -25,7 +25,7 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                 // -- ordering --
                 ordinal: 0,
                 index: idx as u64,
-                global_sequence: to_global_sequence(&clock, &(idx as u64)),
+                global_sequence: to_global_sequence(&clock, idx as u64),
 
                 // -- contract --
                 address: code_change.address.clone(),
