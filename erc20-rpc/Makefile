@@ -13,4 +13,4 @@ parquet:
 
 .PHONY: gui
 gui: build
-	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 21525891
+	substreams gui substreams.yaml map_events -e eth.substreams.pinax.network:443 --network eth -s 21525891 --production-mode
