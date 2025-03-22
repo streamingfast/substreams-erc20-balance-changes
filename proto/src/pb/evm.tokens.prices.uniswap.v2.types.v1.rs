@@ -16,12 +16,6 @@ pub struct PairCreated {
     /// -- transaction --
     #[prost(bytes="vec", tag="1")]
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
-    /// trx.from (creator)
-    #[prost(bytes="vec", tag="2")]
-    pub from: ::prost::alloc::vec::Vec<u8>,
-    /// trx.to
-    #[prost(bytes="vec", tag="3")]
-    pub to: ::prost::alloc::vec::Vec<u8>,
     /// -- log --
     ///
     /// log.address (factory)
@@ -38,7 +32,7 @@ pub struct PairCreated {
     /// latest global sequence (block_num << 32 + index)
     #[prost(uint64, tag="12")]
     pub global_sequence: u64,
-    /// -- pair created --
+    /// -- pool created --
     #[prost(bytes="vec", tag="20")]
     pub token0: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="21")]
@@ -67,8 +61,11 @@ pub struct Sync {
     #[prost(uint64, tag="12")]
     pub global_sequence: u64,
     /// -- sync --
+    ///
+    /// uint112
     #[prost(string, tag="20")]
     pub reserve0: ::prost::alloc::string::String,
+    /// uint112
     #[prost(string, tag="21")]
     pub reserve1: ::prost::alloc::string::String,
 }
@@ -95,12 +92,17 @@ pub struct Swap {
     #[prost(uint64, tag="12")]
     pub global_sequence: u64,
     /// -- swap --
+    ///
+    /// uint256
     #[prost(string, tag="20")]
     pub amount0_in: ::prost::alloc::string::String,
+    /// uint256
     #[prost(string, tag="21")]
     pub amount0_out: ::prost::alloc::string::String,
+    /// uint256
     #[prost(string, tag="22")]
     pub amount1_in: ::prost::alloc::string::String,
+    /// uint256
     #[prost(string, tag="23")]
     pub amount1_out: ::prost::alloc::string::String,
     #[prost(bytes="vec", tag="24")]

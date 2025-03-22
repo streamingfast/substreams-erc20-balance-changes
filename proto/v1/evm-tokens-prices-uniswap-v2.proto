@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package evm.tokens.prices.types.v1;
+package evm.tokens.prices.uniswap.v2.types.v1;
 
 message Events {
   repeated Swap swaps = 1;
@@ -11,8 +11,6 @@ message Events {
 message PairCreated {
   // -- transaction --
   bytes transaction_id = 1;
-  bytes from = 2; // trx.from (creator)
-  bytes to = 3; // trx.to
 
   // -- log --
   bytes address = 5; // log.address (factory)
@@ -22,7 +20,7 @@ message PairCreated {
   uint64 index = 11; // relative index
   uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
-  // -- pair created --
+  // -- pool created --
   bytes token0 = 20;
   bytes token1 = 21;
   bytes pair = 22;
@@ -41,8 +39,8 @@ message Sync {
   uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- sync --
-  string reserve0 = 20;
-  string reserve1 = 21;
+  string reserve0 = 20; // uint112
+  string reserve1 = 21; // uint112
 }
 
 message Swap {
@@ -58,10 +56,10 @@ message Swap {
   uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- swap --
-  string amount0_in = 20;
-  string amount0_out = 21;
-  string amount1_in = 22;
-  string amount1_out = 23;
+  string amount0_in = 20; // uint256
+  string amount0_out = 21; // uint256
+  string amount1_in = 22; // uint256
+  string amount1_out = 23; // uint256
   bytes sender = 24;
   bytes to = 25;
 }

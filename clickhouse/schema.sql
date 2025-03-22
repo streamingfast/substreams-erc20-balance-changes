@@ -280,8 +280,6 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_pairs_created (
 
    -- transaction --
    transaction_id       FixedString(66),
-   `from`               FixedString(42) COMMENT 'UniswapV2Pair creator address',
-   `to`                 FixedString(42),
 
    -- log --
    address              FixedString(42) COMMENT 'UniswapV2Pair factory address', -- log.address
@@ -377,7 +375,6 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (date, block_num, ordinal)
 ORDER BY (date, block_num, ordinal);
-
 
 -- latest Uniswap::V2::Pair:Sync --
 CREATE TABLE IF NOT EXISTS uniswap_v2_syncs  (

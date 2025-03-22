@@ -1,0 +1,346 @@
+syntax = "proto3";
+
+package evm.tokens.prices.uniswap.v3.types.v1;
+
+message Events {
+  repeated Swap swaps = 1;
+  repeated Initialize intializes = 2;
+  repeated PoolCreated pools_created = 3;
+}
+
+/**
+ * In Uniswap v3, the `PoolCreated` event is emitted when a new liquidity pool is deployed by the factory,
+ * providing key parameters for the pool’s configuration; for example, if a pool is established for USDC and USDT
+ * with a fee tier of 3000 (equating to a 0.30% fee) and a tick spacing of 60, the event will log the addresses for
+ * token0 and token1 (USDC and USDT, respectively), the fee of 3000, the tick spacing of 60, and the address of the
+ * newly created pool contract, thereby enabling users and applications to track and interact with the new pool.
+ */
+
+message PoolCreated {
+  // -- transaction --
+  bytes transaction_id = 1;
+
+  // -- log --
+  bytes address = 5; // log.address (factory)
+
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
+
+  // -- pool created --
+  bytes token0 = 20;
+  bytes token1 = 21;
+  bytes pool = 22;
+  int32 tick_spacing = 23; // int24 (e.g., 60)
+  uint64 fee = 24; // uint24 (e.g., 3000 represents 0.30%)
+}
+
+/**
+ * In Uniswap v3, the `initialize` function is a crucial setup step that configures a newly deployed pool
+ * by setting its initial square root price (`sqrtPriceX96`) and corresponding tick value.
+ * After the pool is created via the `PoolCreated` event, calling `initialize` establishes the starting price
+ * and essential parameters, thereby enabling the pool to process swaps and support liquidity provisioning.
+ * Without this initialization, the pool remains unconfigured and cannot operate properly.
+ */
+message Initialize {
+  // -- transaction --
+  bytes transaction_id = 1;
+
+  // -- log --
+  bytes address = 5; // log.address
+
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
+
+  // -- Initialize --
+  string sqrt_price_x96 = 20; // uint160
+  int32 tick = 21; // int24
+}
+
+/**
+ * In Uniswap v3, the `Swap` event is emitted when a trade occurs in a liquidity pool.
+ * It provides key details of the swap, including the address of the sender initiating the swap,
+ * the recipient of the swapped tokens, and the amounts of token0 and token1 involved in the trade.
+ * Additionally, the event logs updated state parameters such as the square root price (`sqrtPriceX96`),
+ * current liquidity, and the tick after the swap, thereby reflecting the pool's state changes.
+ * This event is essential for on-chain tracking of trades, liquidity dynamics, and price updates.
+ *
+ * Price Calculation:
+ * Uniswap V3 represents the current pool price using a square root price value, `sqrtPriceX96`,
+ * stored as a Q64.96 fixed-point number (with 64 bits for the integer part and 96 bits for the fraction).
+ * To compute the actual price of token0 in terms of token1, the value is squared and then divided by 2^192:
+ *
+ *      price = (sqrtPriceX96 * sqrtPriceX96) / 2^192
+ *
+ * Conversely, to determine the price of token1 in terms of token0, take the reciprocal of the computed price.
+ *
+ * This calculation method provides high precision and efficient on-chain computation of price ratios.
+ */
+message Swap {
+  // -- transaction --
+  bytes transaction_id = 1;
+
+  // -- log --
+  bytes address = 5; // log.address
+
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
+
+  // -- swap --
+  bytes sender = 20; // address
+  bytes recipient = 21; // address
+  string amount0 = 22; // int256
+  string amount1 = 23; // int256
+  string sqrt_price_x96 = 24; // uint160
+  string liquidity = 25; // uint128
+  int32 tick = 26; // int24
+}
+
+// Mint
+// [
+//   {
+//     "indexed": false,
+//     "internalType": "address",
+//     "name": "sender",
+//     "type": "address"
+//   },
+//   {
+//     "indexed": true,
+//     "internalType": "address",
+//     "name": "owner",
+//     "type": "address"
+//   },
+//   {
+//     "indexed": true,
+//     "internalType": "int24",
+//     "name": "tickLower",
+//     "type": "int24"
+//   },
+//   {
+//     "indexed": true,
+//     "internalType": "int24",
+//     "name": "tickUpper",
+//     "type": "int24"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint128",
+//     "name": "amount",
+//     "type": "uint128"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint256",
+//     "name": "amount0",
+//     "type": "uint256"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint256",
+//     "name": "amount1",
+//     "type": "uint256"
+//   }
+// ]
+
+
+// SetFeeProtocol
+// [
+//   {
+//     "indexed": false,
+//     "internalType": "uint8",
+//     "name": "feeProtocol0Old",
+//     "type": "uint8"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint8",
+//     "name": "feeProtocol1Old",
+//     "type": "uint8"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint8",
+//     "name": "feeProtocol0New",
+//     "type": "uint8"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint8",
+//     "name": "feeProtocol1New",
+//     "type": "uint8"
+//   }
+// ]
+
+// Burn
+// [
+//   {
+//     "indexed": true,
+//     "internalType": "address",
+//     "name": "owner",
+//     "type": "address"
+//   },
+//   {
+//     "indexed": true,
+//     "internalType": "int24",
+//     "name": "tickLower",
+//     "type": "int24"
+//   },
+//   {
+//     "indexed": true,
+//     "internalType": "int24",
+//     "name": "tickUpper",
+//     "type": "int24"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint128",
+//     "name": "amount",
+//     "type": "uint128"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint256",
+//     "name": "amount0",
+//     "type": "uint256"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint256",
+//     "name": "amount1",
+//     "type": "uint256"
+//   }
+// ]
+
+
+// Collect
+// [
+//   {
+//     "indexed": true,
+//     "internalType": "address",
+//     "name": "owner",
+//     "type": "address"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "address",
+//     "name": "recipient",
+//     "type": "address"
+//   },
+//   {
+//     "indexed": true,
+//     "internalType": "int24",
+//     "name": "tickLower",
+//     "type": "int24"
+//   },
+//   {
+//     "indexed": true,
+//     "internalType": "int24",
+//     "name": "tickUpper",
+//     "type": "int24"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint128",
+//     "name": "amount0",
+//     "type": "uint128"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint128",
+//     "name": "amount1",
+//     "type": "uint128"
+//   }
+// ]
+
+// CollectProtocol
+// [
+//   {
+//     "indexed": true,
+//     "internalType": "address",
+//     "name": "sender",
+//     "type": "address"
+//   },
+//   {
+//     "indexed": true,
+//     "internalType": "address",
+//     "name": "recipient",
+//     "type": "address"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint128",
+//     "name": "amount0",
+//     "type": "uint128"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint128",
+//     "name": "amount1",
+//     "type": "uint128"
+//   }
+// ]
+
+// Flash
+// [
+//   {
+//     "indexed": true,
+//     "internalType": "address",
+//     "name": "sender",
+//     "type": "address"
+//   },
+//   {
+//     "indexed": true,
+//     "internalType": "address",
+//     "name": "recipient",
+//     "type": "address"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint256",
+//     "name": "amount0",
+//     "type": "uint256"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint256",
+//     "name": "amount1",
+//     "type": "uint256"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint256",
+//     "name": "paid0",
+//     "type": "uint256"
+//   },
+//   {
+//     "indexed": false,
+//     "internalType": "uint256",
+//     "name": "paid1",
+//     "type": "uint256"
+//   }
+// ],
+
+
+// {
+//   "anonymous": false,
+//   "inputs": [
+//     {
+//       "indexed": false,
+//       "internalType": "uint16",
+//       "name": "observationCardinalityNextOld",
+//       "type": "uint16"
+//     },
+//     {
+//       "indexed": false,
+//       "internalType": "uint16",
+//       "name": "observationCardinalityNextNew",
+//       "type": "uint16"
+//     }
+//   ],
+//   "name": "IncreaseObservationCardinalityNext",
+//   "type": "event"

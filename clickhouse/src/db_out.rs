@@ -1,7 +1,8 @@
 use common::{bytes_to_hex, clock_to_date};
 use proto::pb::evm::tokens::balances::types::v1::{BalanceChange, Events, Transfer};
 use proto::pb::evm::tokens::contracts::types::v1::{ContractChange, ContractCreation, Events as EventsContracts};
-use proto::pb::evm::tokens::prices::types::v1::Events as EventsPrices;
+use proto::pb::evm::tokens::prices::uniswap::v2::types::v1::Events as EventsPricesUniswapV2;
+use proto::pb::evm::tokens::prices::uniswap::v3::types::v1::Events as EventsPricesUniswapV3;
 use substreams::{errors::Error, pb::substreams::Clock};
 use substreams_database_change::{pb::database::DatabaseChanges, tables::Row};
 
@@ -14,7 +15,7 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
 }
 
 #[substreams::handlers::map]
-pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: EventsContracts, erc20_contracts_rpc: EventsContracts, native: Events, prices_uniswap_v2: EventsPrices) -> Result<DatabaseChanges, Error> {
+pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: EventsContracts, erc20_contracts_rpc: EventsContracts, native: Events, prices_uniswap_v2: EventsPricesUniswapV2, prices_uniswap_v3: EventsPricesUniswapV3) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
 
     // Pre-compute frequently used values
@@ -102,15 +103,13 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: E
 
     // -- Uniswap V2: prices created pairs --
     for event in prices_uniswap_v2.pairs_created {
-        let key = [("address", bytes_to_hex(&event.to)), ("pair", bytes_to_hex(&event.pair))];
+        let key = [("address", bytes_to_hex(&event.address)), ("pair", bytes_to_hex(&event.pair))];
         set_clock(
             &clock,
             tables
                 .create_row("uniswap_v2_pairs_created", key)
                 // -- transaction --
                 .set("transaction_id", bytes_to_hex(&event.transaction_id))
-                .set("from", bytes_to_hex(&event.from)) // trx.from
-                .set("to", bytes_to_hex(&event.to))
                 // -- log --
                 .set("address", bytes_to_hex(&event.address)) // log.address
                 // -- ordering --

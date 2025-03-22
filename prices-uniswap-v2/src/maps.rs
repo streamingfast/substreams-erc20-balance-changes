@@ -1,5 +1,5 @@
 use common::to_global_sequence;
-use proto::pb::evm::tokens::prices::types::v1::{Events, PairCreated, Swap, Sync};
+use proto::pb::evm::tokens::prices::uniswap::v2::types::v1::{Events, PairCreated, Swap, Sync};
 use substreams::errors::Error;
 use substreams::pb::substreams::Clock;
 use substreams_abis::evm::uniswap::v2::factory::events::PairCreated as PairCreatedAbi;
@@ -58,8 +58,6 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                 events.pairs_created.push(PairCreated {
                     // -- transaction --
                     transaction_id: trx.hash.to_vec(),
-                    from: trx.from.to_vec(),
-                    to: trx.to.to_vec(),
                     // -- log --
                     address: log.address.to_vec(),
                     // -- ordering --

@@ -18,6 +18,7 @@ imports:
   erc20_contracts_rpc: ../erc20-contracts/substreams.yaml
   native: ../native/substreams.yaml
   prices_uniswap_v2: ../prices-uniswap-v2/substreams.yaml
+  prices_uniswap_v3: ../prices-uniswap-v3/substreams.yaml
 
 binaries:
   default:
@@ -35,6 +36,7 @@ modules:
       - map: erc20_contracts_rpc:map_events
       - map: native:map_events
       - map: prices_uniswap_v2:map_events
+      - map: prices_uniswap_v3:map_events
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 

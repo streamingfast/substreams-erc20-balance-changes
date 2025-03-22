@@ -20,11 +20,24 @@ pub mod evm {
             }
         }
         pub mod prices {
-            pub mod types {
-                // @@protoc_insertion_point(attribute:evm.tokens.prices.types.v1)
-                pub mod v1 {
-                    include!("evm.tokens.prices.types.v1.rs");
-                    // @@protoc_insertion_point(evm.tokens.prices.types.v1)
+            pub mod uniswap {
+                pub mod v2 {
+                    pub mod types {
+                        // @@protoc_insertion_point(attribute:evm.tokens.prices.uniswap.v2.types.v1)
+                        pub mod v1 {
+                            include!("evm.tokens.prices.uniswap.v2.types.v1.rs");
+                            // @@protoc_insertion_point(evm.tokens.prices.uniswap.v2.types.v1)
+                        }
+                    }
+                }
+                pub mod v3 {
+                    pub mod types {
+                        // @@protoc_insertion_point(attribute:evm.tokens.prices.uniswap.v3.types.v1)
+                        pub mod v1 {
+                            include!("evm.tokens.prices.uniswap.v3.types.v1.rs");
+                            // @@protoc_insertion_point(evm.tokens.prices.uniswap.v3.types.v1)
+                        }
+                    }
                 }
             }
         }
