@@ -76,10 +76,10 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: E
             .set("index", event.index)
             .set("global_sequence", event.global_sequence)
             // -- swaps --
-            .set("amount0_in", event.amount0_in.to_string())
-            .set("amount0_out", event.amount0_out.to_string())
-            .set("amount1_in", event.amount1_in.to_string())
-            .set("amount1_out", event.amount1_out.to_string())
+            .set("amount0_in", event.amount0_in)
+            .set("amount0_out", event.amount0_out)
+            .set("amount1_in", event.amount1_in)
+            .set("amount1_out", event.amount1_out)
             .set("sender", bytes_to_hex(&event.sender))
             .set("to", bytes_to_hex(&event.to));
     }
@@ -136,12 +136,12 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: E
             .set("index", event.index)
             .set("global_sequence", event.global_sequence)
             // -- swaps --
-            .set("amount0", event.amount0.to_string())
-            .set("amount1", event.amount1.to_string())
+            .set("amount0", event.amount0)
+            .set("amount1", event.amount1)
             .set("sender", bytes_to_hex(&event.sender))
             .set("recipient", bytes_to_hex(&event.recipient))
-            .set("liquidity", &event.liquidity.to_string())
-            .set("sqrt_price_x96", &event.sqrt_price_x96.to_string())
+            .set("liquidity", &event.liquidity)
+            .set("sqrt_price_x96", &event.sqrt_price_x96)
             .set("tick", &event.tick.to_string());
     }
 
