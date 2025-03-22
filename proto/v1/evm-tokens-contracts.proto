@@ -22,6 +22,11 @@ message ContractChange {
   bytes from = 6;
   bytes to = 7;
 
+  // -- call --
+  // TO-DO: add caller field
+  // https://github.com/pinax-network/substreams-evm-tokens/issues/17
+  // bytes caller = 8;
+
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
   uint64 index = 11; // relative index

@@ -18,6 +18,11 @@ pub struct ContractChange {
     pub from: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="7")]
     pub to: ::prost::alloc::vec::Vec<u8>,
+    // -- call --
+    // TO-DO: add caller field
+    // <https://github.com/pinax-network/substreams-evm-tokens/issues/17>
+    // bytes caller = 8;
+
     /// -- ordering --
     ///
     /// log.ordinal

@@ -63,7 +63,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: E
         process_contract_creation(&mut tables, &clock, event);
     }
 
-    // -- Uniswap V2: prices swaps --
+    // -- Uniswap V2: swaps --
     for event in prices_uniswap_v2.swaps {
         let row = create_row_with_common_values(&mut tables, "uniswap_v2_swaps", &clock, &block_num, &date, event.ordinal);
 
@@ -84,7 +84,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: E
             .set("to", bytes_to_hex(&event.to));
     }
 
-    // -- Uniswap V2: prices syncs --
+    // -- Uniswap V2: syncs --
     for event in prices_uniswap_v2.syncs {
         let row = create_row_with_common_values(&mut tables, "uniswap_v2_sync_changes", &clock, &block_num, &date, event.ordinal);
 
@@ -101,7 +101,7 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: E
             .set("reserve1", event.reserve1.to_string());
     }
 
-    // -- Uniswap V2: prices created pairs --
+    // -- Uniswap V2: created pairs --
     for event in prices_uniswap_v2.pairs_created {
         let key = [("address", bytes_to_hex(&event.address)), ("pair", bytes_to_hex(&event.pair))];
         set_clock(
@@ -121,6 +121,73 @@ pub fn db_out(clock: Clock, erc20: Events, erc20_rpc: Events, erc20_contracts: E
                 .set("token1", bytes_to_hex(&event.token1))
                 .set("pair", bytes_to_hex(&event.pair)),
         );
+    }
+
+    // -- Uniswap V3: swaps --
+    for event in prices_uniswap_v3.swaps {
+        let row = create_row_with_common_values(&mut tables, "uniswap_v3_swaps", &clock, &block_num, &date, event.ordinal);
+
+        // -- transaction --
+        row.set("transaction_id", bytes_to_hex(&event.transaction_id))
+            // -- log --
+            .set("address", bytes_to_hex(&event.address))
+            // -- ordering --
+            .set("ordinal", event.ordinal)
+            .set("index", event.index)
+            .set("global_sequence", event.global_sequence)
+            // -- swaps --
+            .set("amount0", event.amount0.to_string())
+            .set("amount1", event.amount1.to_string())
+            .set("sender", bytes_to_hex(&event.sender))
+            .set("recipient", bytes_to_hex(&event.recipient))
+            .set("liquidity", &event.liquidity.to_string())
+            .set("sqrt_price_x96", &event.sqrt_price_x96.to_string())
+            .set("tick", &event.tick.to_string());
+    }
+
+    // -- Uniswap V3: initialize --
+    for event in prices_uniswap_v3.intializes {
+        let key = [("address", bytes_to_hex(&event.address))];
+        set_clock(
+            &clock,
+            tables
+                .create_row("uniswap_v3_initializes", key)
+                // -- transaction --
+                .set("transaction_id", bytes_to_hex(&event.transaction_id))
+                // -- log --
+                .set("address", bytes_to_hex(&event.address)) // log.address
+                // -- ordering --
+                .set("ordinal", event.ordinal)
+                .set("index", event.index)
+                .set("global_sequence", event.global_sequence)
+                // -- pair created --
+                .set("sqrt_price_x96", &event.sqrt_price_x96.to_string())
+                .set("tick", &event.tick.to_string())
+            );
+    }
+
+    // -- Uniswap V3: pool created --
+    for event in prices_uniswap_v3.pools_created {
+        let key = [("address", bytes_to_hex(&event.address)), ("pool", bytes_to_hex(&event.pool))];
+        set_clock(
+            &clock,
+            tables
+                .create_row("uniswap_v3_pools_created", key)
+                // -- transaction --
+                .set("transaction_id", bytes_to_hex(&event.transaction_id))
+                // -- log --
+                .set("address", bytes_to_hex(&event.address)) // log.address
+                // -- ordering --
+                .set("ordinal", event.ordinal)
+                .set("index", event.index)
+                .set("global_sequence", event.global_sequence)
+                // -- pair created --
+                .set("token0", bytes_to_hex(&event.token0))
+                .set("token1", bytes_to_hex(&event.token1))
+                .set("pool", bytes_to_hex(&event.pool))
+                .set("tick_spacing", event.tick_spacing.to_string())
+                .set("fee", event.fee.to_string())
+            );
     }
 
     Ok(tables.to_database_changes())
@@ -191,12 +258,12 @@ fn process_contract_change(tables: &mut substreams_database_change::tables::Tabl
 
     // -- transaction --
     row
-        .set("transaction_id", bytes_to_hex(&event.transaction_id))
-        .set("from", bytes_to_hex(&event.from))
-        .set("to", bytes_to_hex(&event.to))
+        // .set("transaction_id", bytes_to_hex(&event.transaction_id))
+        // .set("from", bytes_to_hex(&event.from))
+        // .set("to", bytes_to_hex(&event.to))
 
         // -- ordering --
-        .set("ordinal", event.ordinal)
+        // .set("ordinal", event.ordinal)
         .set("index", event.index)
         .set("global_sequence", event.global_sequence)
 
@@ -204,11 +271,11 @@ fn process_contract_change(tables: &mut substreams_database_change::tables::Tabl
         .set("address", &address)
         .set("name", &event.name)
         .set("symbol", &event.symbol)
-        .set("decimals", event.decimals.to_string())
+        .set("decimals", event.decimals.to_string());
 
-        // -- debug --
-        .set("algorithm", event.algorithm().as_str_name())
-        .set("algorithm_code", event.algorithm.to_string());
+        // // -- debug --
+        // .set("algorithm", event.algorithm().as_str_name())
+        // .set("algorithm_code", event.algorithm.to_string());
 }
 
 // Helper function to process a single contract_changes

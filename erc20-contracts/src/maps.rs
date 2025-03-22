@@ -12,18 +12,22 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
             trx.calls
                 .iter()
                 .filter(|call| call.call_type() == CallType::Create)
-                .flat_map(move |call| call.code_changes.iter().map(move |code_change| (trx, code_change)))
+                .flat_map(move |call| call.code_changes.iter().map(move |code_change| (trx, call, code_change)))
         })
         .enumerate()
-        .map(|(idx, (trx, code_change))| {
+        .map(|(idx, (trx, _call, code_change))| {
             ContractCreation {
                 // -- transaction --
                 transaction_id: trx.hash.clone(),
                 from: trx.from.clone(),
                 to: trx.to.clone(),
 
+                // // -- call --
+                // TO-DO: https://github.com/pinax-network/substreams-evm-tokens/issues/17
+                // caller: call.caller.to_vec(),
+
                 // -- ordering --
-                ordinal: 0,
+                ordinal: code_change.ordinal,
                 index: idx as u64,
                 global_sequence: to_global_sequence(&clock, idx as u64),
 
