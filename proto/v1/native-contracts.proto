@@ -12,11 +12,15 @@ message ContractCreation {
   bytes from = 6;
   bytes to = 7;
 
+  // -- call --
+  bytes caller = 8;
+
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
   uint64 index = 11; // relative index
   uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- contract --
-  bytes address = 20;
+  bytes address = 20; // code_change.address
+  bytes hash = 21;  // code_change.new_hash
 }

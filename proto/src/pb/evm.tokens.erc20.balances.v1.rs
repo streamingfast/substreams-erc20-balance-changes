@@ -8,16 +8,6 @@ pub struct Events {
     #[prost(message, repeated, tag="2")]
     pub balance_changes: ::prost::alloc::vec::Vec<BalanceChange>,
 }
-// enum Algorithm {
-//    ALGORITHM_UNSPECIFIED = 0;
-//    ALGORITHM_LOG = 1; // log event
-//    ALGORITHM_CALL = 2; // call
-//    ALGORITHM_CHILD_CALLS = 3; // child calls
-//    ALGORITHM_REBASING_TOKEN = 4; // which the balances grow over time due to accrued interest
-//    ALGORITHM_RPC = 5; // RPC call
-//    ALGORITHM_RPC_FAIL = 6; // RPC call missing
-// }
-
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BalanceChange {

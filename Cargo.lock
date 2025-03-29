@@ -176,7 +176,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
-name = "erc20"
+name = "erc20-balances"
+version = "0.0.0"
+dependencies = [
+ "common",
+ "proto",
+ "substreams",
+ "substreams-abis",
+ "substreams-ethereum",
+]
+
+[[package]]
+name = "erc20-balances-rpc"
 version = "0.0.0"
 dependencies = [
  "common",
@@ -191,7 +202,7 @@ name = "erc20-contracts"
 version = "0.0.0"
 dependencies = [
  "common",
- "erc20",
+ "erc20-balances",
  "proto",
  "substreams",
  "substreams-abis",
@@ -203,18 +214,7 @@ name = "erc20-contracts-rpc"
 version = "0.0.0"
 dependencies = [
  "common",
- "erc20",
- "proto",
- "substreams",
- "substreams-abis",
- "substreams-ethereum",
-]
-
-[[package]]
-name = "erc20-rpc"
-version = "0.0.0"
-dependencies = [
- "common",
+ "erc20-balances",
  "proto",
  "substreams",
  "substreams-abis",
@@ -578,6 +578,17 @@ dependencies = [
  "common",
  "proto",
  "substreams",
+ "substreams-ethereum",
+]
+
+[[package]]
+name = "native-contracts"
+version = "0.0.0"
+dependencies = [
+ "common",
+ "proto",
+ "substreams",
+ "substreams-abis",
  "substreams-ethereum",
 ]
 

@@ -16,11 +16,9 @@ pub struct ContractChange {
     pub from: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="7")]
     pub to: ::prost::alloc::vec::Vec<u8>,
-    // -- call --
-    // TO-DO: add caller field
-    // <https://github.com/pinax-network/substreams-evm-tokens/issues/17>
-    // bytes caller = 8;
-
+    /// -- call --
+    #[prost(bytes="vec", tag="8")]
+    pub caller: ::prost::alloc::vec::Vec<u8>,
     /// -- ordering --
     ///
     /// log.ordinal
@@ -42,40 +40,7 @@ pub struct ContractChange {
     #[prost(int32, tag="23")]
     pub decimals: i32,
     /// -- debug --
-    #[prost(enumeration="Algorithm", tag="99")]
+    #[prost(enumeration="super::super::super::algorithm::v1::Algorithm", tag="99")]
     pub algorithm: i32,
-}
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum Algorithm {
-    Unspecified = 0,
-    /// ERC-20
-    ///
-    /// log event
-    Log = 1,
-    /// RPC call
-    Rpc = 5,
-}
-impl Algorithm {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            Algorithm::Unspecified => "ALGORITHM_UNSPECIFIED",
-            Algorithm::Log => "ALGORITHM_LOG",
-            Algorithm::Rpc => "ALGORITHM_RPC",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "ALGORITHM_UNSPECIFIED" => Some(Self::Unspecified),
-            "ALGORITHM_LOG" => Some(Self::Log),
-            "ALGORITHM_RPC" => Some(Self::Rpc),
-            _ => None,
-        }
-    }
 }
 // @@protoc_insertion_point(module)

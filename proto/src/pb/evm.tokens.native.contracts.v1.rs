@@ -16,6 +16,9 @@ pub struct ContractCreation {
     pub from: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="7")]
     pub to: ::prost::alloc::vec::Vec<u8>,
+    /// -- call --
+    #[prost(bytes="vec", tag="8")]
+    pub caller: ::prost::alloc::vec::Vec<u8>,
     /// -- ordering --
     ///
     /// log.ordinal
@@ -28,7 +31,12 @@ pub struct ContractCreation {
     #[prost(uint64, tag="12")]
     pub global_sequence: u64,
     /// -- contract --
+    ///
+    /// code_change.address
     #[prost(bytes="vec", tag="20")]
     pub address: ::prost::alloc::vec::Vec<u8>,
+    /// code_change.new_hash
+    #[prost(bytes="vec", tag="21")]
+    pub hash: ::prost::alloc::vec::Vec<u8>,
 }
 // @@protoc_insertion_point(module)

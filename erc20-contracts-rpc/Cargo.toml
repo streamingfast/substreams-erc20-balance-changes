@@ -17,5 +17,5 @@ substreams = { workspace = true }
 substreams-ethereum = { workspace = true }
 substreams-abis = { workspace = true }
 proto = { path = "../proto" }
-erc20 = { path = "../erc20" }
+erc20-balances = { path = "../erc20-balances" }
 common = { path = "../common" }
