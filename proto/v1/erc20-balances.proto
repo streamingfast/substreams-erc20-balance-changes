@@ -1,8 +1,7 @@
 syntax = "proto3";
 
 package evm.tokens.erc20.balances.v1;
-
-import "proto/v1/algorithm.proto";
+import "v1/algorithm.proto";
 
 message Events {
   repeated Transfer transfers = 1;

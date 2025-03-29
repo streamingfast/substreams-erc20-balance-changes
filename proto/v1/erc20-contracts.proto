@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package evm.tokens.erc20.contracts.v1;
-import "proto/v1/algorithm.proto";
+import "v1/algorithm.proto";
 
 message Events {
   repeated ContractChange contract_changes = 1;

@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: evm_tokens_erc20_contracts
+  name: erc20_contracts
   version: v1.11.0
   url: https://githubcom/pinax-network/substreams-evm-tokens
   description: EVM Token contracts
@@ -13,9 +13,10 @@ binaries:
 
 protobuf:
   files:
-    - evm-tokens-contracts.proto
+    - v1/erc20-contracts.proto
+    - v1/algorithm.proto
   importPaths:
-    - ../proto/v1
+    - ../proto
 
 modules:
   - name: map_events
@@ -24,6 +25,6 @@ modules:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.tokens.contracts.types.v1.Events
+      type: proto:evm.tokens.erc20.contracts.v1.Events
 
 network: mainnet

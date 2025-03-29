@@ -13,7 +13,3 @@ build:
 	substreams pack ./native
 	substreams pack ./prices-uniswap-v2
 	substreams pack ./prices-uniswap-v3
-
-.PHONY: protogen
-protogen:
-	buf generate

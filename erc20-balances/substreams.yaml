@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: evm_tokens_erc20
+  name: erc20_balances
   version: v1.11.0
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: ERC20 balance changes & transfers
@@ -9,13 +9,14 @@ package:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/erc20.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc20_balances.wasm
 
 protobuf:
   files:
-    - evm-tokens-balances.proto
+    - v1/algorithm.proto
+    - v1/erc20-balances.proto
   importPaths:
-    - ../proto/v1
+    - ../proto
 
 modules:
   - name: map_events
@@ -25,6 +26,6 @@ modules:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.tokens.balances.types.v1.Events
+      type: proto:evm.tokens.erc20.balances.v1.Events
 
 network: mainnet

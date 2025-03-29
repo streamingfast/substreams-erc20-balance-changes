@@ -7,12 +7,12 @@ package:
   image: ../image.png
 
 imports:
-  erc20: ../erc20/substreams.yaml
+  erc20_balances: ../erc20-balances/substreams.yaml
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/erc20_rpc.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc20_balances_rpc.wasm
 
 # protobuf:
 #   files:
@@ -26,8 +26,8 @@ modules:
     doc: ERC20 balance changes via RPC
     inputs:
       - source: sf.substreams.v1.Clock
-      - map: erc20:map_events
+      - map: erc20_balances:map_events
     output:
-      type: proto:evm.tokens.balances.types.v1.Events
+      type: proto:evm.tokens.erc20.balances.v1.Events
 
 network: mainnet

@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use common::{to_global_sequence, Address};
-use proto::pb::evm::tokens::balances::types::v1::{Algorithm, BalanceChange, Events};
+use proto::pb::evm::tokens::algorithm::v1::Algorithm;
+use proto::pb::evm::tokens::erc20::balances::v1::{BalanceChange, Events};
 use substreams::errors::Error;
 use substreams::log;
 
@@ -82,30 +83,11 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
             }
             None => {
                 log::info!(format!(
-                    "missing balance: contract={} owner={}",
+                    "|missing balance|\ncontract = {}\nowner = {}",
                     common::bytes_to_hex(&contract),
                     common::bytes_to_hex(&owner)
                 ));
-                // let balance_change = BalanceChange {
-                //     // -- transaction --
-                //     transaction_id: vec![],
-
-                //     // -- balance change --
-                //     contract,
-                //     owner,
-                //     old_balance: "".to_string(), // cannot determine old balance from RPC call
-                //     new_balance: "".to_string(),
-
-                //     // -- ordering --
-                //     ordinal,
-                //     index,
-                //     global_sequence: to_global_sequence(&clock, index),
-
-                //     // -- debug --
-                //     algorithm: Algorithm::RpcFail.into(),
-                // };
                 fail_rpc += 1;
-                // events.balance_changes.push(balance_change);
             }
         }
     }

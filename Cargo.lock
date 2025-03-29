@@ -202,7 +202,6 @@ name = "erc20-contracts"
 version = "0.0.0"
 dependencies = [
  "common",
- "erc20-balances",
  "proto",
  "substreams",
  "substreams-abis",

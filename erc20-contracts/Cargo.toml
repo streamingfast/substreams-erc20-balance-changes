@@ -10,12 +10,11 @@ authors = [
 ]
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 substreams = { workspace = true }
 substreams-ethereum = { workspace = true }
 substreams-abis = { workspace = true }
 proto = { path = "../proto" }
-erc20-balances = { path = "../erc20-balances" }
 common = { path = "../common" }
