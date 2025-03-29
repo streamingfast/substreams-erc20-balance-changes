@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_tokens_erc20_contracts
-  version: v1.10.0
+  version: v1.11.0
   url: https://githubcom/pinax-network/substreams-evm-tokens
   description: EVM Token contracts
   image: ../image.png
@@ -9,11 +9,11 @@ package:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/erc20_contracts.wasm
+    file: ../target/wasm32-unknown-unknown/release/native_contracts.wasm
 
 protobuf:
   files:
-    - evm-tokens-contracts.proto
+    - native-contracts.proto
   importPaths:
     - ../proto/v1
 
@@ -24,6 +24,6 @@ modules:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.tokens.contracts.types.v1.Events
+      type: proto:evm.tokens.native.contracts.v1.Events
 
 network: mainnet
