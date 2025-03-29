@@ -1,12 +1,13 @@
 [workspace]
 members = [
-  "erc20",
-  "erc20-rpc",
+  "erc20-balances",
+  "erc20-balances-rpc",
   "erc20-contracts",
   "erc20-contracts-rpc",
-  "native",
-  "prices-uniswap-v2",
-  "prices-uniswap-v3",
+  "native-balances",
+  "native-contracts",
+  "uniswap-v2",
+  "uniswap-v3",
   "proto",
   "common",
   "clickhouse"

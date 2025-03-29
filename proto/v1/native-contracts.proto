@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package evm.tokens.native.contracts.v1;
+
+message Events {
+  repeated ContractCreation contract_creations = 1;
+}
+
+message ContractCreation {
+  // -- transaction --
+  bytes transaction_id = 5;
+  bytes from = 6;
+  bytes to = 7;
+
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
+
+  // -- contract --
+  bytes address = 20;
+}

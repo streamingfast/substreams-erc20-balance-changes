@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package evm.tokens.prices.uniswap.v3.types.v1;
+package evm.tokens.uniswap_v3.v1;
 
 message Events {
   repeated Swap swaps = 1;

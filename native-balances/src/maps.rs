@@ -39,7 +39,6 @@ pub fn to_balance_change<'a>(
         global_sequence: to_global_sequence(clock, index),
 
         // -- balance change --
-        contract: NATIVE_ADDRESS.to_vec(),
         owner: balance_change.address.to_vec(),
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
@@ -70,7 +69,6 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, transfer: Tr
         global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
-        contract: NATIVE_ADDRESS.to_vec(),
         from: transfer.from,
         to: transfer.to,
         value: transfer.value.to_string(),

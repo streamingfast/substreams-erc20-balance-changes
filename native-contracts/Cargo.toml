@@ -1,10 +1,12 @@
 [package]
-name = "erc20-rpc"
+name = "erc20-contracts"
 description = { workspace = true }
 edition = { workspace = true }
 version = { workspace = true }
 authors = [
-    "Denis <denis@pinax.network>"
+    "Denis <denis@pinax.network>",
+    "Etienne Donneger <etienne.d@pinax.network>",
+    "MathieuLefebvre <mathieu@pinax.network>"
 ]
 
 [lib]
@@ -15,4 +17,5 @@ substreams = { workspace = true }
 substreams-ethereum = { workspace = true }
 substreams-abis = { workspace = true }
 proto = { path = "../proto" }
+erc20 = { path = "../erc20" }
 common = { path = "../common" }

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package evm.tokens.erc20.contracts.v1;
+import "proto/v1/algorithm.proto";
+
+message Events {
+  repeated ContractChange contract_changes = 1;
+}
+
+message ContractChange {
+  // -- transaction --
+  bytes transaction_id = 5;
+  bytes from = 6;
+  bytes to = 7;
+
+  // -- call --
+  bytes caller = 8;
+
+  // -- ordering --
+  uint64 ordinal = 10; // log.ordinal
+  uint64 index = 11; // relative index
+  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
+
+  // -- contract --
+  bytes address = 20;
+  string name = 21;
+  string symbol = 22;
+  int32 decimals = 23;
+
+  // -- debug --
+  evm.tokens.algorithm.v1.Algorithm algorithm = 99;
+}

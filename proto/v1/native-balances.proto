@@ -1,29 +1,11 @@
 syntax = "proto3";
 
-package evm.tokens.balances.types.v1;
+package evm.tokens.native.balances.v1;
+import "proto/v1/algorithm.proto";
 
 message Events {
   repeated Transfer transfers = 1;
   repeated BalanceChange balance_changes = 2;
-}
-
-enum Algorithm {
-  ALGORITHM_UNSPECIFIED = 0;
-
-  // ERC-20
-  ALGORITHM_LOG = 1; // log event
-  ALGORITHM_CALL = 2; // call
-  ALGORITHM_CHILD_CALLS = 3; // child calls
-  ALGORITHM_REBASING_TOKEN = 4; // which the balances grow over time due to accrued interest
-  ALGORITHM_RPC = 5; // RPC call
-  ALGORITHM_RPC_FAIL = 6; // RPC call missing
-
-  // Native (ETH)
-  ALGORITHM_BLOCK = 10; // block balance changes
-  ALGORITHM_FAILED = 11; // failed transaction
-  ALGORITHM_GAS = 12; // gas fee consumed
-  ALGORITHM_TRANSACTION = 13; // from transaction
-  ALGORITHM_SYSTEM = 14; // system contract
 }
 
 message BalanceChange {
@@ -36,18 +18,18 @@ message BalanceChange {
   uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- balance change --
-  bytes contract = 20; // storage_change.address
   bytes owner = 21;
   string old_balance = 22;
   string new_balance = 23;
 
   // -- debug --
-  Algorithm algorithm = 99;
+  evm.tokens.algorithm.v1.Algorithm algorithm = 99;
+  string reason = 100; // balance_changes.reason
 }
 
 message Transfer {
   // -- transaction --
-  bytes transaction_id = 5;
+  optional bytes transaction_id = 5;
 
   // -- ordinal --
   uint64 ordinal = 10; // log.ordinal or call.begin_ordinal or trx.begin_ordinal
@@ -55,11 +37,11 @@ message Transfer {
   uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- transfer --
-  bytes contract = 20; // log.address
   bytes from = 21;
   bytes to = 22;
   string value = 23;
 
   // -- debug --
-  Algorithm algorithm = 99;
+  evm.tokens.algorithm.v1.Algorithm algorithm = 99;
+  string reason = 100; // balance_changes.reason
 }
