@@ -10,7 +10,10 @@ message Events {
 
 message BalanceChange {
   // -- transaction --
-  bytes transaction_id = 5;
+  optional bytes transaction_id = 5;
+
+  // -- call --
+  optional bytes caller = 8;
 
   // -- ordering --
   uint64 ordinal = 10; // storage_change.ordinal or balance_change.ordinal
@@ -19,17 +22,21 @@ message BalanceChange {
 
   // -- balance change --
   bytes contract = 20; // storage_change.address
-  bytes owner = 21;
+  bytes address = 21; // keccak_address_map.get(storage_change.key)
   string old_balance = 22;
   string new_balance = 23;
 
   // -- debug --
   evm.tokens.algorithm.v1.Algorithm algorithm = 99;
+  string reason = 100; // balance_change.reason
 }
 
 message Transfer {
   // -- transaction --
-  bytes transaction_id = 5;
+  optional bytes transaction_id = 5;
+
+  // -- call --
+  optional bytes caller = 8;
 
   // -- ordinal --
   uint64 ordinal = 10; // log.ordinal or call.begin_ordinal or trx.begin_ordinal
@@ -44,4 +51,5 @@ message Transfer {
 
   // -- debug --
   evm.tokens.algorithm.v1.Algorithm algorithm = 99;
+  string type = 100; // trx.type
 }

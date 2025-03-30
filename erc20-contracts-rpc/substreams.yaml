@@ -6,6 +6,9 @@ package:
   description: EVM Token contracts via RPC
   image: ../image.png
 
+imports:
+  v1_10: https://github.com/pinax-network/substreams-evm-tokens/releases/download/v1.10.0/evm-tokens-erc20-contracts-rpc-v1.10.0.spkg
+
 binaries:
   default:
     type: wasm/rust-v1
@@ -13,19 +16,20 @@ binaries:
 
 protobuf:
   files:
-    - evm-tokens-contracts.proto
+    - v1/erc20-contracts.proto
+    - v1/algorithm.proto
   importPaths:
-    - ../proto/v1
+    - ../proto
 
 modules:
   - name: map_events
     kind: map
     inputs:
       - source: sf.substreams.v1.Clock
-      - store: store_erc20_transfers
+      - store: v1_10:store_erc20_transfers
         mode: deltas
     output:
-      type: proto:evm.tokens.contracts.types.v1.Events
+      type: proto:evm.tokens.erc20.contracts.v1.Events
 
   - name: store_erc20_transfers
     kind: store

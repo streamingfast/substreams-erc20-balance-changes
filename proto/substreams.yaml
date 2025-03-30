@@ -10,6 +10,9 @@ protobuf:
   files:
     - v1/erc20-balances.proto
     - v1/erc20-contracts.proto
+    - v1/native-contracts.proto
+    - v1/uniswap-v2.proto
+    - v1/uniswap-v3.proto
     - v1/algorithm.proto
   excludePaths:
     - sf/substreams

@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use erc20::algorithms::transfers::get_erc20_transfer;
+use erc20_balances::algorithms::transfers::get_erc20_transfer;
 use substreams::scalar::BigInt;
 use substreams::store::{StoreAdd, StoreAddBigInt, StoreNew};
 use substreams::Hex;

@@ -1,5 +1,6 @@
 use common::to_global_sequence;
-use proto::pb::evm::tokens::contracts::types::v1::{Algorithm, ContractChange, Events};
+use proto::pb::evm::tokens::algorithm::v1::Algorithm;
+use proto::pb::evm::tokens::erc20::contracts::v1::{ContractChange, Events};
 use substreams::pb::substreams::Clock;
 use substreams::store::{DeltaBigInt, Deltas};
 use substreams::{errors::Error, scalar::BigInt, Hex};

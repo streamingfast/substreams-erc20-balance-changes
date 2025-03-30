@@ -12,11 +12,8 @@ pub struct Events {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BalanceChange {
     /// -- transaction --
-    #[prost(bytes="vec", optional, tag="5")]
-    pub transaction_id: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
-    /// -- call --
-    #[prost(bytes="vec", optional, tag="8")]
-    pub caller: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
+    #[prost(bytes="vec", tag="5")]
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
     /// -- ordering --
     ///
     /// storage_change.ordinal or balance_change.ordinal
@@ -29,13 +26,8 @@ pub struct BalanceChange {
     #[prost(uint64, tag="12")]
     pub global_sequence: u64,
     /// -- balance change --
-    ///
-    /// storage_change.address
-    #[prost(bytes="vec", tag="20")]
-    pub contract: ::prost::alloc::vec::Vec<u8>,
-    /// keccak_address_map.get(storage_change.key)
     #[prost(bytes="vec", tag="21")]
-    pub address: ::prost::alloc::vec::Vec<u8>,
+    pub owner: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="22")]
     pub old_balance: ::prost::alloc::string::String,
     #[prost(string, tag="23")]
@@ -43,7 +35,7 @@ pub struct BalanceChange {
     /// -- debug --
     #[prost(enumeration="super::super::super::algorithm::v1::Algorithm", tag="99")]
     pub algorithm: i32,
-    /// balance_change.reason
+    /// balance_changes.reason
     #[prost(string, tag="100")]
     pub reason: ::prost::alloc::string::String,
 }
@@ -53,9 +45,6 @@ pub struct Transfer {
     /// -- transaction --
     #[prost(bytes="vec", optional, tag="5")]
     pub transaction_id: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
-    /// -- call --
-    #[prost(bytes="vec", optional, tag="8")]
-    pub caller: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
     /// -- ordinal --
     ///
     /// log.ordinal or call.begin_ordinal or trx.begin_ordinal
@@ -68,10 +57,6 @@ pub struct Transfer {
     #[prost(uint64, tag="12")]
     pub global_sequence: u64,
     /// -- transfer --
-    ///
-    /// log.address
-    #[prost(bytes="vec", tag="20")]
-    pub contract: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="21")]
     pub from: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="22")]

@@ -1,4 +1,4 @@
-use proto::pb::evm::tokens::balances::types::v1::Algorithm;
+use proto::pb::evm::tokens::algorithm::v1::Algorithm;
 use substreams::scalar::BigInt;
 use substreams_ethereum::pb::eth::v2::{Call, TransactionTrace};
 

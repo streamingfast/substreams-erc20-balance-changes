@@ -24,5 +24,28 @@ pub mod evm {
                 }
             }
         }
+        pub mod native {
+            pub mod contracts {
+                // @@protoc_insertion_point(attribute:evm.tokens.native.contracts.v1)
+                pub mod v1 {
+                    include!("evm.tokens.native.contracts.v1.rs");
+                    // @@protoc_insertion_point(evm.tokens.native.contracts.v1)
+                }
+            }
+        }
+        pub mod uniswap_v2 {
+            // @@protoc_insertion_point(attribute:evm.tokens.uniswap_v2.v1)
+            pub mod v1 {
+                include!("evm.tokens.uniswap_v2.v1.rs");
+                // @@protoc_insertion_point(evm.tokens.uniswap_v2.v1)
+            }
+        }
+        pub mod uniswap_v3 {
+            // @@protoc_insertion_point(attribute:evm.tokens.uniswap_v3.v1)
+            pub mod v1 {
+                include!("evm.tokens.uniswap_v3.v1.rs");
+                // @@protoc_insertion_point(evm.tokens.uniswap_v3.v1)
+            }
+        }
     }
 }

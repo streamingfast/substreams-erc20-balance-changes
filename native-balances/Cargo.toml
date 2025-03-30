@@ -1,5 +1,5 @@
 [package]
-name = "native"
+name = "native_balances"
 description = { workspace = true }
 edition = { workspace = true }
 version = { workspace = true }

@@ -33,3 +33,11 @@ pub fn extend_from_address(address1: &Address, address2: &Address) -> Vec<u8> {
     key.extend_from_slice(&address2);
     key
 }
+
+pub fn to_optional_vector(vec: &Vec<u8>) -> Option<Vec<u8>> {
+    if vec.len() > 0 {
+        Some(vec.to_vec())
+    } else {
+        None
+    }
+}
