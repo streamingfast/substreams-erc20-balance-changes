@@ -15,5 +15,8 @@ enum Algorithm {
     ALGORITHM_FAILED = 11; // failed transaction
     ALGORITHM_GAS = 12; // gas fee consumed
     ALGORITHM_TRANSACTION = 13; // from transaction
-    ALGORITHM_SYSTEM = 14; // system contract
+    ALGORITHM_TRANSACTION_FEE = 14; // from transaction fee
+    ALGORITHM_TRANSACTION_FEE_BURN = 15; // from transaction fee burned EIP-1559
+    ALGORITHM_TRANSACTION_FEE_PRIORITY_FEE = 16; // from transaction fee tip EIP-1559
+    ALGORITHM_SYSTEM = 20; // system contract
 }

@@ -1,12 +1,13 @@
-use common::{to_global_sequence, to_optional_vector, Address, NATIVE_ADDRESS};
+use common::{bytes_to_hex, to_global_sequence, to_optional_vector, Address, NATIVE_ADDRESS};
 use proto::pb::evm::tokens::algorithm::v1::Algorithm;
 use proto::pb::evm::tokens::erc20::balances::v1::{BalanceChange, Events, Transfer};
+use substreams::log;
 use substreams::{errors::Error, scalar::BigInt};
 
 use substreams::pb::substreams::Clock;
 use substreams_ethereum::pb::eth::v2::{BalanceChange as BalanceChangeAbi, Block, Call, TransactionTrace};
 
-use crate::algorithms::transfers::{get_transfer_from_call, get_transfer_from_transaction};
+use crate::algorithms::transfers::{get_transfer_from_call, get_transfer_from_transaction, get_transfer_from_transaction_fee};
 use crate::utils::{get_balances, is_failed_transaction, is_gas_balance_change};
 
 #[substreams::handlers::map]
@@ -51,7 +52,8 @@ pub fn to_balance_change<'a>(
 
         // -- debug --
         algorithm: algorithm.into(),
-        reason: balance_change.reason().as_str_name().to_string()
+        reason: balance_change.reason().as_str_name().to_string(),
+        r#type: trx.r#type().as_str_name().to_string(),
     }
 }
 
@@ -115,8 +117,27 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
         }
     }
 
+    // to compute the burned portion of transaction fee
+    let header = block.header.clone().expect("header is required");
+    let base_fee_per_gas = match header.base_fee_per_gas {
+        Some(base_fee_per_gas) => BigInt::from_unsigned_bytes_be(&base_fee_per_gas.bytes),
+        None => BigInt::zero(),
+    };
+
     // iterate over successful transactions
     for trx in block.transactions() {
+        let gas_price = BigInt::from_unsigned_bytes_be(&trx.gas_price.clone().expect("gas price is None").bytes);
+        let gas_used = BigInt::from(trx.gas_used);
+        let transaction_fee = gas_price * gas_used;
+        log::info!("transaction: {} trx.type: {}", bytes_to_hex(&trx.hash), trx.r#type().as_str_name());
+        log::info!("gas_used: {} gas_price {:?}", trx.gas_used, trx.gas_price);
+        log::info!("transaction_fee {}", transaction_fee);
+
+        // transaction fee
+        for transfer in get_transfer_from_transaction_fee(trx, &base_fee_per_gas, &header.coinbase) {
+            events.transfers.push(to_transfer(clock, trx, &default_call, transfer, index));
+            index += 1;
+        }
         // find all transfers from transactions
         if let Some(transfer) = get_transfer_from_transaction(trx) {
             events.transfers.push(to_transfer(clock, trx, &default_call, transfer, index));

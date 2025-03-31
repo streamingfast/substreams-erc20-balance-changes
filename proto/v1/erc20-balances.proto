@@ -27,8 +27,9 @@ message BalanceChange {
   string new_balance = 23;
 
   // -- debug --
-  evm.tokens.algorithm.v1.Algorithm algorithm = 99;
-  string reason = 100; // balance_change.reason
+  evm.tokens.algorithm.v1.Algorithm algorithm = 100;
+  string type = 101; // trx.type
+  string reason = 102; // balance_change.reason
 }
 
 message Transfer {
@@ -50,6 +51,6 @@ message Transfer {
   string value = 23;
 
   // -- debug --
-  evm.tokens.algorithm.v1.Algorithm algorithm = 99;
-  string type = 100; // trx.type
+  evm.tokens.algorithm.v1.Algorithm algorithm = 100;
+  string type = 101; // trx.type
 }

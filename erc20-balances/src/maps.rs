@@ -29,7 +29,10 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
 pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log, transfer: &'a TransferAbi, algorithm: Algorithm, index: u64) -> Transfer {
     Transfer {
         // -- transaction --
-        transaction_id: trx.hash.to_vec(),
+        transaction_id: Some(trx.hash.to_vec()),
+
+        // -- call --
+        caller: Some(vec![]),
 
         // -- ordering --
         ordinal: log.ordinal,
@@ -44,13 +47,14 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log
 
         // -- debug --
         algorithm: algorithm.into(),
+        reason: trx.r#type().as_str_name().to_string(),
     }
 }
 
 pub fn to_balance_change<'a>(
     clock: &Clock,
     trx: &'a TransactionTrace,
-    owner: Address,
+    address: Address,
     storage_change: &'a StorageChange,
     algorithm: Algorithm,
     index: u64,
@@ -60,7 +64,10 @@ pub fn to_balance_change<'a>(
 
     BalanceChange {
         // -- transaction
-        transaction_id: trx.hash.to_vec(),
+        transaction_id: Some(trx.hash.to_vec()),
+
+        // -- call --
+        caller: Some(vec![]),
 
         // -- ordering --
         ordinal: storage_change.ordinal,
@@ -69,12 +76,13 @@ pub fn to_balance_change<'a>(
 
         // -- balance change --
         contract: storage_change.address.to_vec(),
-        owner,
+        address,
         old_balance: old_balance.to_string(),
         new_balance: new_balance.to_string(),
 
         // -- debug --
         algorithm: algorithm.into(),
+        reason: trx.r#type().as_str_name().to_string(),
     }
 }
 
@@ -103,8 +111,8 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             // -- Balance Changes --
             keccak_address_map.extend(addresses_for_storage_keys(call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
-            for (owner, storage_change, change_type) in balance_changes {
-                let balance_change = to_balance_change(clock, trx, owner, storage_change, change_type, index);
+            for (address, storage_change, change_type) in balance_changes {
+                let balance_change = to_balance_change(clock, trx, address, storage_change, change_type, index);
                 let key = extend_from_address(&balance_change.contract, &balance_change.owner);
 
                 // overwrite balance change if it already exists

@@ -24,8 +24,14 @@ pub enum Algorithm {
     Gas = 12,
     /// from transaction
     Transaction = 13,
+    /// from transaction fee
+    TransactionFee = 14,
+    /// from transaction fee burned EIP-1559
+    TransactionFeeBurn = 15,
+    /// from transaction fee tip EIP-1559
+    TransactionFeePriorityFee = 16,
     /// system contract
-    System = 14,
+    System = 20,
 }
 impl Algorithm {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -45,6 +51,9 @@ impl Algorithm {
             Algorithm::Failed => "ALGORITHM_FAILED",
             Algorithm::Gas => "ALGORITHM_GAS",
             Algorithm::Transaction => "ALGORITHM_TRANSACTION",
+            Algorithm::TransactionFee => "ALGORITHM_TRANSACTION_FEE",
+            Algorithm::TransactionFeeBurn => "ALGORITHM_TRANSACTION_FEE_BURN",
+            Algorithm::TransactionFeePriorityFee => "ALGORITHM_TRANSACTION_FEE_PRIORITY_FEE",
             Algorithm::System => "ALGORITHM_SYSTEM",
         }
     }
@@ -62,6 +71,9 @@ impl Algorithm {
             "ALGORITHM_FAILED" => Some(Self::Failed),
             "ALGORITHM_GAS" => Some(Self::Gas),
             "ALGORITHM_TRANSACTION" => Some(Self::Transaction),
+            "ALGORITHM_TRANSACTION_FEE" => Some(Self::TransactionFee),
+            "ALGORITHM_TRANSACTION_FEE_BURN" => Some(Self::TransactionFeeBurn),
+            "ALGORITHM_TRANSACTION_FEE_PRIORITY_FEE" => Some(Self::TransactionFeePriorityFee),
             "ALGORITHM_SYSTEM" => Some(Self::System),
             _ => None,
         }

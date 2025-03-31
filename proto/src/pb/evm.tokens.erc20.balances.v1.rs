@@ -41,10 +41,13 @@ pub struct BalanceChange {
     #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
     /// -- debug --
-    #[prost(enumeration="super::super::super::algorithm::v1::Algorithm", tag="99")]
+    #[prost(enumeration="super::super::super::algorithm::v1::Algorithm", tag="100")]
     pub algorithm: i32,
+    /// trx.type
+    #[prost(string, tag="101")]
+    pub r#type: ::prost::alloc::string::String,
     /// balance_change.reason
-    #[prost(string, tag="100")]
+    #[prost(string, tag="102")]
     pub reason: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -79,10 +82,10 @@ pub struct Transfer {
     #[prost(string, tag="23")]
     pub value: ::prost::alloc::string::String,
     /// -- debug --
-    #[prost(enumeration="super::super::super::algorithm::v1::Algorithm", tag="99")]
+    #[prost(enumeration="super::super::super::algorithm::v1::Algorithm", tag="100")]
     pub algorithm: i32,
     /// trx.type
-    #[prost(string, tag="100")]
+    #[prost(string, tag="101")]
     pub r#type: ::prost::alloc::string::String,
 }
 // @@protoc_insertion_point(module)
