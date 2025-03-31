@@ -36,12 +36,15 @@ pub fn get_transfer_from_call(call: &Call) -> Option<TransferStruct> {
     if value.le(&BigInt::zero()) {
         return None;
     }
-    log::info!(
-        "get_transfer_from_call: {} {} {}",
-        call.parent_index,
-        call.index,
-        value
-    );
+    // TO-DO: Validate this assumption
+    // Test: contract calls
+    // https://etherscan.io/tx/0xe28a0ad59830ada1e96b1274e9f1aa9d5aa8bcf34bfe25271968962a7dbad803#internal
+    // Test: single ETH transfer
+    // https://etherscan.io/tx/0xdc2cd99c61de744a502fed484d73468c2f60cb2ad8dfc9e891886e9c619302ef
+    if call.depth == 0 {
+        // It's the top-level call
+        return None;
+    }
 
     Some(TransferStruct {
         from: call.caller.to_vec(),

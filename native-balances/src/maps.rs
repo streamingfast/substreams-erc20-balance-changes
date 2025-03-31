@@ -126,13 +126,6 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
 
     // iterate over successful transactions
     for trx in block.transactions() {
-        let gas_price = BigInt::from_unsigned_bytes_be(&trx.gas_price.clone().expect("gas price is None").bytes);
-        let gas_used = BigInt::from(trx.gas_used);
-        let transaction_fee = gas_price * gas_used;
-        log::info!("transaction: {} trx.type: {}", bytes_to_hex(&trx.hash), trx.r#type().as_str_name());
-        log::info!("gas_used: {} gas_price {:?}", trx.gas_used, trx.gas_price);
-        log::info!("transaction_fee {}", transaction_fee);
-
         // transaction fee
         for transfer in get_transfer_from_transaction_fee(trx, &base_fee_per_gas, &header.coinbase) {
             events.transfers.push(to_transfer(clock, trx, &default_call, transfer, index));
