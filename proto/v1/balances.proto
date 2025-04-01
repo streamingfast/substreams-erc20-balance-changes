@@ -44,14 +44,14 @@ message BalanceChange {
   // -- balance change --
   bytes contract = 20; // storage_change.address
   bytes address = 21; // keccak_address_map.get(storage_change.key)
-  string old_balance = 22;
+  optional string old_balance = 22;
   string new_balance = 23;
 
   // -- debug --
   Algorithm algorithm = 100;
-  sf.ethereum.type.v2.TransactionTrace.Type trx_type = 101; // trx.type
-  sf.ethereum.type.v2.CallType call_type = 102; // call.call_type
-  sf.ethereum.type.v2.BalanceChange.Reason reason = 103; // balance_change.reason
+  optional sf.ethereum.type.v2.TransactionTrace.Type trx_type = 101; // trx.type
+  optional sf.ethereum.type.v2.CallType call_type = 102; // call.call_type
+  optional sf.ethereum.type.v2.BalanceChange.Reason reason = 103; // balance_change.reason
 }
 
 message Transfer {

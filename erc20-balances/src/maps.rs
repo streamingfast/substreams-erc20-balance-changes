@@ -5,7 +5,7 @@ use crate::algorithms::algorithm2_child_calls::get_all_child_call_storage_change
 use crate::algorithms::transfers::get_erc20_transfer;
 use crate::algorithms::utils::addresses_for_storage_keys;
 use common::{extend_from_address, to_global_sequence, Address, Hash};
-use proto::pb::evm::tokens::{algorithm::v1::Algorithm, erc20::balances::v1::{BalanceChange, Events, Transfer}};
+use proto::pb::evm::tokens::balances::v1::{BalanceChange, Events, Transfer, Algorithm};
 use substreams::errors::Error;
 use substreams::log;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
@@ -26,13 +26,13 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
     Ok(events)
 }
 
-pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log, transfer: &'a TransferAbi, algorithm: Algorithm, index: u64) -> Transfer {
+pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Call, log: &'a Log, transfer: &'a TransferAbi, algorithm: Algorithm, index: u64) -> Transfer {
     Transfer {
         // -- transaction --
         transaction_id: Some(trx.hash.to_vec()),
 
         // -- call --
-        caller: Some(vec![]),
+        caller: Some(call.caller.to_vec()),
 
         // -- ordering --
         ordinal: log.ordinal,
@@ -47,13 +47,15 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, log: &'a Log
 
         // -- debug --
         algorithm: algorithm.into(),
-        reason: trx.r#type().as_str_name().to_string(),
+        trx_type: trx.r#type,
+        call_type: 0,
     }
 }
 
 pub fn to_balance_change<'a>(
     clock: &Clock,
     trx: &'a TransactionTrace,
+    call: &'a Call,
     address: Address,
     storage_change: &'a StorageChange,
     algorithm: Algorithm,
@@ -67,7 +69,7 @@ pub fn to_balance_change<'a>(
         transaction_id: Some(trx.hash.to_vec()),
 
         // -- call --
-        caller: Some(vec![]),
+        caller: Some(call.caller.to_vec()),
 
         // -- ordering --
         ordinal: storage_change.ordinal,
@@ -77,12 +79,14 @@ pub fn to_balance_change<'a>(
         // -- balance change --
         contract: storage_change.address.to_vec(),
         address,
-        old_balance: old_balance.to_string(),
+        old_balance: Some(old_balance.to_string()),
         new_balance: new_balance.to_string(),
 
         // -- debug --
         algorithm: algorithm.into(),
-        reason: trx.r#type().as_str_name().to_string(),
+        trx_type: Some(trx.r#type),
+        call_type: Some(call.call_type),
+        reason: None,
     }
 }
 
@@ -105,15 +109,15 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
                 Some(transfer) => transfer,
                 None => continue,
             };
-            events.transfers.push(to_transfer(clock, trx, log, &transfer, Algorithm::Log, index));
+            events.transfers.push(to_transfer(clock, trx, call, log, &transfer, Algorithm::Log, index));
             index += 1;
 
             // -- Balance Changes --
             keccak_address_map.extend(addresses_for_storage_keys(call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
             for (address, storage_change, change_type) in balance_changes {
-                let balance_change = to_balance_change(clock, trx, address, storage_change, change_type, index);
-                let key = extend_from_address(&balance_change.contract, &balance_change.owner);
+                let balance_change = to_balance_change(clock, trx, call, address, storage_change, change_type, index);
+                let key = extend_from_address(&balance_change.contract, &balance_change.address);
 
                 // overwrite balance change if it already exists
                 last_balance_changes.insert(key, balance_change);

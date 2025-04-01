@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use common::{to_global_sequence, Address};
-use proto::pb::evm::tokens::algorithm::v1::Algorithm;
-use proto::pb::evm::tokens::erc20::balances::v1::{BalanceChange, Events};
+use proto::pb::evm::tokens::balances::v1::{BalanceChange, Events, Algorithm};
 use substreams::errors::Error;
 use substreams::log;
 
@@ -24,7 +23,7 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
     for balance_changes in &erc20.balance_changes {
         index = index.max(balance_changes.index); // highest index
         ordinal = ordinal.max(balance_changes.ordinal); // highest ordinal
-        existing_balances.insert(balance_changes.contract.to_vec(), balance_changes.owner.to_vec());
+        existing_balances.insert(balance_changes.contract.to_vec(), balance_changes.address.to_vec());
     }
 
     // find all missing balances based on transfer events
@@ -52,23 +51,26 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
     // ignore NULL address
     let mut missing = 0;
     let mut fail_rpc = 0;
-    for (contract, owner) in missing_balances {
-        if owner == common::NULL_ADDRESS.to_vec() {
+    for (contract, address) in missing_balances {
+        if address == common::NULL_ADDRESS.to_vec() {
             continue;
         }
         missing += 1;
         index += 1;
         ordinal += 1; // RPC calls are not ordered, but starting from max ordinal, allows to keep track of the order
-        match get_balance_of(contract.to_vec(), owner.to_vec()) {
+        match get_balance_of(contract.to_vec(), address.to_vec()) {
             Some(balance) => {
                 let balance_change = BalanceChange {
                     // -- transaction --
-                    transaction_id: vec![],
+                    transaction_id: None,
+
+                    // -- call --
+                    caller: None,
 
                     // -- balance change --
                     contract,
-                    owner,
-                    old_balance: "".to_string(), // cannot determine old balance from RPC call
+                    address,
+                    old_balance: None,
                     new_balance: balance.to_string(),
 
                     // -- ordering --
@@ -78,6 +80,9 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
 
                     // -- debug --
                     algorithm: Algorithm::Rpc.into(),
+                    reason: None,
+                    trx_type: None,
+                    call_type: None,
                 };
                 events.balance_changes.push(balance_change);
             }
@@ -85,7 +90,7 @@ pub fn map_events(clock: Clock, erc20: Events) -> Result<Events, Error> {
                 log::info!(format!(
                     "|missing balance|\ncontract = {}\nowner = {}",
                     common::bytes_to_hex(&contract),
-                    common::bytes_to_hex(&owner)
+                    common::bytes_to_hex(&address)
                 ));
                 fail_rpc += 1;
             }

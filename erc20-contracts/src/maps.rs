@@ -1,5 +1,4 @@
 use common::to_global_sequence;
-use proto::pb::evm::tokens::algorithm::v1::Algorithm;
 use proto::pb::evm::tokens::erc20::contracts::v1::{Events, ContractChange};
 use substreams::errors::Error;
 use substreams::pb::substreams::Clock;
@@ -37,8 +36,6 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                         name,
                         symbol: "".to_string(),
                         decimals: 0,
-                        // -- debug --
-                        algorithm: Algorithm::Call.into(),
                     });
                     index += 1;
                 }
@@ -66,8 +63,6 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                         name: "".to_string(),
                         symbol,
                         decimals: 0,
-                        // -- debug --
-                        algorithm: Algorithm::Call.into(),
                     });
                     index += 1;
                 }

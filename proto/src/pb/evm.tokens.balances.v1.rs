@@ -36,22 +36,22 @@ pub struct BalanceChange {
     /// keccak_address_map.get(storage_change.key)
     #[prost(bytes="vec", tag="21")]
     pub address: ::prost::alloc::vec::Vec<u8>,
-    #[prost(string, tag="22")]
-    pub old_balance: ::prost::alloc::string::String,
+    #[prost(string, optional, tag="22")]
+    pub old_balance: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(string, tag="23")]
     pub new_balance: ::prost::alloc::string::String,
     /// -- debug --
     #[prost(enumeration="Algorithm", tag="100")]
     pub algorithm: i32,
     /// trx.type
-    #[prost(enumeration="super::super::super::super::sf::ethereum::r#type::v2::transaction_trace::Type", tag="101")]
-    pub trx_type: i32,
+    #[prost(enumeration="super::super::super::super::sf::ethereum::r#type::v2::transaction_trace::Type", optional, tag="101")]
+    pub trx_type: ::core::option::Option<i32>,
     /// call.call_type
-    #[prost(enumeration="super::super::super::super::sf::ethereum::r#type::v2::CallType", tag="102")]
-    pub call_type: i32,
+    #[prost(enumeration="super::super::super::super::sf::ethereum::r#type::v2::CallType", optional, tag="102")]
+    pub call_type: ::core::option::Option<i32>,
     /// balance_change.reason
-    #[prost(enumeration="super::super::super::super::sf::ethereum::r#type::v2::balance_change::Reason", tag="103")]
-    pub reason: i32,
+    #[prost(enumeration="super::super::super::super::sf::ethereum::r#type::v2::balance_change::Reason", optional, tag="103")]
+    pub reason: ::core::option::Option<i32>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

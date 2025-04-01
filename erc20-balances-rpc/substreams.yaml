@@ -14,12 +14,6 @@ binaries:
     type: wasm/rust-v1
     file: ../target/wasm32-unknown-unknown/release/erc20_balances_rpc.wasm
 
-# protobuf:
-#   files:
-#     - evm-tokens-balances.proto
-#   importPaths:
-#     - ../proto/v1
-
 modules:
   - name: map_events
     kind: map
@@ -28,6 +22,6 @@ modules:
       - source: sf.substreams.v1.Clock
       - map: erc20_balances:map_events
     output:
-      type: proto:evm.tokens.erc20.balances.v1.Events
+      type: proto:evm.tokens.balances.v1.Events
 
 network: mainnet
