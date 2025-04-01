@@ -2,9 +2,9 @@ use common::to_global_sequence;
 use proto::pb::evm::tokens::erc20::contracts::v1::{Events, ContractChange};
 use substreams::errors::Error;
 use substreams::pb::substreams::Clock;
-use substreams_abis::evm::token::erc20_name_symbol;
 use substreams_ethereum::pb::eth::v2::Block;
-use substreams_ethereum::Function;
+
+use crate::metadata::get_metadata;
 
 #[substreams::handlers::map]
 pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
@@ -15,58 +15,29 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
         for call_view in trx.calls() {
             let call = call_view.call;
 
-            // setName
-            match erc20_name_symbol::functions::SetName::match_and_decode(call) {
-                Some(func) => {
-                    let name = func.name;
+            match get_metadata(call) {
+                Some(result) => {
                     events.contract_changes.push(ContractChange {
                         // -- transaction --
-                        transaction_id: trx.hash.to_vec(),
-                        from: trx.from.to_vec(),
-                        to: trx.to.to_vec(),
-                        caller: call.caller.to_vec(),
+                        transaction_id: Some(trx.hash.to_vec()),
+
+                        // -- call --
+                        caller: Some(call.caller.to_vec()),
 
                         // -- ordering --
-                        ordinal: call.begin_ordinal,
+                        ordinal: Some(call.begin_ordinal),
                         index,
                         global_sequence: to_global_sequence(&clock, call.index.into()),
 
                         // -- contract --
                         address: call.address.to_vec(),
-                        name,
-                        symbol: "".to_string(),
-                        decimals: 0,
+                        name: result.name,
+                        symbol: result.symbol,
+                        decimals: result.decimals,
                     });
                     index += 1;
                 }
-                None => {}
-            }
-
-            // setSymbol
-            match erc20_name_symbol::functions::SetSymbol::match_and_decode(call) {
-                Some(func) => {
-                    let symbol = func.symbol;
-                    events.contract_changes.push(ContractChange {
-                        // -- transaction --
-                        transaction_id: trx.hash.to_vec(),
-                        from: trx.from.to_vec(),
-                        to: trx.to.to_vec(),
-                        caller: call.caller.to_vec(),
-
-                        // -- ordering --
-                        ordinal: call.begin_ordinal,
-                        index,
-                        global_sequence: to_global_sequence(&clock, call.index.into()),
-
-                        // -- contract --
-                        address: call.address.to_vec(),
-                        name: "".to_string(),
-                        symbol,
-                        decimals: 0,
-                    });
-                    index += 1;
-                }
-                None => {}
+                _ => {}
             }
         }
     }

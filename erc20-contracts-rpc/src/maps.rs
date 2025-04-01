@@ -13,7 +13,7 @@ pub fn map_events(clock: Clock, store_erc20_transfers: Deltas<DeltaBigInt>) -> R
         .into_iter()
         .enumerate()
         .filter_map(|(idx, delta)| {
-            // Extract Token Metadata on first valid ERC20 transfer event
+            // Extract Token Metadata only on first valid ERC20 transfer event
             if delta.new_value != BigInt::one() {
                 return None;
             }
@@ -23,6 +23,9 @@ pub fn map_events(clock: Clock, store_erc20_transfers: Deltas<DeltaBigInt>) -> R
                 calls::get_contract(&address).map(|(name, symbol, decimals)| {
                     ContractChange {
                         transaction_id: None,
+
+                        // -- call --
+                        caller: None,
 
                         // -- ordering --
                         ordinal: None,

@@ -12,6 +12,9 @@ pub struct ContractChange {
     /// -- transaction --
     #[prost(bytes="vec", optional, tag="5")]
     pub transaction_id: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
+    /// -- call --
+    #[prost(bytes="vec", optional, tag="8")]
+    pub caller: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
     /// -- ordering --
     ///
     /// log.ordinal

@@ -10,11 +10,18 @@ authors = [
 ]
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 substreams = { workspace = true }
 substreams-ethereum = { workspace = true }
-substreams-abis = { workspace = true }
 proto = { path = "../proto" }
 common = { path = "../common" }
+ethabi = "18.0"
+prost = "0.13"
+prost-types = "0.13"
+
+[build-dependencies]
+prost-build = "0.13"
+anyhow = "1"
+substreams-ethereum = "0.10"

@@ -1,2 +1,3 @@
 pub mod maps;
-pub mod algorithms;
+pub mod metadata;
+pub mod abi;

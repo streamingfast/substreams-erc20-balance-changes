@@ -10,6 +10,9 @@ message ContractChange {
   // -- transaction --
   optional bytes transaction_id = 5;
 
+  // -- call --
+  optional bytes caller = 8;
+
   // -- ordering --
   optional uint64 ordinal = 10; // log.ordinal
   uint64 index = 11; // relative index
