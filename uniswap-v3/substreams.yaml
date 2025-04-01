@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: evm_tokens_prices_uniswap_v3
+  name: uniswap_v3
   version: v1.11.0
   url: https://githubcom/pinax-network/substreams-evm-tokens
   description: EVM Token prices Uniswap V3
@@ -13,7 +13,7 @@ binaries:
 
 protobuf:
   files:
-    - evm-tokens-prices-uniswap-v3.proto
+    - uniswap-v3.proto
   importPaths:
     - ../proto/v1
 
@@ -24,6 +24,6 @@ modules:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.tokens.prices.uniswap.v3.types.v1.Events
+      type: proto:evm.tokens.uniswap.v3.Events
 
 network: mainnet

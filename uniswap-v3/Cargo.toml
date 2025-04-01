@@ -1,5 +1,5 @@
 [package]
-name = "prices-uniswap-v3"
+name = "uniswap-v3"
 description = { workspace = true }
 edition = { workspace = true }
 version = { workspace = true }

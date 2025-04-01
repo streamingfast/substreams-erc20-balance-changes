@@ -1,5 +1,5 @@
 use common::to_global_sequence;
-use proto::pb::evm::tokens::prices::uniswap::v2::types::v1::{Events, PairCreated, Swap, Sync};
+use proto::pb::evm::tokens::uniswap::v2::{Events, PairCreated, Swap, Sync};
 use substreams::errors::Error;
 use substreams::pb::substreams::Clock;
 use substreams_abis::evm::uniswap::v2::factory::events::PairCreated as PairCreatedAbi;

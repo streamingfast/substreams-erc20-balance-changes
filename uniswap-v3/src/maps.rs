@@ -1,5 +1,5 @@
 use common::to_global_sequence;
-use proto::pb::evm::tokens::prices::uniswap::v3::types::v1::{Events, PoolCreated, Initialize, Swap};
+use proto::pb::evm::tokens::uniswap::v3::{Events, PoolCreated, Initialize, Swap};
 use substreams::errors::Error;
 use substreams::pb::substreams::Clock;
 use substreams_abis::evm::uniswap::v3::factory::events::PoolCreated as PoolCreatedAbi;
