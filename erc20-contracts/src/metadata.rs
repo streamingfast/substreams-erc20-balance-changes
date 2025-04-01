@@ -1,5 +1,5 @@
 use substreams_ethereum::{pb::eth::v2::Call, Function};
-use crate::abi::functions::{SetMetadata, SetName, SetSymbol};
+use crate::abi::functions;
 
 pub struct SetNameSymbol {
     pub name: Option<String>,
@@ -38,21 +38,45 @@ pub fn get_metadata<'a>(call: &'a Call) -> Option<SetNameSymbol> {
 }
 
 pub fn get_symbol<'a>(call: &'a Call) -> Option<String> {
-    if let Some(result) = SetSymbol::match_and_decode(call) {
+    if let Some(result) = functions::SetSymbol::match_and_decode(call) {
+        return Some(result.symbol);
+    }
+    if let Some(result) = functions::ChangeSymbol::match_and_decode(call) {
+        return Some(result.symbol);
+    }
+    if let Some(result) = functions::UpdateSymbol::match_and_decode(call) {
+        return Some(result.symbol);
+    }
+    if let Some(result) = functions::SetTokenSymbol::match_and_decode(call) {
         return Some(result.symbol);
     }
     None
 }
 
 pub fn get_name<'a>(call: &'a Call) -> Option<String> {
-    if let Some(result) = SetName::match_and_decode(call) {
+    if let Some(result) = functions::SetName::match_and_decode(call) {
+        return Some(result.name);
+    }
+    if let Some(result) = functions::ChangeName::match_and_decode(call) {
+        return Some(result.name);
+    }
+    if let Some(result) = functions::UpdateName::match_and_decode(call) {
         return Some(result.name);
     }
     None
 }
 
 pub fn get_name_symbol<'a>(call: &'a Call) -> Option<(String, String)> {
-    if let Some(result) = SetMetadata::match_and_decode(call) {
+    if let Some(result) = functions::SetMetadata::match_and_decode(call) {
+        return Some((result.name, result.symbol));
+    }
+    if let Some(result) = functions::SetNameAndSymbol1::match_and_decode(call) {
+        return Some((result.name, result.symbol));
+    }
+    if let Some(result) = functions::SetNameAndSymbol2::match_and_decode(call) {
+        return Some((result.name, result.symbol));
+    }
+    if let Some(result) = functions::SetNameAndTicker::match_and_decode(call) {
         return Some((result.name, result.symbol));
     }
     None
