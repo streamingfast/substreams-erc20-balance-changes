@@ -10,20 +10,13 @@ pub struct Events {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ContractChange {
     /// -- transaction --
-    #[prost(bytes="vec", tag="5")]
-    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="6")]
-    pub from: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="7")]
-    pub to: ::prost::alloc::vec::Vec<u8>,
-    /// -- call --
-    #[prost(bytes="vec", tag="8")]
-    pub caller: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", optional, tag="5")]
+    pub transaction_id: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
     /// -- ordering --
     ///
     /// log.ordinal
-    #[prost(uint64, tag="10")]
-    pub ordinal: u64,
+    #[prost(uint64, optional, tag="10")]
+    pub ordinal: ::core::option::Option<u64>,
     /// relative index
     #[prost(uint64, tag="11")]
     pub index: u64,
@@ -33,11 +26,11 @@ pub struct ContractChange {
     /// -- contract --
     #[prost(bytes="vec", tag="20")]
     pub address: ::prost::alloc::vec::Vec<u8>,
-    #[prost(string, tag="21")]
-    pub name: ::prost::alloc::string::String,
-    #[prost(string, tag="22")]
-    pub symbol: ::prost::alloc::string::String,
-    #[prost(int32, tag="23")]
-    pub decimals: i32,
+    #[prost(string, optional, tag="21")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag="22")]
+    pub symbol: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(int32, optional, tag="23")]
+    pub decimals: ::core::option::Option<i32>,
 }
 // @@protoc_insertion_point(module)
