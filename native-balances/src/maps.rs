@@ -45,14 +45,14 @@ pub fn to_balance_change<'a>(
         // -- balance change --
         contract: NATIVE_ADDRESS.to_vec(),
         address: balance_change.address.to_vec(),
-        old_balance: old_balance.to_string(),
+        old_balance: Some(old_balance.to_string()),
         new_balance: new_balance.to_string(),
 
         // -- debug --
         algorithm: algorithm.into(),
-        reason: balance_change.reason,
-        trx_type: trx.r#type,
-        call_type: call.call_type,
+        reason: Some(balance_change.reason),
+        trx_type: Some(trx.r#type),
+        call_type: Some(call.call_type),
     }
 }
 
