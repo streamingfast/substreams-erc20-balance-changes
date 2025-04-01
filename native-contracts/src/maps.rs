@@ -1,5 +1,5 @@
 use common::to_global_sequence;
-use proto::pb::evm::tokens::native::contracts::v1::{ContractCreation, Events};
+use proto::pb::evm::tokens::contracts::v1::{ContractCreation, Events};
 use substreams::errors::Error;
 use substreams::pb::substreams::Clock;
 use substreams_ethereum::pb::eth::v2::{Block, CallType};

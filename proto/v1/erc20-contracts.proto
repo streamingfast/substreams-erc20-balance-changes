@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 package evm.tokens.erc20.contracts.v1;
-import "v1/algorithm.proto";
 
 message Events {
   repeated ContractChange contract_changes = 1;
@@ -26,7 +25,4 @@ message ContractChange {
   string name = 21;
   string symbol = 22;
   int32 decimals = 23;
-
-  // -- debug --
-  evm.tokens.algorithm.v1.Algorithm algorithm = 99;
 }

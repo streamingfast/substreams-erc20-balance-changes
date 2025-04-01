@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package evm.tokens.native.contracts.v1;
+package evm.tokens.contracts.v1;
 
 message Events {
   repeated ContractCreation contract_creations = 1;

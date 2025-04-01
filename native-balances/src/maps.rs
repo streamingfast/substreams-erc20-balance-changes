@@ -1,13 +1,11 @@
-use common::{bytes_to_hex, to_global_sequence, to_optional_vector, Address, NATIVE_ADDRESS};
-use proto::pb::evm::tokens::algorithm::v1::Algorithm;
-use proto::pb::evm::tokens::erc20::balances::v1::{BalanceChange, Events, Transfer};
-use substreams::log;
+use common::{to_global_sequence, to_optional_vector, Address, NATIVE_ADDRESS};
+use proto::pb::evm::tokens::balances::v1::{Algorithm, BalanceChange, Events, Transfer};
 use substreams::{errors::Error, scalar::BigInt};
 
 use substreams::pb::substreams::Clock;
 use substreams_ethereum::pb::eth::v2::{BalanceChange as BalanceChangeAbi, Block, Call, TransactionTrace};
 
-use crate::algorithms::transfers::{get_transfer_from_call, get_transfer_from_transaction, get_transfer_from_transaction_fee};
+use crate::algorithms::transfers::{get_transfer_from_block_reward, get_transfer_from_call, get_transfer_from_transaction, get_transfer_from_transaction_fee};
 use crate::utils::{get_balances, is_failed_transaction, is_gas_balance_change};
 
 #[substreams::handlers::map]
@@ -52,8 +50,9 @@ pub fn to_balance_change<'a>(
 
         // -- debug --
         algorithm: algorithm.into(),
-        reason: balance_change.reason().as_str_name().to_string(),
-        r#type: trx.r#type().as_str_name().to_string(),
+        reason: balance_change.reason,
+        trx_type: trx.r#type,
+        call_type: call.call_type,
     }
 }
 
@@ -88,7 +87,8 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Ca
 
         // -- debug --
         algorithm: transfer.algorithm.into(),
-        r#type: trx.r#type().as_str_name().to_string(),
+        trx_type: trx.r#type,
+        call_type: call.call_type,
     }
 }
 
@@ -101,6 +101,13 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
 
     // balance changes at block level
     for balance_change in &block.balance_changes {
+        // Block Rewards as transfer
+        if let Some(transfer) = get_transfer_from_block_reward(balance_change) {
+            events.transfers.push(to_transfer(clock, &default_trace, &default_call, transfer, index));
+            index += 1;
+        }
+
+        // Block Rewards as balance change
         events
             .balance_changes
             .push(to_balance_change(clock, &default_trace, &default_call, balance_change, Algorithm::Block, index));

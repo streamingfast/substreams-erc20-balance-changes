@@ -3,7 +3,7 @@ package:
   name: native_balances
   version: v1.11.0
   url: https://github.com/pinax-network/substreams-evm-tokens
-  description: Native balance changes & transfers
+  description: Extracts all ETH balances & transfers for EVM blockchains.
   image: ../image.png
 
 binaries:
@@ -13,19 +13,18 @@ binaries:
 
 protobuf:
   files:
-    - v1/erc20-balances.proto
-    - v1/algorithm.proto
+    - v1/balances.proto
+    - v1/ethereum.proto
   importPaths:
     - ../proto
 
 modules:
   - name: map_events
     kind: map
-    doc: Native balance changes & transfers
     inputs:
       - source: sf.substreams.v1.Clock
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.tokens.erc20.balances.v1.Events
+      type: proto:evm.tokens.balances.v1.Events
 
 network: mainnet

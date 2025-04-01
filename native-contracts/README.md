@@ -1,3 +1,7 @@
-# Substreams: `ERC-20 Contracts`
+# Substreams: `Contracts`
 
-> Extracts ERC-20 token contract metadata from the Ethereum blockchain.
+> Extracts Contract metadata for EVM blockchains.
+
+## Events
+
+- [x] `contract_creations`

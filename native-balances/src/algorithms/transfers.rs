@@ -1,12 +1,32 @@
 use common::{Address, NULL_ADDRESS};
-use proto::pb::evm::tokens::algorithm::v1::Algorithm;
+use proto::pb::evm::tokens::balances::v1::Algorithm;
+use substreams_ethereum::pb::eth::v2::{TransactionTrace, BalanceChange, Call, balance_change::Reason};
 use substreams::{log, scalar::BigInt};
-use substreams_ethereum::pb::eth::v2::{Call, TransactionTrace};
 
 use crate::{
     maps::TransferStruct,
-    utils::{is_failed_call, is_failed_transaction},
+    utils::{get_balances, is_failed_call, is_failed_transaction},
 };
+
+pub fn get_transfer_from_block_reward(balance_change: &BalanceChange) -> Option<TransferStruct> {
+    if balance_change.reason() != Reason::RewardMineBlock {
+        return None;
+    }
+
+    let (old_balance, new_balance) = get_balances(balance_change);
+    let value = new_balance - old_balance;
+    if value.le(&BigInt::zero()) {
+        return None;
+    }
+
+    Some(TransferStruct {
+        from: NULL_ADDRESS.to_vec(),
+        to: balance_change.address.to_vec(),
+        value,
+        ordinal: balance_change.ordinal,
+        algorithm: Algorithm::BlockReward,
+    })
+}
 
 pub fn get_transfer_from_transaction(trx: &TransactionTrace) -> Option<TransferStruct> {
     if is_failed_transaction(trx) {
@@ -41,10 +61,15 @@ pub fn get_transfer_from_call(call: &Call) -> Option<TransferStruct> {
     // https://etherscan.io/tx/0xe28a0ad59830ada1e96b1274e9f1aa9d5aa8bcf34bfe25271968962a7dbad803#internal
     // Test: single ETH transfer
     // https://etherscan.io/tx/0xdc2cd99c61de744a502fed484d73468c2f60cb2ad8dfc9e891886e9c619302ef
+    // Test: tornado cash (block 9194719)
+    // https://etherscan.io/tx/0x3b4f42376dbb1224d59e541636cc3704cccb9572067d8f9758312d432adb86a6
+
+    // ignore top-level calls
     if call.depth == 0 {
-        // It's the top-level call
         return None;
     }
+    // call.
+    // log::info!("call depth: {}", call.);
 
     Some(TransferStruct {
         from: call.caller.to_vec(),

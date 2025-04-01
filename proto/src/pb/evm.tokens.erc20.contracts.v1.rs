@@ -39,8 +39,5 @@ pub struct ContractChange {
     pub symbol: ::prost::alloc::string::String,
     #[prost(int32, tag="23")]
     pub decimals: i32,
-    /// -- debug --
-    #[prost(enumeration="super::super::super::algorithm::v1::Algorithm", tag="99")]
-    pub algorithm: i32,
 }
 // @@protoc_insertion_point(module)

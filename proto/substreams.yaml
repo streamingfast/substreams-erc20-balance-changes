@@ -3,17 +3,14 @@ package:
   name: proto
   version: v1.11.0
 
-# imports:
-#   ethereum: https://github.com/streamingfast/substreams-foundational-modules/releases/download/ethereum-common-v0.3.1/ethereum-common-v0.3.1.spkg
-
 protobuf:
   files:
-    - v1/erc20-balances.proto
+    - v1/balances.proto
     - v1/erc20-contracts.proto
-    - v1/native-contracts.proto
+    - v1/contracts.proto
     - v1/uniswap-v2.proto
     - v1/uniswap-v3.proto
-    - v1/algorithm.proto
+    - v1/ethereum.proto
   excludePaths:
     - sf/substreams
     - google
