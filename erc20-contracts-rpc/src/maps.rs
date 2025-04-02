@@ -20,24 +20,32 @@ pub fn map_events(clock: Clock, store_erc20_transfers: Deltas<DeltaBigInt>) -> R
 
             // try to decode address and get contract details
             Hex::decode(&delta.key).ok().and_then(|address| {
-                calls::get_contract(&address).map(|(name, symbol, decimals)| {
-                    ContractChange {
-                        transaction_id: None,
+                let decimals = calls::get_contract_decimals(address.to_vec());
+                // Token must have decimals
+                // do not attempt to perform any further RPC calls to get name,symbol
+                if decimals.is_none() {
+                    return None;
+                }
+                // Name & Symbol are optional, even after ERC20 transfer these fields can be modified
+                let name = calls::get_contract_name(address.to_vec()).or(calls::get_contract_name_bytes32(address.to_vec()));
+                let symbol = calls::get_contract_symbol(address.to_vec()).or(calls::get_contract_symbol_bytes32(address.to_vec()));
 
-                        // -- call --
-                        caller: None,
+                Some(ContractChange {
+                    transaction_id: None,
 
-                        // -- ordering --
-                        ordinal: None,
-                        index: idx as u64,
-                        global_sequence: to_global_sequence(&clock, idx as u64),
+                    // -- call --
+                    caller: None,
 
-                        // -- contract --
-                        address,
-                        name: Some(name),
-                        symbol: Some(symbol),
-                        decimals: Some(decimals.into()),
-                    }
+                    // -- ordering --
+                    ordinal: None,
+                    index: idx as u64,
+                    global_sequence: to_global_sequence(&clock, idx as u64),
+
+                    // -- contract --
+                    address,
+                    name,
+                    symbol,
+                    decimals,
                 })
             })
         })

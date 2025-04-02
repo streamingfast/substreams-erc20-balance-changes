@@ -10,7 +10,7 @@ members = [
   "uniswap-v3",
   "proto",
   "common",
-  "clickhouse"
+  # "clickhouse"
 ]
 resolver = "2"
 
@@ -20,6 +20,6 @@ edition = "2021"
 version = "0.0.0"
 
 [workspace.dependencies]
-substreams = "0.6"
-substreams-abis = "0.1.3"
-substreams-ethereum = "0.10"
+substreams = "0.6.1"
+substreams-abis = "0.2.1"
+substreams-ethereum = "0.10.3"

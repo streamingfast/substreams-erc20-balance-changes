@@ -1,4 +1,4 @@
-use substreams::{hex, pb::substreams::Clock, Hex};
+use substreams::{hex, pb::substreams::Clock, scalar::BigInt, Hex};
 
 pub type Address = Vec<u8>;
 pub type Hash = Vec<u8>;
@@ -40,4 +40,21 @@ pub fn to_optional_vector(vec: &Vec<u8>) -> Option<Vec<u8>> {
     } else {
         None
     }
+}
+
+pub fn bytes32_to_string(bytes: &[u8]) -> String {
+    let s = String::from_utf8_lossy(&bytes);
+    s.trim_matches('\0').to_string()
+}
+
+// Used to enforce ERC-20 decimals to be between 0 and 255
+pub fn bigint_to_int32(bigint: &substreams::scalar::BigInt) -> Option<i32> {
+    if bigint.lt(&BigInt::zero()) {
+        return None;
+    }
+    let int = bigint.to_i32();
+    if int < 0 || int > 255 {
+        return None;
+    }
+    Some(int)
 }
