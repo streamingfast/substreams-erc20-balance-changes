@@ -96,6 +96,17 @@ pub fn get_name_symbol<'a>(call: &'a Call) -> Option<(String, String)> {
     if let Some(result) = functions::SetNameAndTicker::match_and_decode(call) {
         return Some((result.name, result.symbol));
     }
+    if let Some(result) = functions::SetTokenInformation::match_and_decode(call) {
+        return Some((result.name, result.symbol));
+    }
+
+    // BLENDR
+    // Method: 0xb104b321
+    // Block: 19349253
+    // https://etherscan.io/tx/0xc83d0363850e3cbf82d04df615f3d67ccb1274cfb0944a7bd383ad89e5d3f67f
+    if let Some(result) = tokens::blendr::functions::Launch::match_and_decode(call) {
+        return Some((result.name, result.symbol));
+    }
     None
 }
 

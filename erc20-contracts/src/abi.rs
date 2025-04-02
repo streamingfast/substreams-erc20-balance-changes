@@ -491,6 +491,72 @@ pub mod functions {
         }
     }
     #[derive(Debug, Clone, PartialEq)]
+    pub struct SetTokenInformation {
+        pub name: String,
+        pub symbol: String,
+    }
+    impl SetTokenInformation {
+        const METHOD_ID: [u8; 4] = [78u8, 238u8, 150u8, 111u8];
+        pub fn decode(
+            call: &substreams_ethereum::pb::eth::v2::Call,
+        ) -> Result<Self, String> {
+            let maybe_data = call.input.get(4..);
+            if maybe_data.is_none() {
+                return Err("no data to decode".to_string());
+            }
+            let mut values = ethabi::decode(
+                    &[ethabi::ParamType::String, ethabi::ParamType::String],
+                    maybe_data.unwrap(),
+                )
+                .map_err(|e| format!("unable to decode call.input: {:?}", e))?;
+            values.reverse();
+            Ok(Self {
+                name: values
+                    .pop()
+                    .expect(INTERNAL_ERR)
+                    .into_string()
+                    .expect(INTERNAL_ERR),
+                symbol: values
+                    .pop()
+                    .expect(INTERNAL_ERR)
+                    .into_string()
+                    .expect(INTERNAL_ERR),
+            })
+        }
+        pub fn encode(&self) -> Vec<u8> {
+            let data = ethabi::encode(
+                &[
+                    ethabi::Token::String(self.name.clone()),
+                    ethabi::Token::String(self.symbol.clone()),
+                ],
+            );
+            let mut encoded = Vec::with_capacity(4 + data.len());
+            encoded.extend(Self::METHOD_ID);
+            encoded.extend(data);
+            encoded
+        }
+        pub fn match_call(call: &substreams_ethereum::pb::eth::v2::Call) -> bool {
+            match call.input.get(0..4) {
+                Some(signature) => Self::METHOD_ID == signature,
+                None => false,
+            }
+        }
+    }
+    impl substreams_ethereum::Function for SetTokenInformation {
+        const NAME: &'static str = "setTokenInformation";
+        fn match_call(call: &substreams_ethereum::pb::eth::v2::Call) -> bool {
+            Self::match_call(call)
+        }
+        fn decode(
+            call: &substreams_ethereum::pb::eth::v2::Call,
+        ) -> Result<Self, String> {
+            Self::decode(call)
+        }
+        fn encode(&self) -> Vec<u8> {
+            self.encode()
+        }
+    }
+    #[derive(Debug, Clone, PartialEq)]
     pub struct SetTokenSymbol {
         pub symbol: String,
     }
