@@ -117,5 +117,15 @@ pub fn get_name_symbol_precision<'a>(call: &'a Call) -> Option<(String, String, 
             return Some((result.token_name, result.token_symbol, decimals));
         }
     }
+
+    // Wormhole
+    // TO-DO: More validation needed
+    // https://github.com/pinax-network/substreams-evm-tokens/issues/28
+    // https://github.com/wormhole-foundation/wormhole/blob/9b9c07b4b1474a1526c9a7346dab640e627630bc/ethereum/contracts/bridge/token/TokenImplementation.sol#L17-L25
+    if let Some(result) = functions::Initialize::match_and_decode(call) {
+        if let Some(decimals) = bigint_to_int32(&result.decimals) {
+            return Some((result.name, result.symbol, decimals));
+        }
+    }
     None
 }
