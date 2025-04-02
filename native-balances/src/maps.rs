@@ -6,10 +6,10 @@ use substreams::pb::substreams::Clock;
 use substreams_ethereum::pb::eth::v2::{BalanceChange as BalanceChangeAbi, Block, Call, TransactionTrace};
 
 use crate::algorithms::transfers::{get_transfer_from_block_reward, get_transfer_from_call, get_transfer_from_transaction, get_transfer_from_transaction_fee};
-use crate::utils::{get_balances, is_failed_transaction, is_gas_balance_change};
+use crate::utils::{get_balances, is_failed_transaction, is_gas_balance_change, is_valid_balance_change};
 
 #[substreams::handlers::map]
-pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
+pub fn map_events(mut clock: Clock, block: Block) -> Result<Events, Error> {
     // Pre-allocate vectors to avoid reallocations
     let transaction_count = block.transactions().count();
     let mut events = Events {
@@ -108,19 +108,23 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
         }
 
         // Block Rewards as balance change
-        events
-            .balance_changes
-            .push(to_balance_change(clock, &default_trace, &default_call, balance_change, Algorithm::Block, index));
-        index += 1;
+        if is_valid_balance_change(balance_change) {
+            events
+                .balance_changes
+                .push(to_balance_change(clock, &default_trace, &default_call, balance_change, Algorithm::BlockReward, index));
+            index += 1;
+        }
     }
 
     // balance changes at system call level
     for call in &block.system_calls {
         for balance_change in &call.balance_changes {
-            events
-                .balance_changes
-                .push(to_balance_change(clock, &default_trace, call, balance_change, Algorithm::System, index));
-            index += 1;
+            if is_valid_balance_change(balance_change) {
+                events
+                    .balance_changes
+                    .push(to_balance_change(clock, &default_trace, call, balance_change, Algorithm::System, index));
+                index += 1;
+            }
         }
     }
 
@@ -171,8 +175,10 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
                 };
 
                 // balance change
-                events.balance_changes.push(to_balance_change(clock, trx, call_view.call, balance_change, algorithm, index));
-                index += 1;
+                if is_valid_balance_change(balance_change) {
+                    events.balance_changes.push(to_balance_change(clock, trx, call_view.call, balance_change, algorithm, index));
+                    index += 1;
+                }
             }
         }
     }

@@ -9,3 +9,5 @@ crate-type = ["rlib"]
 
 [dependencies]
 substreams = { workspace = true }
+prost = "0.13"
+prost-types = "0.13"

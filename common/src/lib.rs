@@ -1,9 +1,12 @@
+use prost_types::Timestamp;
 use substreams::{hex, pb::substreams::Clock, scalar::BigInt, Hex};
 
 pub type Address = Vec<u8>;
 pub type Hash = Vec<u8>;
 pub const NULL_ADDRESS: [u8; 20] = hex!("0000000000000000000000000000000000000000");
+pub const NULL_HASH: [u8; 32] = hex!("0000000000000000000000000000000000000000000000000000000000000000");
 pub const NATIVE_ADDRESS: [u8; 20] = hex!("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+pub const GENESIS_HASH_MAINNET: [u8; 32] = hex!("d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3");
 
 // Timestamp to date conversion
 // ex: 2015-07-30T16:02:18Z => 2015-07-30
@@ -12,6 +15,18 @@ pub fn clock_to_date(clock: &Clock) -> String {
         Some(date) => date.to_string(),
         _ => "".to_string(),
     }
+}
+
+pub fn update_genesis_clock(mut clock: Clock) -> Clock {
+    // ETH Mainnet
+    if clock.id == "d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3" {
+        clock.timestamp = Some(Timestamp {
+            seconds: 1438269973,
+            nanos: 0,
+        });
+        return clock;
+    }
+    clock
 }
 
 // In ClickHouse, an aggregate function like argMax can only take one expression as the “ordering” argument.
@@ -36,6 +51,12 @@ pub fn extend_from_address(address1: &Address, address2: &Address) -> Vec<u8> {
 
 pub fn to_optional_vector(vec: &Vec<u8>) -> Option<Vec<u8>> {
     if vec.len() > 0 {
+        if vec.len() == 32 && vec.to_vec() == NULL_HASH {
+            return None;
+        }
+        if vec.len() == 20 && vec.to_vec() == NULL_ADDRESS {
+            return None;
+        }
         Some(vec.to_vec())
     } else {
         None

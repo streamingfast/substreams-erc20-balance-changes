@@ -39,3 +39,22 @@ pub fn get_balances(balance_change: &BalanceChange) -> (BigInt, BigInt) {
 
     (old_balance, new_balance)
 }
+
+pub fn is_valid_balance_change(balance_change: &BalanceChange) -> bool {
+    // balance must have new value
+    match balance_change.new_value {
+        Some(ref new_value) => {
+            // balance must have different old and new value
+            match balance_change.old_value {
+                Some(ref old_value) => {
+                    if old_value == new_value {
+                        return false;
+                    }
+                }
+                None => {}
+            }
+        }
+        None => return false,
+    }
+    true
+}
