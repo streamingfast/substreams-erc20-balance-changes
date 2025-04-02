@@ -75,6 +75,8 @@ pub fn get_name<'a>(call: &'a Call) -> Option<String> {
     }
 
     // DAI setName(bytes32)
+    // MKR: https://etherscan.io/tx/0xac1adc09b9c5fd60edb48ed06fc1bad6fe0f6774eb76eb39eaba40190f88dae7
+    // Blocks: 4620855, 4645274
     if let Some(result) = tokens::sai::functions::SetName::match_and_decode(call) {
         return Some(bytes32_to_string(&result.name.to_vec()));
     }

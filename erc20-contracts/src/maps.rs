@@ -42,10 +42,4 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
         }
     }
     Ok(events)
-
-    // TO-DO: pull from known symbol & name contract updates
-    // - setMetadata
-    // - setNameAndTicker
-    // - setName
-    // https://github.com/pinax-network/substreams-evm-tokens/issues/13
 }
