@@ -13,11 +13,14 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    -- transaction --
    transaction_id       FixedString(66),
 
+   -- call --
+   caller               FixedString(42) COMMENT 'ERC-20 contract caller address', -- call.caller
+
    -- balance change --
    contract             FixedString(42) COMMENT 'ERC-20 contract address',
-   owner                FixedString(42) COMMENT 'ERC-20 owner address',
-   old_balance          UInt256 COMMENT 'ERC-20 owner old balance',
-   new_balance          UInt256 COMMENT 'ERC-20 owner new balance',
+   address              FixedString(42) COMMENT 'ERC-20 wallet address',
+   old_balance          UInt256 COMMENT 'ERC-20 wallet address old balance',
+   new_balance          UInt256 COMMENT 'ERC-20 wallet address new balance',
 
    -- debug --
    algorithm            LowCardinality(String),
@@ -26,7 +29,8 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    -- indexes --
    INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contract           (contract)            TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_owner              (owner)               TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_address            (address)             TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,
    INDEX idx_old_balance        (old_balance)         TYPE minmax GRANULARITY 4,
    INDEX idx_new_balance        (new_balance)         TYPE minmax GRANULARITY 4,
    INDEX idx_algorithm          (algorithm)           TYPE set(20) GRANULARITY 4,
@@ -50,6 +54,9 @@ CREATE TABLE IF NOT EXISTS transfers  (
    -- transaction --
    transaction_id       FixedString(66),
 
+   -- call --
+   caller               FixedString(42) COMMENT 'ERC-20 contract caller address', -- call.caller
+
    -- transfer --
    contract             FixedString(42) COMMENT 'ERC-20 contract address', -- log.address
    `from`               FixedString(42) COMMENT 'ERC-20 transfer sender address', -- log.topics[1]
@@ -65,8 +72,9 @@ CREATE TABLE IF NOT EXISTS transfers  (
    INDEX idx_contract           (contract)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_from               (`from`)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_to                 (`to`)               TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_caller             (caller)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_value              (value)              TYPE minmax GRANULARITY 4,
-   INDEX idx_algorithm          (algorithm)          TYPE set(20) GRANULARITY 4,
+   INDEX idx_algorithm          (algorithm)          TYPE set(32) GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -83,8 +91,8 @@ CREATE TABLE IF NOT EXISTS balances (
 
    -- balance change --
    contract             FixedString(42) COMMENT 'ERC-20 contract address',
-   owner                FixedString(42) COMMENT 'ERC-20 owner address',
-   new_balance          UInt256 COMMENT 'ERC-20 owner new balance',
+   address              FixedString(42) COMMENT 'ERC-20 wallet address',
+   new_balance          UInt256 COMMENT 'ERC-20 new balance',
 
    -- indexes --
    INDEX idx_block_num     (block_num)       TYPE minmax GRANULARITY 4,
@@ -92,17 +100,17 @@ CREATE TABLE IF NOT EXISTS balances (
    INDEX idx_new_balance   (new_balance)     TYPE minmax GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree(global_sequence)
-PRIMARY KEY (owner, contract)
-ORDER BY (owner, contract);
+PRIMARY KEY (address, contract)
+ORDER BY (address, contract);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS balances_mv
 TO balances AS
 SELECT * FROM balance_changes;
 
--- latest balances by contract/owner --
+-- latest balances by contract/address --
 CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_contract
 ENGINE = ReplacingMergeTree(global_sequence)
-PRIMARY KEY (contract, owner)
-ORDER BY (contract, owner)
+PRIMARY KEY (contract, address)
+ORDER BY (contract, address)
 AS
 SELECT * FROM balances;
