@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS erc20_balance_changes  (
    block_num            UInt32,
    block_hash           FixedString(66),
    timestamp            DateTime(0, 'UTC'),
-   date                 Date,
 
    -- ordering --
    ordinal              UInt64, -- storage_change.ordinal or balance_change.ordinal
@@ -33,8 +32,8 @@ CREATE TABLE IF NOT EXISTS erc20_balance_changes  (
    INDEX idx_algorithm          (algorithm)           TYPE set(20) GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
-PRIMARY KEY (date, block_num, `index`)
-ORDER BY (date, block_num, `index`);
+PRIMARY KEY (timestamp, block_num, `index`)
+ORDER BY (timestamp, block_num, `index`);
 
 -- ERC-20 transfers --
 CREATE TABLE IF NOT EXISTS transfers  (
@@ -42,7 +41,6 @@ CREATE TABLE IF NOT EXISTS transfers  (
    block_num            UInt32,
    block_hash           FixedString(66),
    timestamp            DateTime(0, 'UTC'),
-   date                 Date,
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
@@ -71,15 +69,14 @@ CREATE TABLE IF NOT EXISTS transfers  (
    INDEX idx_algorithm          (algorithm)          TYPE set(20) GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
-PRIMARY KEY (date, block_num, `index`)
-ORDER BY (date, block_num, `index`);
+PRIMARY KEY (timestamp, block_num, `index`)
+ORDER BY (timestamp, block_num, `index`);
 
 -- latest balances by owner/contract --
 CREATE TABLE IF NOT EXISTS balances (
    -- block --
    block_num            UInt32,
    timestamp            DateTime(0, 'UTC'),
-   date                 Date,
 
    -- ordering --
    global_sequence      UInt64, -- block_num << 32 + index
@@ -116,7 +113,6 @@ CREATE TABLE IF NOT EXISTS contracts  (
    -- block --
    block_num            UInt32,
    timestamp            DateTime(0, 'UTC'),
-   date                 Date,
 
    -- ordering --
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)

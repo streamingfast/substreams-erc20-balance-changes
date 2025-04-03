@@ -13,8 +13,8 @@ imports:
 
   # EVM Tokens Substreams
   erc20_balances: ../erc20-balances/substreams.yaml
+  erc20_balances_rpc: ../erc20-balances-rpc/substreams.yaml
   native_balances: ../native-balances/substreams.yaml
-  # erc20_balances_rpc: ../erc20-balances-rpc/substreams.yaml
   # erc20_contracts: ../erc20-contracts/substreams.yaml
   # erc20_contracts_rpc: ../erc20-contracts-rpc/substreams.yaml
   # native_contracts: ../native-contracts/substreams.yaml
@@ -32,6 +32,7 @@ modules:
     inputs:
       - source: sf.substreams.v1.Clock
       - map: erc20_balances:map_events
+      - map: erc20_balances_rpc:map_events
       - map: native_balances:map_events
       # - map: erc20_balances_rpc:map_events
       # - map: erc20_contracts:map_events

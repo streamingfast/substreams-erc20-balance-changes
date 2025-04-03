@@ -1,8 +1,8 @@
 use common::update_genesis_clock;
 use proto::pb::evm::tokens::balances::v1::Events as EventsBalances;
-use proto::pb::evm::tokens::contracts::v1::Events as EventsContracts;
-use proto::pb::evm::tokens::uniswap::v2::Events as EventsPricesUniswapV2;
-use proto::pb::evm::tokens::uniswap::v3::Events as EventsPricesUniswapV3;
+// use proto::pb::evm::tokens::contracts::v1::Events as EventsContracts;
+// use proto::pb::evm::tokens::uniswap::v2::Events as EventsPricesUniswapV2;
+// use proto::pb::evm::tokens::uniswap::v3::Events as EventsPricesUniswapV3;
 use substreams::{errors::Error, pb::substreams::Clock};
 use substreams_database_change::pb::database::DatabaseChanges;
 
@@ -10,12 +10,14 @@ use crate::erc20_balances::process_erc20_balances;
 
 #[substreams::handlers::map]
 // pub fn db_out(mut clock: Clock, erc20_balances: EventsBalances, erc20_balances_rpc: EventsBalances, erc20_contracts: EventsContracts, erc20_contracts_rpc: EventsContracts, native_balances: EventsBalances, uniswap_v2: EventsPricesUniswapV2, uniswap_v3: EventsPricesUniswapV3) -> Result<DatabaseChanges, Error> {
-pub fn db_out(mut clock: Clock, erc20_balances: EventsBalances, native_balances: EventsBalances) -> Result<DatabaseChanges, Error> {
+pub fn db_out(mut clock: Clock, erc20_balances: EventsBalances, erc20_balances_rpc: EventsBalances, native_balances: EventsBalances) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
     clock = update_genesis_clock(clock);
 
     // -- ERC-20 --
     process_erc20_balances(&mut tables, &clock, erc20_balances);
+    process_erc20_balances(&mut tables, &clock, erc20_balances_rpc);
+    process_erc20_balances(&mut tables, &clock, native_balances);
 
     // // Pre-compute frequently used values
     // let block_num = clock.number.to_string();
