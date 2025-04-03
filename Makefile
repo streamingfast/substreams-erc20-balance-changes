@@ -13,4 +13,4 @@ build:
 	substreams pack ./native-contracts
 	substreams pack ./uniswap-v2
 	substreams pack ./uniswap-v3
-	# substreams pack ./clickhouse
+	substreams pack ./clickhouse

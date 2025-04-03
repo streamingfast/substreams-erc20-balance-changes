@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: native_balances
+  name: evm_native_balances
   version: v1.11.0
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: Extracts all ETH balances & transfers for EVM blockchains.
