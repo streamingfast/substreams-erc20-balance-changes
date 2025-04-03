@@ -4,8 +4,7 @@ use substreams::pb::substreams::Clock;
 
 use crate::common::{common_key, set_algorithm, set_caller, set_clock, set_ordering, set_transaction_id};
 
-pub fn process_erc20_balances(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events) {
-    let mut index = 0; // Initialize index for ordering
+pub fn process_erc20_balances(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events, mut index: u64) -> u64 {
     // Process ERC-20 balance changes
     for event in events.balance_changes {
         process_erc20_balance_change(tables, clock, event, index);
@@ -17,6 +16,7 @@ pub fn process_erc20_balances(tables: &mut substreams_database_change::tables::T
         process_erc20_transfer(tables, clock, event, index);
         index += 1;
     }
+    index
 }
 
 fn process_erc20_balance_change(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: BalanceChange, index: u64) {

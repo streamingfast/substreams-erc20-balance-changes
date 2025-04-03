@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS balance_changes  (
    INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,
    INDEX idx_old_balance        (old_balance)         TYPE minmax GRANULARITY 4,
    INDEX idx_new_balance        (new_balance)         TYPE minmax GRANULARITY 4,
-   INDEX idx_algorithm          (algorithm)           TYPE set(20) GRANULARITY 4,
+   INDEX idx_algorithm          (algorithm)           TYPE set(32) GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)

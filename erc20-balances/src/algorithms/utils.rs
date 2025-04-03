@@ -53,11 +53,6 @@ pub fn is_erc20_valid_balance<'a>(transfer: &'a Transfer, storage_change: &'a St
     // https://github.com/streamingfast/substreams-erc20-balance-changes/issues/14
     let diff = BigInt::absolute(&(&balance_change_abs - &transfer_value_abs));
     if diff > BigInt::one() {
-        // log::info!(
-        //     "Balance change does not match transfer value. Balance change: {}, transfer value: {}",
-        //     balance_change_abs,
-        //     transfer_value_abs
-        // );
         return false;
     }
     true

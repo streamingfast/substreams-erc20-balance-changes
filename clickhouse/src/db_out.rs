@@ -15,9 +15,10 @@ pub fn db_out(mut clock: Clock, erc20_balances: EventsBalances, erc20_balances_r
     clock = update_genesis_clock(clock);
 
     // -- ERC-20 --
-    process_erc20_balances(&mut tables, &clock, erc20_balances);
-    process_erc20_balances(&mut tables, &clock, erc20_balances_rpc);
-    process_erc20_balances(&mut tables, &clock, native_balances);
+    let mut index = 0;
+    index = process_erc20_balances(&mut tables, &clock, erc20_balances, index);
+    index = process_erc20_balances(&mut tables, &clock, erc20_balances_rpc, index);
+    index = process_erc20_balances(&mut tables, &clock, native_balances, index);
 
     // // Pre-compute frequently used values
     // let block_num = clock.number.to_string();

@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 
-use crate::algorithms::algorithm1_call::get_owner_from_erc20_balance_change;
+use crate::algorithms::{algorithm1_call::get_owner_from_erc20_balance_change, utils::is_erc20_valid_balance};
 use crate::algorithms::algorithm2_child_calls::get_all_child_call_storage_changes;
 use crate::algorithms::transfers::get_erc20_transfer;
 use crate::algorithms::utils::addresses_for_storage_keys;
 use common::{extend_from_address, Address, Hash};
 use proto::pb::evm::tokens::balances::v1::{BalanceChange, Events, Transfer, Algorithm};
 use substreams::errors::Error;
+use substreams::hex;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
 use substreams::scalar::BigInt;
 use substreams_ethereum::pb::eth::v2::{Block, Call, Log, StorageChange, TransactionTrace};
@@ -46,11 +47,20 @@ pub fn to_balance_change<'a>(
     trx: &'a TransactionTrace,
     call: &'a Call,
     address: Address,
+    transfer: &'a TransferAbi,
     storage_change: &'a StorageChange,
     algorithm: Algorithm,
 ) -> BalanceChange {
     let old_balance = BigInt::from_unsigned_bytes_be(&storage_change.old_value);
     let new_balance = BigInt::from_unsigned_bytes_be(&storage_change.new_value);
+
+    // Yield one of two results depending on whether the storage change
+    // matches the transfer's balance changes
+    let algorithm = if is_erc20_valid_balance(transfer, storage_change) {
+        algorithm
+    } else {
+        Algorithm::BalanceNotMatchTransfer
+    };
 
     BalanceChange {
         // -- transaction
@@ -99,8 +109,8 @@ pub fn insert_events<'a>(block: &'a Block, events: &mut Events) {
             // -- Balance Changes --
             keccak_address_map.extend(addresses_for_storage_keys(call)); // memoize
             let balance_changes = iter_balance_changes_algorithms(trx, call, &transfer, &keccak_address_map);
-            for (address, storage_change, change_type) in balance_changes {
-                let balance_change = to_balance_change( trx, call, address, storage_change, change_type);
+            for (address, storage_change, algorithm) in balance_changes {
+                let balance_change = to_balance_change( trx, call, address, &transfer, storage_change, algorithm);
                 let key = extend_from_address(&balance_change.contract, &balance_change.address);
 
                 // overwrite balance change if it already exists
@@ -122,12 +132,14 @@ pub fn iter_balance_changes_algorithms<'a>(
 ) -> impl Iterator<Item = (Address, &'a StorageChange, Algorithm)> + 'a {
     // First iterator - algorithm #1 (normal case)
     let normal_changes = call.storage_changes.iter().filter_map(move |storage_change| {
-        get_owner_from_erc20_balance_change(transfer, storage_change, keccak_address_map).map(|owner| (owner, storage_change, Algorithm::Call))
+        get_owner_from_erc20_balance_change(transfer, storage_change, keccak_address_map)
+            .map(|owner| (owner, storage_change, Algorithm::Call))
     });
 
     // Second iterator - algorithm #2 (child calls)
     let child_changes = get_all_child_call_storage_changes(call, trx).filter_map(move |storage_change| {
-        get_owner_from_erc20_balance_change(transfer, storage_change, keccak_address_map).map(|owner| (owner, storage_change, Algorithm::ChildCalls))
+        get_owner_from_erc20_balance_change(transfer, storage_change, keccak_address_map)
+            .map(|owner| (owner, storage_change, Algorithm::ChildCalls))
     });
 
     normal_changes.chain(child_changes)
