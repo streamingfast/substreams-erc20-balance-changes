@@ -1,32 +1,28 @@
-use common::{to_global_sequence, to_optional_vector, Address, NATIVE_ADDRESS};
+use common::{to_optional_vector, Address, NATIVE_ADDRESS};
 use proto::pb::evm::tokens::balances::v1::{Algorithm, BalanceChange, Events, Transfer};
 use substreams::{errors::Error, scalar::BigInt};
-
-use substreams::pb::substreams::Clock;
 use substreams_ethereum::pb::eth::v2::{BalanceChange as BalanceChangeAbi, Block, Call, TransactionTrace};
 
 use crate::algorithms::transfers::{get_transfer_from_block_reward, get_transfer_from_call, get_transfer_from_transaction, get_transfer_from_transaction_fee};
 use crate::utils::{get_balances, is_failed_transaction, is_gas_balance_change, is_valid_balance_change};
 
 #[substreams::handlers::map]
-pub fn map_events(mut clock: Clock, block: Block) -> Result<Events, Error> {
+pub fn map_events(block: Block) -> Result<Events, Error> {
     // Pre-allocate vectors to avoid reallocations
     let transaction_count = block.transactions().count();
     let mut events = Events {
         transfers: Vec::with_capacity(transaction_count * 2),
         balance_changes: Vec::with_capacity(transaction_count * 4),
     };
-    insert_events(&clock, &block, &mut events);
+    insert_events(&block, &mut events);
     Ok(events)
 }
 
 pub fn to_balance_change<'a>(
-    clock: &Clock,
     trx: &'a TransactionTrace,
     call: &'a Call,
     balance_change: &'a BalanceChangeAbi,
     algorithm: Algorithm,
-    index: u64,
 ) -> BalanceChange {
     let (old_balance, new_balance) = get_balances(balance_change);
 
@@ -38,9 +34,7 @@ pub fn to_balance_change<'a>(
         caller: to_optional_vector(&call.caller),
 
         // -- ordering --
-        ordinal: balance_change.ordinal,
-        index,
-        global_sequence: to_global_sequence(clock, index),
+        ordinal: Some(balance_change.ordinal),
 
         // -- balance change --
         contract: NATIVE_ADDRESS.to_vec(),
@@ -66,7 +60,7 @@ pub struct TransferStruct {
     pub algorithm: Algorithm,
 }
 
-pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Call, transfer: TransferStruct, index: u64) -> Transfer {
+pub fn to_transfer<'a>(trx: &'a TransactionTrace, call: &'a Call, transfer: TransferStruct) -> Transfer {
     Transfer {
         // -- transaction --
         transaction_id: to_optional_vector(&trx.hash),
@@ -76,8 +70,6 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Ca
 
         // -- ordering --
         ordinal: transfer.ordinal,
-        index,
-        global_sequence: to_global_sequence(clock, index),
 
         // -- transfer --
         contract: NATIVE_ADDRESS.to_vec(),
@@ -92,9 +84,7 @@ pub fn to_transfer<'a>(clock: &'a Clock, trx: &'a TransactionTrace, call: &'a Ca
     }
 }
 
-pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events) {
-    let mut index = 0; // relative index for ordering
-
+pub fn insert_events<'a>(block: &'a Block, events: &mut Events) {
     // Pre-allocate a default TransactionTrace to avoid creating it multiple times
     let default_trace = TransactionTrace::default();
     let default_call = Call::default();
@@ -103,16 +93,14 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
     for balance_change in &block.balance_changes {
         // Block Rewards as transfer
         if let Some(transfer) = get_transfer_from_block_reward(balance_change) {
-            events.transfers.push(to_transfer(clock, &default_trace, &default_call, transfer, index));
-            index += 1;
+            events.transfers.push(to_transfer( &default_trace, &default_call, transfer));
         }
 
         // Block Rewards as balance change
         if is_valid_balance_change(balance_change) {
             events
                 .balance_changes
-                .push(to_balance_change(clock, &default_trace, &default_call, balance_change, Algorithm::BlockReward, index));
-            index += 1;
+                .push(to_balance_change( &default_trace, &default_call, balance_change, Algorithm::BlockReward));
         }
     }
 
@@ -122,8 +110,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
             if is_valid_balance_change(balance_change) {
                 events
                     .balance_changes
-                    .push(to_balance_change(clock, &default_trace, call, balance_change, Algorithm::System, index));
-                index += 1;
+                    .push(to_balance_change( &default_trace, call, balance_change, Algorithm::System));
             }
         }
     }
@@ -139,19 +126,16 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
     for trx in block.transactions() {
         // transaction fee
         for transfer in get_transfer_from_transaction_fee(trx, &base_fee_per_gas, &header.coinbase) {
-            events.transfers.push(to_transfer(clock, trx, &default_call, transfer, index));
-            index += 1;
+            events.transfers.push(to_transfer( trx, &default_call, transfer));
         }
         // find all transfers from transactions
         if let Some(transfer) = get_transfer_from_transaction(trx) {
-            events.transfers.push(to_transfer(clock, trx, &default_call, transfer, index));
-            index += 1;
+            events.transfers.push(to_transfer( trx, &default_call, transfer));
         }
         // find all transfers from calls
         for call_view in trx.calls() {
             if let Some(transfer) = get_transfer_from_call(call_view.call) {
-                events.transfers.push(to_transfer(clock, trx, call_view.call, transfer, index));
-                index += 1;
+                events.transfers.push(to_transfer( trx, call_view.call, transfer));
             }
         }
     }
@@ -176,8 +160,7 @@ pub fn insert_events<'a>(clock: &'a Clock, block: &'a Block, events: &mut Events
 
                 // balance change
                 if is_valid_balance_change(balance_change) {
-                    events.balance_changes.push(to_balance_change(clock, trx, call_view.call, balance_change, algorithm, index));
-                    index += 1;
+                    events.balance_changes.push(to_balance_change( trx, call_view.call, balance_change, algorithm ));
                 }
             }
         }

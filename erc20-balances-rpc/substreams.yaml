@@ -19,7 +19,6 @@ modules:
     kind: map
     doc: ERC20 balance changes via RPC
     inputs:
-      - source: sf.substreams.v1.Clock
       - map: erc20_balances:map_events
     output:
       type: proto:evm.tokens.balances.v1.Events

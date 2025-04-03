@@ -25,8 +25,6 @@ message PoolCreated {
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
-  uint64 index = 11; // relative index
-  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- pool created --
   bytes token0 = 20;
@@ -52,8 +50,6 @@ message Initialize {
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
-  uint64 index = 11; // relative index
-  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- Initialize --
   string sqrt_price_x96 = 20; // uint160
@@ -88,8 +84,6 @@ message Swap {
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
-  uint64 index = 11; // relative index
-  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- swap --
   bytes sender = 20; // address

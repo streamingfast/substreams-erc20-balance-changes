@@ -20,14 +20,8 @@ pub struct BalanceChange {
     /// -- ordering --
     ///
     /// storage_change.ordinal or balance_change.ordinal
-    #[prost(uint64, tag="10")]
-    pub ordinal: u64,
-    /// relative index
-    #[prost(uint64, tag="11")]
-    pub index: u64,
-    /// latest global sequence (block_num << 32 + index)
-    #[prost(uint64, tag="12")]
-    pub global_sequence: u64,
+    #[prost(uint64, optional, tag="10")]
+    pub ordinal: ::core::option::Option<u64>,
     /// -- balance change --
     ///
     /// storage_change.address
@@ -67,12 +61,6 @@ pub struct Transfer {
     /// log.ordinal or call.begin_ordinal or trx.begin_ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
-    /// relative index
-    #[prost(uint64, tag="11")]
-    pub index: u64,
-    /// latest global sequence (block_num << 32 + index)
-    #[prost(uint64, tag="12")]
-    pub global_sequence: u64,
     /// -- transfer --
     ///
     /// log.address

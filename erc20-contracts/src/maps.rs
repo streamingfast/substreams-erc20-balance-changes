@@ -1,15 +1,12 @@
-use common::to_global_sequence;
 use proto::pb::evm::tokens::erc20::contracts::v1::{Events, ContractChange};
 use substreams::errors::Error;
-use substreams::pb::substreams::Clock;
 use substreams_ethereum::pb::eth::v2::Block;
 
 use crate::metadata::get_metadata;
 
 #[substreams::handlers::map]
-pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
+pub fn map_events(block: Block) -> Result<Events, Error> {
     let mut events = Events::default();
-    let mut index = 0;
 
     for trx in block.transactions() {
         for call_view in trx.calls() {
@@ -26,8 +23,6 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
 
                         // -- ordering --
                         ordinal: Some(call.begin_ordinal),
-                        index,
-                        global_sequence: to_global_sequence(&clock, call.index.into()),
 
                         // -- contract --
                         address: call.address.to_vec(),
@@ -35,7 +30,6 @@ pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
                         symbol: result.symbol,
                         decimals: result.decimals,
                     });
-                    index += 1;
                 }
                 _ => {}
             }

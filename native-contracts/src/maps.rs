@@ -1,43 +1,39 @@
-use common::to_global_sequence;
 use proto::pb::evm::tokens::contracts::v1::{ContractCreation, Events};
 use substreams::errors::Error;
-use substreams::pb::substreams::Clock;
 use substreams_ethereum::pb::eth::v2::{Block, CallType};
 
 #[substreams::handlers::map]
-pub fn map_events(clock: Clock, block: Block) -> Result<Events, Error> {
-    let contract_creations: Vec<ContractCreation> = block
-        .transactions()
-        .flat_map(|trx| {
-            trx.calls
-                .iter()
-                .filter(|call| call.call_type() == CallType::Create)
-                .flat_map(move |call| call.code_changes.iter().map(move |code_change| (trx, call, code_change)))
-        })
-        .enumerate()
-        .map(|(idx, (trx, call, code_change))| {
-            ContractCreation {
+pub fn map_events(block: Block) -> Result<Events, Error> {
+    let mut events = Events::default();
+
+    for trx in block.transactions() {
+        for call_view in trx.calls() {
+            // Filter for contract creation calls
+            let call = call_view.call;
+            if call.call_type() != CallType::Create { continue; }
+
+            // Code changes describe the contract creation
+            for code_change in call.code_changes.iter() {
                 // -- transaction --
-                transaction_id: trx.hash.to_vec(),
-                from: trx.from.to_vec(),
-                to: trx.to.to_vec(),
+                events.contract_creations.push(ContractCreation {
+                    // -- transaction --
+                    transaction_id: trx.hash.to_vec(),
+                    from: trx.from.to_vec(),
+                    to: trx.to.to_vec(),
 
-                // -- call --
-                caller: call.caller.to_vec(),
+                    // -- call --
+                    caller: call.caller.to_vec(),
 
-                // -- ordering --
-                ordinal: code_change.ordinal,
-                index: idx as u64,
-                global_sequence: to_global_sequence(&clock, idx as u64),
+                    // -- ordering --
+                    ordinal: code_change.ordinal,
 
-                // -- contract --
-                address: code_change.address.to_vec(),
-                hash: code_change.new_hash.to_vec(),
+                    // -- contract --
+                    address: code_change.address.to_vec(),
+                    hash: code_change.new_hash.to_vec(),
+                });
             }
-        })
-        .collect();
+        }
+    }
 
-    Ok(Events {
-        contract_creations,
-    })
+    Ok(events)
 }

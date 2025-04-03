@@ -24,12 +24,6 @@ pub struct ContractCreation {
     /// log.ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
-    /// relative index
-    #[prost(uint64, tag="11")]
-    pub index: u64,
-    /// latest global sequence (block_num << 32 + index)
-    #[prost(uint64, tag="12")]
-    pub global_sequence: u64,
     /// -- contract --
     ///
     /// code_change.address

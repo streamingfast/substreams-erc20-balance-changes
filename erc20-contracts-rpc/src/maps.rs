@@ -1,18 +1,15 @@
-use common::to_global_sequence;
 use proto::pb::evm::tokens::erc20::contracts::v1::{ContractChange, Events};
-use substreams::pb::substreams::Clock;
 use substreams::store::{DeltaBigInt, Deltas};
 use substreams::{errors::Error, scalar::BigInt, Hex};
 
 use crate::calls;
 
 #[substreams::handlers::map]
-pub fn map_events(clock: Clock, store_erc20_transfers: Deltas<DeltaBigInt>) -> Result<Events, Error> {
+pub fn map_events(store_erc20_transfers: Deltas<DeltaBigInt>) -> Result<Events, Error> {
     let contract_changes = store_erc20_transfers
         .deltas
         .into_iter()
-        .enumerate()
-        .filter_map(|(idx, delta)| {
+        .filter_map(|delta| {
             // Extract Token Metadata only on first valid ERC20 transfer event
             if delta.new_value != BigInt::one() {
                 return None;
@@ -38,8 +35,6 @@ pub fn map_events(clock: Clock, store_erc20_transfers: Deltas<DeltaBigInt>) -> R
 
                     // -- ordering --
                     ordinal: None,
-                    index: idx as u64,
-                    global_sequence: to_global_sequence(&clock, idx as u64),
 
                     // -- contract --
                     address,

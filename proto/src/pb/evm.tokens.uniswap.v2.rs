@@ -26,12 +26,6 @@ pub struct PairCreated {
     /// log.ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
-    /// relative index
-    #[prost(uint64, tag="11")]
-    pub index: u64,
-    /// latest global sequence (block_num << 32 + index)
-    #[prost(uint64, tag="12")]
-    pub global_sequence: u64,
     /// -- pool created --
     #[prost(bytes="vec", tag="20")]
     pub token0: ::prost::alloc::vec::Vec<u8>,
@@ -54,12 +48,6 @@ pub struct Sync {
     /// log.ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
-    /// relative index
-    #[prost(uint64, tag="11")]
-    pub index: u64,
-    /// latest global sequence (block_num << 32 + index)
-    #[prost(uint64, tag="12")]
-    pub global_sequence: u64,
     /// -- sync --
     ///
     /// uint112
@@ -85,12 +73,6 @@ pub struct Swap {
     /// log.ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
-    /// relative index
-    #[prost(uint64, tag="11")]
-    pub index: u64,
-    /// latest global sequence (block_num << 32 + index)
-    #[prost(uint64, tag="12")]
-    pub global_sequence: u64,
     /// -- swap --
     ///
     /// uint256

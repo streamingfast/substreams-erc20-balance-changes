@@ -20,12 +20,6 @@ pub struct ContractChange {
     /// log.ordinal
     #[prost(uint64, optional, tag="10")]
     pub ordinal: ::core::option::Option<u64>,
-    /// relative index
-    #[prost(uint64, tag="11")]
-    pub index: u64,
-    /// latest global sequence (block_num << 32 + index)
-    #[prost(uint64, tag="12")]
-    pub global_sequence: u64,
     /// -- contract --
     #[prost(bytes="vec", tag="20")]
     pub address: ::prost::alloc::vec::Vec<u8>,

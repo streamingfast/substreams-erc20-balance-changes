@@ -17,8 +17,6 @@ message ContractCreation {
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
-  uint64 index = 11; // relative index
-  uint64 global_sequence = 12; // latest global sequence (block_num << 32 + index)
 
   // -- contract --
   bytes address = 20; // code_change.address
