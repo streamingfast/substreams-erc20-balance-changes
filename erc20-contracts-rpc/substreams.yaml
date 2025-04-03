@@ -24,7 +24,6 @@ modules:
   - name: map_events
     kind: map
     inputs:
-      - source: sf.substreams.v1.Clock
       - store: v1_10:store_erc20_transfers
         mode: deltas
     output:
