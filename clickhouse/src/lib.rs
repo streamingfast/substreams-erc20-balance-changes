@@ -1,6 +1,6 @@
 mod db_out;
 mod common;
-mod erc20_balances;
+mod balances;
 // mod erc20_contracts;
 // mod uniswap_v2;
 // mod uniswap_v3;

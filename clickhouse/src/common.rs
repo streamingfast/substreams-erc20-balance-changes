@@ -1,5 +1,5 @@
 use common::{bytes_to_hex, to_global_sequence, Hash};
-use proto::pb::evm::tokens::balances::v1::Algorithm;
+use proto::pb::{evm::tokens::balances::v1::Algorithm, sf::ethereum::r#type::v2::{balance_change::Reason, transaction_trace::Type, CallType, TransactionTraceStatus}};
 use substreams::pb::substreams::Clock;
 use substreams_database_change::tables::Row;
 
@@ -34,10 +34,14 @@ pub fn set_ordering(index: u64, ordinal: Option<u64>, clock: &Clock, row: &mut R
         .set("global_sequence", to_global_sequence(clock, index));
 }
 
-pub fn set_algorithm(algorithm: Algorithm, row: &mut Row) {
+pub fn set_debug(algorithm: Algorithm, trx_type: Type, call_type: CallType, reason: Option<Reason>, row: &mut Row) {
     row
         .set("algorithm", algorithm.as_str_name())
-        .set("algorithm_code", algorithm as u8);
+        .set("trx_type", algorithm.as_str_name())
+        .set("call_type", algorithm.as_str_name());
+    if let Some(reason) = reason {
+        row.set("reason", reason.as_str_name());
+    }
 }
 
 pub fn set_bytes(bytes: Option<Hash>, name: &str, row: &mut Row) {

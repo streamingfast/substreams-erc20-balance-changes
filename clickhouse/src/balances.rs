@@ -2,49 +2,49 @@ use common::bytes_to_hex;
 use proto::pb::evm::tokens::balances::v1::{BalanceChange, Events, Transfer};
 use substreams::pb::substreams::Clock;
 
-use crate::common::{common_key, set_algorithm, set_caller, set_clock, set_ordering, set_transaction_id};
+use crate::common::{common_key, set_caller, set_clock, set_debug, set_ordering, set_transaction_id};
 
-pub fn process_erc20_balances(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events, mut index: u64) -> u64 {
+pub fn process_balances(prefix: &str, tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events, mut index: u64) -> u64 {
     // Process ERC-20 balance changes
     for event in events.balance_changes {
-        process_erc20_balance_change(tables, clock, event, index);
+        process_balance_change(prefix, tables, clock, event, index);
         index += 1;
     }
 
     // Process ERC-20 transfers
     for event in events.transfers {
-        process_erc20_transfer(tables, clock, event, index);
+        process_transfer(prefix, tables, clock, event, index);
         index += 1;
     }
     index
 }
 
-fn process_erc20_balance_change(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: BalanceChange, index: u64) {
+fn process_balance_change(prefix: &str, tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: BalanceChange, index: u64) {
     let key = common_key(clock, index);
     let row = tables
-        .create_row("balance_changes", key)
-        .set("contract", bytes_to_hex(&event.contract))
+        .create_row(&format!("{}balance_changes", prefix).to_string(), key)
         .set("address", bytes_to_hex(&event.address))
+        .set("contract", bytes_to_hex(&event.contract))
         .set("old_balance", event.old_balance.as_ref().unwrap_or(&"0".to_string()))
         .set("new_balance", &event.new_balance);
 
-    set_algorithm(event.algorithm(), row);
+    set_debug(event.algorithm(), event.trx_type(), event.call_type(), Some(event.reason()), row);
     set_caller(event.caller, row);
     set_ordering(index, event.ordinal, clock, row);
     set_transaction_id(event.transaction_id, row);
     set_clock(clock, row);
 }
 
-fn process_erc20_transfer(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: Transfer, index: u64) {
+fn process_transfer(prefix: &str, tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: Transfer, index: u64) {
     let key = common_key(clock, event.ordinal);
     let row = tables
-        .create_row("transfers", key)
+        .create_row(&format!("{}transfers", prefix).to_string(), key)
         .set("contract", bytes_to_hex(&event.contract))
         .set("from", bytes_to_hex(&event.from))
         .set("to", bytes_to_hex(&event.to))
         .set("value", &event.value);
 
-    set_algorithm(event.algorithm(), row);
+    set_debug(event.algorithm(), event.trx_type(), event.call_type(), None, row);
     set_ordering(index, Some(event.ordinal), clock, row);
     set_caller(event.caller, row);
     set_transaction_id(event.transaction_id, row);

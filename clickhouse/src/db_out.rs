@@ -6,7 +6,7 @@ use proto::pb::evm::tokens::balances::v1::Events as EventsBalances;
 use substreams::{errors::Error, pb::substreams::Clock};
 use substreams_database_change::pb::database::DatabaseChanges;
 
-use crate::erc20_balances::process_erc20_balances;
+use crate::balances::process_balances;
 
 #[substreams::handlers::map]
 // pub fn db_out(mut clock: Clock, erc20_balances: EventsBalances, erc20_balances_rpc: EventsBalances, erc20_contracts: EventsContracts, erc20_contracts_rpc: EventsContracts, native_balances: EventsBalances, uniswap_v2: EventsPricesUniswapV2, uniswap_v3: EventsPricesUniswapV3) -> Result<DatabaseChanges, Error> {
@@ -14,11 +14,11 @@ pub fn db_out(mut clock: Clock, erc20_balances: EventsBalances, erc20_balances_r
     let mut tables = substreams_database_change::tables::Tables::new();
     clock = update_genesis_clock(clock);
 
-    // -- ERC-20 --
+    // -- Balances/Transfers --
     let mut index = 0;
-    index = process_erc20_balances(&mut tables, &clock, erc20_balances, index);
-    index = process_erc20_balances(&mut tables, &clock, erc20_balances_rpc, index);
-    index = process_erc20_balances(&mut tables, &clock, native_balances, index);
+    index = process_balances("erc20_", &mut tables, &clock, erc20_balances, index);
+    index = process_balances("erc20_", &mut tables, &clock, erc20_balances_rpc, index);
+    index = process_balances("native_", &mut tables, &clock, native_balances, index);
 
     // // Pre-compute frequently used values
     // let block_num = clock.number.to_string();
