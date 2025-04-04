@@ -19,11 +19,13 @@ pub struct ContractCreation {
     #[prost(bytes="vec", tag="7")]
     pub to: ::prost::alloc::vec::Vec<u8>,
     /// -- call --
+    ///
+    /// call.caller
     #[prost(bytes="vec", tag="8")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
     /// -- ordering --
     ///
-    /// log.ordinal
+    /// code_change.ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
     /// -- contract --

@@ -14,10 +14,10 @@ message ContractCreation {
   bytes to = 7;
 
   // -- call --
-  bytes caller = 8;
+  bytes caller = 8; // call.caller
 
   // -- ordering --
-  uint64 ordinal = 10; // log.ordinal
+  uint64 ordinal = 10; // code_change.ordinal
 
   // -- contract --
   bytes address = 20; // code_change.address
