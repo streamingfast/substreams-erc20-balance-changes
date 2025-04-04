@@ -13,19 +13,24 @@ CREATE TABLE IF NOT EXISTS contract_creations  (
 
    -- transaction --
    transaction_id       FixedString(66),
-   `from`               FixedString(42) COMMENT 'creator address',
+   `from`               FixedString(42),
    `to`                 FixedString(42),
+
+   -- call --
+   caller               FixedString(42) COMMENT 'contract creator',
 
    -- contract --
    address              FixedString(42) COMMENT 'contract address',
+   hash                 FixedString(66) COMMENT 'unique contract hash',
 
    -- indexes --
    INDEX idx_block_num          (block_num)           TYPE minmax GRANULARITY 4,
    INDEX idx_timestamp          (timestamp)           TYPE minmax GRANULARITY 4,
-   INDEX idx_date               (date)                TYPE minmax GRANULARITY 4,
    INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
    INDEX idx_from               (`from`)              TYPE bloom_filter GRANULARITY 4,
    INDEX idx_to                 (`to`)                TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_hash               (hash)                TYPE bloom_filter GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (address)

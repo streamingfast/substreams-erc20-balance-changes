@@ -145,14 +145,15 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    date                 Date,
 
    -- ordering --
-   -- ordinal              UInt64 COMMENT 'NOT IMPLEMENTED', -- log.ordinal
+   ordinal              UInt64, -- log.ordinal
    `index`              UInt64, -- relative index
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
-   -- -- transaction --
-   -- transaction_id       FixedString(66) COMMENT 'NOT IMPLEMENTED',
-   -- `from`               FixedString(42) COMMENT 'NOT IMPLEMENTED: ERC-20 creator/modifier address',
-   -- `to`                 FixedString(42) COMMENT 'NOT IMPLEMENTED',
+   -- transaction --
+   transaction_id       FixedString(66),
+
+   -- call --
+   caller               FixedString(42) COMMENT 'contract creator/modifier address',
 
    -- contract --
    address              FixedString(42) COMMENT 'ERC-20 contract address',
@@ -160,19 +161,13 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    symbol               String COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
    decimals             UInt8 COMMENT 'ERC-20 contract decimals (18 by default)',
 
-   -- -- debug --
-   -- algorithm            LowCardinality(String) COMMENT 'NOT IMPLEMENTED',
-   -- algorithm_code       UInt8 COMMENT 'NOT IMPLEMENTED',
-
    -- indexes --
-   -- INDEX idx_transaction_id      (transaction_id)     TYPE bloom_filter GRANULARITY 4,
-   -- INDEX idx_from                (`from`)             TYPE bloom_filter GRANULARITY 4,
-   -- INDEX idx_to                  (`to`)               TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_transaction_id      (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_caller              (caller)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address             (address)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_name                (name)               TYPE bloom_filter GRANULARITY 4,
    INDEX idx_symbol              (symbol)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_decimals            (decimals)           TYPE minmax GRANULARITY 4,
-   -- INDEX idx_algorithm           (algorithm)          TYPE set(2) GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (date, block_num, `index`)
@@ -229,6 +224,45 @@ ORDER BY (address);
 CREATE MATERIALIZED VIEW IF NOT EXISTS native_balances_mv
 TO native_balances AS
 SELECT * FROM native_balance_changes;
+
+
+-- contract creations events --
+CREATE TABLE IF NOT EXISTS contract_creations  (
+   -- block --
+   block_num            UInt32,
+   block_hash           FixedString(66),
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
+
+   -- ordering --
+   ordinal              UInt64, -- storage_change.ordinal or balance_change.ordinal
+   `index`              UInt64, -- relative index
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- transaction --
+   transaction_id       FixedString(66),
+   `from`               FixedString(42),
+   `to`                 FixedString(42),
+
+   -- call --
+   caller               FixedString(42) COMMENT 'contract creator',
+
+   -- contract --
+   address              FixedString(42) COMMENT 'contract address',
+   hash                 FixedString(66) COMMENT 'unique contract hash',
+
+   -- indexes --
+   INDEX idx_block_num          (block_num)           TYPE minmax GRANULARITY 4,
+   INDEX idx_timestamp          (timestamp)           TYPE minmax GRANULARITY 4,
+   INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_from               (`from`)              TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_to                 (`to`)                TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_hash               (hash)                TYPE bloom_filter GRANULARITY 4,
+)
+ENGINE = ReplacingMergeTree
+PRIMARY KEY (address)
+ORDER BY (address);
 
 
 

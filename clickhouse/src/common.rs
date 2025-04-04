@@ -1,5 +1,5 @@
 use common::{bytes_to_hex, to_global_sequence, Hash};
-use proto::pb::{evm::tokens::balances::v1::Algorithm, sf::ethereum::r#type::v2::{balance_change::Reason, transaction_trace::Type, CallType, TransactionTraceStatus}};
+use proto::pb::{evm::tokens::balances::v1::Algorithm, sf::ethereum::r#type::v2::{balance_change::Reason, transaction_trace::Type, CallType}};
 use substreams::pb::substreams::Clock;
 use substreams_database_change::tables::Row;
 

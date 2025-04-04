@@ -1,23 +1,49 @@
+use common::bytes_to_hex;
+use proto::pb::evm::tokens::contracts::v1::{ContractChange, ContractCreation, Events};
+use substreams::pb::substreams::Clock;
 
-// Helper function to process a single contract_changes
-fn process_contract_creation(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: ContractCreation) {
-    let address = bytes_to_hex(&event.address);
-    let key = [("address", address.to_string())];
-    set_clock(
-        &clock,
-        tables
-            .create_row("contract_creations", key)
-            // -- transaction --
-            .set("transaction_id", bytes_to_hex(&event.transaction_id))
-            .set("from", bytes_to_hex(&event.from))
-            .set("to", bytes_to_hex(&event.to))
+use crate::common::{common_key, set_caller, set_clock, set_ordering, set_transaction_id};
 
-            // -- ordering --
-            .set("ordinal", event.ordinal)
-            .set("index", event.index)
-            .set("global_sequence", event.global_sequence)
+pub fn process_contracts(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events, mut index: u64) -> u64 {
+    for event in events.contract_creations {
+        process_contract_creation(tables, clock, event, index);
+        index += 1;
+    }
 
-            // -- contract --
-            .set("address", &address),
-    );
+    for event in events.contract_changes {
+        process_contract_change(tables, clock, event, index);
+        index += 1;
+    }
+    index
+}
+
+fn process_contract_change(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: ContractChange, index: u64) {
+    let key = common_key(clock, index);
+    let row = tables
+        .create_row("contract_changes", key)
+        .set("address", &bytes_to_hex(&event.address))
+        .set("name", &event.name.unwrap_or("".to_string()))
+        .set("symbol", &event.symbol.unwrap_or("".to_string()))
+        .set("decimals", event.decimals.unwrap_or(0).to_string());
+    // TO-DO handle Nullable values
+
+    set_caller(event.caller, row);
+    set_ordering(index, event.ordinal, clock, row);
+    set_transaction_id(event.transaction_id, row);
+    set_clock(clock, row);
+}
+
+fn process_contract_creation(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: ContractCreation, index: u64) {
+    let key = common_key(clock, index);
+    let row = tables
+        .create_row("contract_changes", key)
+        .set("address", &bytes_to_hex(&event.address))
+        .set("from", &bytes_to_hex(&event.from))
+        .set("to", &bytes_to_hex(&event.to))
+        .set("hash", &bytes_to_hex(&event.hash));
+
+    set_caller(Some(event.caller), row);
+    set_ordering(index, Some(event.ordinal), clock, row);
+    set_transaction_id(Some(event.transaction_id), row);
+    set_clock(clock, row);
 }
