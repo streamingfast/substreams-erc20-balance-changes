@@ -13,17 +13,18 @@ pub fn map_events(block: Block) -> Result<Events, Error> {
     // https://github.com/Uniswap/v3-core
     // https://github.com/pinax-network/substreams-abis/tree/main/abi/evm/uniswap/v3
     for trx in block.transactions() {
-        for (log, _) in trx.logs_with_calls() {
+        for (log, call_view) in trx.logs_with_calls() {
             // Uniswap::V3::Pair:Swap
             if let Some(event) = SwapAbi::match_and_decode(log) {
                 events.swaps.push(Swap {
                     // -- transaction --
                     transaction_id: trx.hash.to_vec(),
-                    // -- log --
-                    address: log.address.to_vec(),
+                    // -- call --
+                    caller: call_view.call.caller.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
                     // -- swap --
+                    address: log.address.to_vec(),
                     amount0: event.amount0.to_string(),
                     amount1: event.amount1.to_string(),
                     sender: event.sender,
@@ -37,11 +38,12 @@ pub fn map_events(block: Block) -> Result<Events, Error> {
                 events.pools_created.push(PoolCreated {
                     // -- transaction --
                     transaction_id: trx.hash.to_vec(),
-                    // -- log --
-                    address: log.address.to_vec(),
+                    // -- call --
+                    caller: call_view.call.caller.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
                     // -- pair created --
+                    address: log.address.to_vec(),
                     pool: event.pool,
                     token0: event.token0,
                     token1: event.token1,
@@ -53,11 +55,12 @@ pub fn map_events(block: Block) -> Result<Events, Error> {
                 events.intializes.push(Initialize {
                     // -- transaction --
                     transaction_id: trx.hash.to_vec(),
-                    // -- log --
-                    address: log.address.to_vec(),
+                    // -- call --
+                    caller: call_view.call.caller.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
                     // -- intialize --
+                    address: log.address.to_vec(),
                     sqrt_price_x96: event.sqrt_price_x96.to_string(),
                     tick: event.tick.to_i32(),
                 });

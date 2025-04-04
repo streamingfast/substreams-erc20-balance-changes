@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    block_num            UInt32,
    block_hash           FixedString(66),
    timestamp            DateTime(0, 'UTC'),
-   date                 Date,
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
@@ -32,8 +31,8 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    INDEX idx_decimals            (decimals)           TYPE minmax GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
-PRIMARY KEY (date, block_num, `index`)
-ORDER BY (date, block_num, `index`);
+PRIMARY KEY (timestamp, block_num, `index`)
+ORDER BY (timestamp, block_num, `index`);
 
 -- latest ERC-20 contracts --
 CREATE TABLE IF NOT EXISTS contracts  (

@@ -14,24 +14,28 @@ pub struct Events {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PairCreated {
     /// -- transaction --
-    #[prost(bytes="vec", tag="1")]
-    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
-    /// -- log --
-    ///
-    /// log.address (factory)
     #[prost(bytes="vec", tag="5")]
-    pub address: ::prost::alloc::vec::Vec<u8>,
+    pub transaction_id: ::prost::alloc::vec::Vec<u8>,
+    /// -- call --
+    ///
+    /// call.caller
+    #[prost(bytes="vec", tag="8")]
+    pub caller: ::prost::alloc::vec::Vec<u8>,
     /// -- ordering --
     ///
     /// log.ordinal
     #[prost(uint64, tag="10")]
     pub ordinal: u64,
     /// -- pool created --
+    ///
+    /// log.address (factory)
     #[prost(bytes="vec", tag="20")]
-    pub token0: ::prost::alloc::vec::Vec<u8>,
+    pub address: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="21")]
-    pub token1: ::prost::alloc::vec::Vec<u8>,
+    pub token0: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="22")]
+    pub token1: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="23")]
     pub pair: ::prost::alloc::vec::Vec<u8>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -40,9 +44,11 @@ pub struct Sync {
     /// -- transaction --
     #[prost(bytes="vec", tag="1")]
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
-    /// -- log --
-    #[prost(bytes="vec", tag="5")]
-    pub address: ::prost::alloc::vec::Vec<u8>,
+    /// -- call --
+    ///
+    /// call.caller
+    #[prost(bytes="vec", tag="8")]
+    pub caller: ::prost::alloc::vec::Vec<u8>,
     /// -- ordering --
     ///
     /// log.ordinal
@@ -50,11 +56,14 @@ pub struct Sync {
     pub ordinal: u64,
     /// -- sync --
     ///
-    /// uint112
-    #[prost(string, tag="20")]
-    pub reserve0: ::prost::alloc::string::String,
+    /// log.address (factory)
+    #[prost(bytes="vec", tag="20")]
+    pub address: ::prost::alloc::vec::Vec<u8>,
     /// uint112
     #[prost(string, tag="21")]
+    pub reserve0: ::prost::alloc::string::String,
+    /// uint112
+    #[prost(string, tag="22")]
     pub reserve1: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -63,11 +72,11 @@ pub struct Swap {
     /// -- transaction --
     #[prost(bytes="vec", tag="1")]
     pub transaction_id: ::prost::alloc::vec::Vec<u8>,
-    /// -- log --
+    /// -- call --
     ///
-    /// log.address
-    #[prost(bytes="vec", tag="5")]
-    pub address: ::prost::alloc::vec::Vec<u8>,
+    /// call.caller
+    #[prost(bytes="vec", tag="8")]
+    pub caller: ::prost::alloc::vec::Vec<u8>,
     /// -- ordering --
     ///
     /// log.ordinal
@@ -75,21 +84,24 @@ pub struct Swap {
     pub ordinal: u64,
     /// -- swap --
     ///
-    /// uint256
-    #[prost(string, tag="20")]
-    pub amount0_in: ::prost::alloc::string::String,
+    /// log.address (factory)
+    #[prost(bytes="vec", tag="20")]
+    pub address: ::prost::alloc::vec::Vec<u8>,
     /// uint256
     #[prost(string, tag="21")]
-    pub amount0_out: ::prost::alloc::string::String,
+    pub amount0_in: ::prost::alloc::string::String,
     /// uint256
     #[prost(string, tag="22")]
-    pub amount1_in: ::prost::alloc::string::String,
+    pub amount0_out: ::prost::alloc::string::String,
     /// uint256
     #[prost(string, tag="23")]
+    pub amount1_in: ::prost::alloc::string::String,
+    /// uint256
+    #[prost(string, tag="24")]
     pub amount1_out: ::prost::alloc::string::String,
-    #[prost(bytes="vec", tag="24")]
-    pub sender: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="25")]
+    pub sender: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="26")]
     pub to: ::prost::alloc::vec::Vec<u8>,
 }
 // @@protoc_insertion_point(module)

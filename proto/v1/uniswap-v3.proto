@@ -20,18 +20,19 @@ message PoolCreated {
   // -- transaction --
   bytes transaction_id = 1;
 
-  // -- log --
-  bytes address = 5; // log.address (factory)
+  // -- call --
+  bytes caller = 8; // call.caller
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
 
   // -- pool created --
-  bytes token0 = 20;
-  bytes token1 = 21;
-  bytes pool = 22;
-  int32 tick_spacing = 23; // int24 (e.g., 60)
-  uint64 fee = 24; // uint24 (e.g., 3000 represents 0.30%)
+  bytes address = 20; // log.address (factory)
+  bytes token0 = 21;
+  bytes token1 = 22;
+  bytes pool = 23;
+  int32 tick_spacing = 24; // int24 (e.g., 60)
+  uint64 fee = 25; // uint24 (e.g., 3000 represents 0.30%)
 }
 
 /**
@@ -45,15 +46,16 @@ message Initialize {
   // -- transaction --
   bytes transaction_id = 1;
 
-  // -- log --
-  bytes address = 5; // log.address
+  // -- call --
+  bytes caller = 8; // call.caller
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
 
   // -- Initialize --
-  string sqrt_price_x96 = 20; // uint160
-  int32 tick = 21; // int24
+  bytes address = 20; // log.address
+  string sqrt_price_x96 = 21; // uint160
+  int32 tick = 22; // int24
 }
 
 /**
@@ -79,262 +81,19 @@ message Swap {
   // -- transaction --
   bytes transaction_id = 1;
 
-  // -- log --
-  bytes address = 5; // log.address
+  // -- call --
+  bytes caller = 8; // call.caller
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
 
   // -- swap --
-  bytes sender = 20; // address
-  bytes recipient = 21; // address
-  string amount0 = 22; // int256
-  string amount1 = 23; // int256
-  string sqrt_price_x96 = 24; // uint160
-  string liquidity = 25; // uint128
-  int32 tick = 26; // int24
+  bytes address = 20; // log.address
+  bytes sender = 21; // address
+  bytes recipient = 22; // address
+  string amount0 = 23; // int256
+  string amount1 = 24; // int256
+  string sqrt_price_x96 = 25; // uint160
+  string liquidity = 26; // uint128
+  int32 tick = 27; // int24
 }
-
-// Mint
-// [
-//   {
-//     "indexed": false,
-//     "internalType": "address",
-//     "name": "sender",
-//     "type": "address"
-//   },
-//   {
-//     "indexed": true,
-//     "internalType": "address",
-//     "name": "owner",
-//     "type": "address"
-//   },
-//   {
-//     "indexed": true,
-//     "internalType": "int24",
-//     "name": "tickLower",
-//     "type": "int24"
-//   },
-//   {
-//     "indexed": true,
-//     "internalType": "int24",
-//     "name": "tickUpper",
-//     "type": "int24"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint128",
-//     "name": "amount",
-//     "type": "uint128"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint256",
-//     "name": "amount0",
-//     "type": "uint256"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint256",
-//     "name": "amount1",
-//     "type": "uint256"
-//   }
-// ]
-
-
-// SetFeeProtocol
-// [
-//   {
-//     "indexed": false,
-//     "internalType": "uint8",
-//     "name": "feeProtocol0Old",
-//     "type": "uint8"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint8",
-//     "name": "feeProtocol1Old",
-//     "type": "uint8"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint8",
-//     "name": "feeProtocol0New",
-//     "type": "uint8"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint8",
-//     "name": "feeProtocol1New",
-//     "type": "uint8"
-//   }
-// ]
-
-// Burn
-// [
-//   {
-//     "indexed": true,
-//     "internalType": "address",
-//     "name": "owner",
-//     "type": "address"
-//   },
-//   {
-//     "indexed": true,
-//     "internalType": "int24",
-//     "name": "tickLower",
-//     "type": "int24"
-//   },
-//   {
-//     "indexed": true,
-//     "internalType": "int24",
-//     "name": "tickUpper",
-//     "type": "int24"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint128",
-//     "name": "amount",
-//     "type": "uint128"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint256",
-//     "name": "amount0",
-//     "type": "uint256"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint256",
-//     "name": "amount1",
-//     "type": "uint256"
-//   }
-// ]
-
-
-// Collect
-// [
-//   {
-//     "indexed": true,
-//     "internalType": "address",
-//     "name": "owner",
-//     "type": "address"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "address",
-//     "name": "recipient",
-//     "type": "address"
-//   },
-//   {
-//     "indexed": true,
-//     "internalType": "int24",
-//     "name": "tickLower",
-//     "type": "int24"
-//   },
-//   {
-//     "indexed": true,
-//     "internalType": "int24",
-//     "name": "tickUpper",
-//     "type": "int24"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint128",
-//     "name": "amount0",
-//     "type": "uint128"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint128",
-//     "name": "amount1",
-//     "type": "uint128"
-//   }
-// ]
-
-// CollectProtocol
-// [
-//   {
-//     "indexed": true,
-//     "internalType": "address",
-//     "name": "sender",
-//     "type": "address"
-//   },
-//   {
-//     "indexed": true,
-//     "internalType": "address",
-//     "name": "recipient",
-//     "type": "address"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint128",
-//     "name": "amount0",
-//     "type": "uint128"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint128",
-//     "name": "amount1",
-//     "type": "uint128"
-//   }
-// ]
-
-// Flash
-// [
-//   {
-//     "indexed": true,
-//     "internalType": "address",
-//     "name": "sender",
-//     "type": "address"
-//   },
-//   {
-//     "indexed": true,
-//     "internalType": "address",
-//     "name": "recipient",
-//     "type": "address"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint256",
-//     "name": "amount0",
-//     "type": "uint256"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint256",
-//     "name": "amount1",
-//     "type": "uint256"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint256",
-//     "name": "paid0",
-//     "type": "uint256"
-//   },
-//   {
-//     "indexed": false,
-//     "internalType": "uint256",
-//     "name": "paid1",
-//     "type": "uint256"
-//   }
-// ],
-
-
-// {
-//   "anonymous": false,
-//   "inputs": [
-//     {
-//       "indexed": false,
-//       "internalType": "uint16",
-//       "name": "observationCardinalityNextOld",
-//       "type": "uint16"
-//     },
-//     {
-//       "indexed": false,
-//       "internalType": "uint16",
-//       "name": "observationCardinalityNextNew",
-//       "type": "uint16"
-//     }
-//   ],
-//   "name": "IncreaseObservationCardinalityNext",
-//   "type": "event"

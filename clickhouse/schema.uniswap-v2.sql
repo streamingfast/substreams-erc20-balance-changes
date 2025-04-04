@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_pairs_created (
    block_num            UInt32,
    block_hash           FixedString(66),
    timestamp            DateTime(0, 'UTC'),
-   date                 Date,
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
@@ -13,6 +12,9 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_pairs_created (
 
    -- transaction --
    transaction_id       FixedString(66),
+
+   -- call --
+   caller               FixedString(42) COMMENT 'factory creator', -- call.caller
 
    -- log --
    address              FixedString(42) COMMENT 'UniswapV2Pair factory address', -- log.address
@@ -25,7 +27,6 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_pairs_created (
    -- indexes --
    INDEX idx_block_num        (block_num)          TYPE minmax GRANULARITY 4,
    INDEX idx_timestamp        (timestamp)          TYPE minmax GRANULARITY 4,
-   INDEX idx_date             (date)               TYPE minmax GRANULARITY 4,
    INDEX idx_transaction_id   (transaction_id)     TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token0           (token0)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token1           (token1)             TYPE bloom_filter GRANULARITY 4,
@@ -35,12 +36,11 @@ PRIMARY KEY (address, pair)
 ORDER BY (address, pair);
 
 -- Uniswap::V2::Pair:Sync --
-CREATE TABLE IF NOT EXISTS uniswap_v2_sync_changes  (
+CREATE TABLE IF NOT EXISTS uniswap_v2_syncs  (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),
    timestamp            DateTime(0, 'UTC'),
-   date                 Date,
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
@@ -49,6 +49,9 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_sync_changes  (
 
    -- transaction --
    transaction_id       FixedString(66),
+
+   -- call --
+   caller               FixedString(42) COMMENT 'caller address', -- call.caller
 
    -- log --
    address              FixedString(42) COMMENT 'UniswapV2Pair pair address', -- log.address
@@ -58,13 +61,15 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_sync_changes  (
    reserve1             UInt256 COMMENT 'UniswapV2Pair token1 reserve',
 
    -- indexes --
-   INDEX idx_sync_changes_transaction_id     (transaction_id)  TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_sync_changes_reserve0_minmax    (reserve0)        TYPE minmax       GRANULARITY 4,
-   INDEX idx_sync_changes_reserve1_minmax    (reserve1)        TYPE minmax       GRANULARITY 4,
+   INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_address            (address)             TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_reserve0_minmax    (reserve0)            TYPE minmax       GRANULARITY 4,
+   INDEX idx_reserve1_minmax    (reserve1)            TYPE minmax       GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
-PRIMARY KEY (date, block_num, ordinal)
-ORDER BY (date, block_num, ordinal);
+PRIMARY KEY (timestamp, block_num, `index`)
+ORDER BY (timestamp, block_num, `index`);
 
 -- Uniswap::V2::Pair:Swap --
 CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
@@ -72,7 +77,6 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
    block_num            UInt32,
    block_hash           FixedString(66),
    timestamp            DateTime(0, 'UTC'),
-   date                 Date,
 
    -- ordering --
    ordinal              UInt64, -- log.ordinal
@@ -81,6 +85,9 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
 
    -- transaction --
    transaction_id       FixedString(66),
+
+   -- call --
+   caller               FixedString(42) COMMENT 'caller address', -- call.caller
 
    -- log --
    address              FixedString(42) COMMENT 'UniswapV2Pair pair address', -- log.address
@@ -95,6 +102,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
 
    -- indexes --
    INDEX idx_transaction_id   (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_caller           (caller)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address          (address)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_sender           (sender)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_to               (`to`)               TYPE bloom_filter GRANULARITY 4,
@@ -104,35 +112,6 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
    INDEX idx_amount1_out      (amount1_out)        TYPE minmax       GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
-PRIMARY KEY (date, block_num, ordinal)
-ORDER BY (date, block_num, ordinal);
-
--- latest Uniswap::V2::Pair:Sync --
-CREATE TABLE IF NOT EXISTS uniswap_v2_syncs  (
-   -- block --
-   block_num            UInt32,
-   timestamp            DateTime(0, 'UTC'),
-   date                 Date,
-
-   -- ordering --
-   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
-
-   -- log --
-   address              FixedString(42),
-
-   -- sync --
-   reserve0             UInt256,
-   reserve1             UInt256,
-
-   -- indexes --
-   INDEX idx_reserve0       (reserve0)         TYPE minmax       GRANULARITY 4,
-   INDEX idx_reserve1       (reserve1)         TYPE minmax       GRANULARITY 4,
-)
-ENGINE = ReplacingMergeTree(global_sequence)
-PRIMARY KEY (address)
-ORDER BY (address);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_syncs_mv
-TO uniswap_v2_syncs AS
-SELECT * FROM uniswap_v2_sync_changes;
+PRIMARY KEY (timestamp, block_num, `index`)
+ORDER BY (timestamp, block_num, `index`);
 

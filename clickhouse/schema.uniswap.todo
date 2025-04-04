@@ -1,0 +1,30 @@
+
+-- latest Uniswap::V2::Pair:Sync --
+CREATE TABLE IF NOT EXISTS uniswap_v2_syncs  (
+   -- block --
+   block_num            UInt32,
+   timestamp            DateTime(0, 'UTC'),
+   date                 Date,
+
+   -- ordering --
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- log --
+   address              FixedString(42),
+
+   -- sync --
+   reserve0             UInt256,
+   reserve1             UInt256,
+
+   -- indexes --
+   INDEX idx_reserve0       (reserve0)         TYPE minmax       GRANULARITY 4,
+   INDEX idx_reserve1       (reserve1)         TYPE minmax       GRANULARITY 4,
+)
+ENGINE = ReplacingMergeTree(global_sequence)
+PRIMARY KEY (address)
+ORDER BY (address);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_syncs_mv
+TO uniswap_v2_syncs AS
+SELECT * FROM uniswap_v2_sync_changes;
+

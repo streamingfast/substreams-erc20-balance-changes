@@ -18,8 +18,8 @@ imports:
   erc20_balances: ../erc20-balances/substreams.yaml
   erc20_contracts: ../erc20-contracts/substreams.yaml
   erc20_contracts_rpc: ../erc20-contracts-rpc/substreams.yaml
-  # uniswap_v2: ../uniswap-v2/substreams.yaml
-  # uniswap_v3: ../uniswap-v3/substreams.yaml
+  uniswap_v2: ../uniswap-v2/substreams.yaml
+  uniswap_v3: ../uniswap-v3/substreams.yaml
 
 binaries:
   default:
@@ -31,14 +31,16 @@ modules:
     kind: map
     inputs:
       - source: sf.substreams.v1.Clock
+      # Native
       - map: native_balances:map_events
       - map: native_contracts:map_events
-
+      # ERC20
       - map: erc20_balances:map_events
       - map: erc20_contracts:map_events
       - map: erc20_contracts_rpc:map_events
-      # - map: uniswap_v2:map_events
-      # - map: uniswap_v3:map_events
+      # Uniswap V2/V3
+      - map: uniswap_v2:map_events
+      - map: uniswap_v3:map_events
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 

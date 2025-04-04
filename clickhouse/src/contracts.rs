@@ -34,9 +34,9 @@ fn process_contract_change(tables: &mut substreams_database_change::tables::Tabl
 }
 
 fn process_contract_creation(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: ContractCreation, index: u64) {
-    let key = common_key(clock, index);
+    let key = [("address", bytes_to_hex(&event.address))];
     let row = tables
-        .create_row("contract_changes", key)
+        .create_row("contract_creations", key)
         .set("address", &bytes_to_hex(&event.address))
         .set("from", &bytes_to_hex(&event.from))
         .set("to", &bytes_to_hex(&event.to))

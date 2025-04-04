@@ -10,50 +10,53 @@ message Events {
 
 message PairCreated {
   // -- transaction --
-  bytes transaction_id = 1;
+  bytes transaction_id = 5;
 
-  // -- log --
-  bytes address = 5; // log.address (factory)
+  // -- call --
+  bytes caller = 8; // call.caller
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
 
   // -- pool created --
-  bytes token0 = 20;
-  bytes token1 = 21;
-  bytes pair = 22;
+  bytes address = 20; // log.address (factory)
+  bytes token0 = 21;
+  bytes token1 = 22;
+  bytes pair = 23;
 }
 
 message Sync {
   // -- transaction --
   bytes transaction_id = 1;
 
-  // -- log --
-  bytes address = 5;
+  // -- call --
+  bytes caller = 8; // call.caller
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
 
   // -- sync --
-  string reserve0 = 20; // uint112
-  string reserve1 = 21; // uint112
+  bytes address = 20; // log.address (factory)
+  string reserve0 = 21; // uint112
+  string reserve1 = 22; // uint112
 }
 
 message Swap {
   // -- transaction --
   bytes transaction_id = 1;
 
-  // -- log --
-  bytes address = 5; // log.address
+  // -- call --
+  bytes caller = 8; // call.caller
 
   // -- ordering --
   uint64 ordinal = 10; // log.ordinal
 
   // -- swap --
-  string amount0_in = 20; // uint256
-  string amount0_out = 21; // uint256
-  string amount1_in = 22; // uint256
-  string amount1_out = 23; // uint256
-  bytes sender = 24;
-  bytes to = 25;
+  bytes address = 20; // log.address (factory)
+  string amount0_in = 21; // uint256
+  string amount0_out = 22; // uint256
+  string amount1_in = 23; // uint256
+  string amount1_out = 24; // uint256
+  bytes sender = 25;
+  bytes to = 26;
 }

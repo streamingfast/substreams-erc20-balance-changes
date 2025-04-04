@@ -13,17 +13,18 @@ pub fn map_events(block: Block) -> Result<Events, Error> {
     // https://github.com/Uniswap/v2-core
     // https://github.com/pinax-network/substreams-abis/tree/main/abi/evm/uniswap/v2
     for trx in block.transactions() {
-        for (log, _) in trx.logs_with_calls() {
+        for (log, call_view) in trx.logs_with_calls() {
             // Uniswap::V2::Pair:Sync
             if let Some(event) = SyncAbi::match_and_decode(log) {
                 events.syncs.push(Sync {
                     // -- transaction --
                     transaction_id: trx.hash.to_vec(),
-                    // -- log --
-                    address: log.address.to_vec(),
+                    // -- call --
+                    caller: call_view.call.caller.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
                     // -- sync --
+                    address: log.address.to_vec(),
                     reserve0: event.reserve0.to_string(),
                     reserve1: event.reserve1.to_string(),
                 });
@@ -32,11 +33,12 @@ pub fn map_events(block: Block) -> Result<Events, Error> {
                 events.swaps.push(Swap {
                     // -- transaction --
                     transaction_id: trx.hash.to_vec(),
-                    // -- log --
-                    address: log.address.to_vec(),
+                    // -- call --
+                    caller: call_view.call.caller.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
                     // -- swap --
+                    address: log.address.to_vec(),
                     amount0_in: event.amount0_in.to_string(),
                     amount0_out: event.amount0_out.to_string(),
                     amount1_in: event.amount1_in.to_string(),
@@ -49,11 +51,12 @@ pub fn map_events(block: Block) -> Result<Events, Error> {
                 events.pairs_created.push(PairCreated {
                     // -- transaction --
                     transaction_id: trx.hash.to_vec(),
-                    // -- log --
-                    address: log.address.to_vec(),
+                    // -- call --
+                    caller: call_view.call.caller.to_vec(),
                     // -- ordering --
                     ordinal: log.ordinal,
                     // -- pair created --
+                    address: log.address.to_vec(),
                     pair: event.pair,
                     token0: event.token0,
                     token1: event.token1,

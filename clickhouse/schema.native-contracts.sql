@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS contract_creations  (
    block_num            UInt32,
    block_hash           FixedString(66),
    timestamp            DateTime(0, 'UTC'),
-   date                 Date,
 
    -- ordering --
    ordinal              UInt64, -- storage_change.ordinal or balance_change.ordinal
