@@ -4,6 +4,7 @@ package evm.tokens.contracts.v1;
 
 message Events {
   repeated ContractCreation contract_creations = 1;
+  repeated ContractChange contract_changes = 2;
 }
 
 message ContractCreation {
@@ -21,4 +22,21 @@ message ContractCreation {
   // -- contract --
   bytes address = 20; // code_change.address
   bytes hash = 21;  // code_change.new_hash
+}
+
+message ContractChange {
+  // -- transaction --
+  optional bytes transaction_id = 5;
+
+  // -- call --
+  optional bytes caller = 8;
+
+  // -- ordering --
+  optional uint64 ordinal = 10; // log.ordinal
+
+  // -- contract --
+  bytes address = 20;
+  optional string name = 21;
+  optional string symbol = 22;
+  optional int32 decimals = 23;
 }

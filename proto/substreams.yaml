@@ -6,7 +6,6 @@ package:
 protobuf:
   files:
     - v1/balances.proto
-    - v1/erc20-contracts.proto
     - v1/contracts.proto
     - v1/uniswap-v2.proto
     - v1/uniswap-v3.proto

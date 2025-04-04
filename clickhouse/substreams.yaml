@@ -15,9 +15,9 @@ imports:
   erc20_balances: ../erc20-balances/substreams.yaml
   erc20_balances_rpc: ../erc20-balances-rpc/substreams.yaml
   native_balances: ../native-balances/substreams.yaml
-  # erc20_contracts: ../erc20-contracts/substreams.yaml
-  # erc20_contracts_rpc: ../erc20-contracts-rpc/substreams.yaml
-  # native_contracts: ../native-contracts/substreams.yaml
+  erc20_contracts: ../erc20-contracts/substreams.yaml
+  erc20_contracts_rpc: ../erc20-contracts-rpc/substreams.yaml
+  native_contracts: ../native-contracts/substreams.yaml
   # uniswap_v2: ../uniswap-v2/substreams.yaml
   # uniswap_v3: ../uniswap-v3/substreams.yaml
 
@@ -32,12 +32,11 @@ modules:
     inputs:
       - source: sf.substreams.v1.Clock
       - map: erc20_balances:map_events
-      - map: erc20_balances_rpc:map_events
       - map: native_balances:map_events
       # - map: erc20_balances_rpc:map_events
-      # - map: erc20_contracts:map_events
-      # - map: erc20_contracts_rpc:map_events
-      # - map: native_contracts:map_events
+      - map: erc20_contracts:map_events
+      - map: erc20_contracts_rpc:map_events
+      - map: native_contracts:map_events
       # - map: uniswap_v2:map_events
       # - map: uniswap_v3:map_events
     output:

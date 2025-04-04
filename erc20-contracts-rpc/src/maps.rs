@@ -1,4 +1,4 @@
-use proto::pb::evm::tokens::erc20::contracts::v1::{ContractChange, Events};
+use proto::pb::evm::tokens::contracts::v1::{ContractChange, Events};
 use substreams::store::{DeltaBigInt, Deltas};
 use substreams::{errors::Error, scalar::BigInt, Hex};
 
@@ -6,7 +6,10 @@ use crate::calls;
 
 #[substreams::handlers::map]
 pub fn map_events(store_erc20_transfers: Deltas<DeltaBigInt>) -> Result<Events, Error> {
-    let contract_changes = store_erc20_transfers
+    let mut events = Events::default();
+
+    // -- contract changes --
+    events.contract_changes = store_erc20_transfers
         .deltas
         .into_iter()
         .filter_map(|delta| {
@@ -46,7 +49,5 @@ pub fn map_events(store_erc20_transfers: Deltas<DeltaBigInt>) -> Result<Events, 
         })
         .collect();
 
-    Ok(Events {
-        contract_changes,
-    })
+    Ok(events)
 }

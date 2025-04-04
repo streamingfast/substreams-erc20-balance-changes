@@ -7,7 +7,6 @@ use crate::algorithms::utils::addresses_for_storage_keys;
 use common::{extend_from_address, Address, Hash};
 use proto::pb::evm::tokens::balances::v1::{BalanceChange, Events, Transfer, Algorithm};
 use substreams::errors::Error;
-use substreams::hex;
 use substreams_abis::evm::token::erc20::events::Transfer as TransferAbi;
 use substreams::scalar::BigInt;
 use substreams_ethereum::pb::eth::v2::{Block, Call, Log, StorageChange, TransactionTrace};

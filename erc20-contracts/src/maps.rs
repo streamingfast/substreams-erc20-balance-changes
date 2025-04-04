@@ -1,4 +1,4 @@
-use proto::pb::evm::tokens::erc20::contracts::v1::{Events, ContractChange};
+use proto::pb::evm::tokens::contracts::v1::{Events, ContractChange};
 use substreams::errors::Error;
 use substreams_ethereum::pb::eth::v2::Block;
 

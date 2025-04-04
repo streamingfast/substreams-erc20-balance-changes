@@ -13,7 +13,7 @@ binaries:
 
 protobuf:
   files:
-    - v1/erc20-contracts.proto
+    - v1/contracts.proto
   importPaths:
     - ../proto
 
@@ -23,6 +23,6 @@ modules:
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.tokens.erc20.contracts.v1.Events
+      type: proto:evm.tokens.contracts.v1.Events
 
 network: mainnet

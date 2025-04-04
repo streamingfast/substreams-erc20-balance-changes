@@ -37,8 +37,8 @@ pub fn set_ordering(index: u64, ordinal: Option<u64>, clock: &Clock, row: &mut R
 pub fn set_debug(algorithm: Algorithm, trx_type: Type, call_type: CallType, reason: Option<Reason>, row: &mut Row) {
     row
         .set("algorithm", algorithm.as_str_name())
-        .set("trx_type", algorithm.as_str_name())
-        .set("call_type", algorithm.as_str_name());
+        .set("trx_type", trx_type.as_str_name())
+        .set("call_type", call_type.as_str_name());
     if let Some(reason) = reason {
         row.set("reason", reason.as_str_name());
     }

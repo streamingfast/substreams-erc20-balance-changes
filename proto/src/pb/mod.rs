@@ -15,15 +15,6 @@ pub mod evm {
                 // @@protoc_insertion_point(evm.tokens.contracts.v1)
             }
         }
-        pub mod erc20 {
-            pub mod contracts {
-                // @@protoc_insertion_point(attribute:evm.tokens.erc20.contracts.v1)
-                pub mod v1 {
-                    include!("evm.tokens.erc20.contracts.v1.rs");
-                    // @@protoc_insertion_point(evm.tokens.erc20.contracts.v1)
-                }
-            }
-        }
         pub mod uniswap {
             // @@protoc_insertion_point(attribute:evm.tokens.uniswap.v2)
             pub mod v2 {
