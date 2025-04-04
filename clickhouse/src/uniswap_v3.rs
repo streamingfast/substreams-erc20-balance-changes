@@ -26,6 +26,7 @@ fn process_uniswap_v3_swaps(tables: &mut substreams_database_change::tables::Tab
     let key = common_key(clock, index);
     let row = tables
         .create_row("uniswap_v3_swaps", key)
+        .set("address", &bytes_to_hex(&event.address))
         .set("amount0", event.amount0)
         .set("amount1", event.amount1)
         .set("sender", bytes_to_hex(&event.sender))
@@ -44,6 +45,7 @@ fn process_uniswap_v3_initializes(tables: &mut substreams_database_change::table
     let key = common_key(clock, index);
     let row = tables
         .create_row("uniswap_v3_initializes", key)
+        .set("address", &bytes_to_hex(&event.address))
         .set("sqrt_price_x96", &event.sqrt_price_x96.to_string())
         .set("tick", &event.tick.to_string());
 
@@ -60,6 +62,7 @@ fn process_uniswap_v3_pools_created(tables: &mut substreams_database_change::tab
     ];
     let row = tables
         .create_row("uniswap_v3_pools_created", key)
+        .set("address", &bytes_to_hex(&event.address))
         .set("token0", bytes_to_hex(&event.token0))
         .set("token1", bytes_to_hex(&event.token1))
         .set("pool", bytes_to_hex(&event.pool))
