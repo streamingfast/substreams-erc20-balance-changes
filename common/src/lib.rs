@@ -1,5 +1,5 @@
 use prost_types::Timestamp;
-use substreams::{hex, pb::substreams::Clock, scalar::BigInt, Hex};
+use substreams::{hex, log, pb::substreams::Clock, scalar::BigInt, Hex};
 
 pub type Address = Vec<u8>;
 pub type Hash = Vec<u8>;
@@ -86,13 +86,14 @@ pub fn bytes32_to_string(bytes: &[u8]) -> String {
 // Used to enforce ERC-20 decimals to be between 0 and 255
 pub fn bigint_to_int32(bigint: &substreams::scalar::BigInt) -> Option<i32> {
     if bigint.lt(&BigInt::zero()) {
+        log::info!("bigint_to_int32: value is negative");
         return None;
     }
-    let int = bigint.to_i32();
-    if int < 0 || int > 255 {
+    if bigint.gt(&BigInt::from(255)) {
+        log::info!("bigint_to_int32: value is greater than 255");
         return None;
     }
-    Some(int)
+    Some(bigint.to_i32())
 }
 
 // Timestamp to date conversion
