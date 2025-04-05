@@ -1,5 +1,5 @@
 -- ERC-20 contracts metadata events --
-CREATE TABLE IF NOT EXISTS erc20_contract_changes  (
+CREATE TABLE IF NOT EXISTS contract_changes  (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),

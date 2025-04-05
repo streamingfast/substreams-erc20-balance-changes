@@ -103,7 +103,7 @@ ORDER BY (timestamp, block_num, `index`);
 
 
 -- ERC-20 contracts metadata events --
-CREATE TABLE IF NOT EXISTS erc20_contract_changes  (
+CREATE TABLE IF NOT EXISTS contract_changes  (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),
@@ -471,30 +471,22 @@ SELECT * FROM balances;
 -- latest Token contracts --
 CREATE TABLE IF NOT EXISTS contracts  (
    -- block --
-   block_num            UInt32,
-   timestamp            DateTime(0, 'UTC'),
+   block_num            SimpleAggregateFunction(max, UInt32) COMMENT 'block number',
+   timestamp            SimpleAggregateFunction(max, DateTime(0, 'UTC')),
 
    -- ordering --
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- contract --
    address              FixedString(42) COMMENT 'ERC-20 contract address',
-   name                 String COMMENT 'ERC-20 contract name (typically 3-8 characters)',
-   symbol               String COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
-   decimals             UInt8 COMMENT 'ERC-20 contract decimals (18 by default)',
-
-   -- indexes --
-   INDEX idx_block_num     (block_num)        TYPE minmax GRANULARITY 4,
-   INDEX idx_timestamp     (timestamp)        TYPE minmax GRANULARITY 4,
-   INDEX idx_name          (name)             TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_symbol        (symbol)           TYPE bloom_filter GRANULARITY 4,
-   INDEX idx_decimals      (decimals)         TYPE minmax GRANULARITY 4,
+   name                 SimpleAggregateFunction(anyLast, String) COMMENT 'ERC-20 contract name (typically 3-8 characters)',
+   symbol               SimpleAggregateFunction(anyLast, String) COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
+   decimals             SimpleAggregateFunction(anyLast, UInt8) COMMENT 'ERC-20 contract decimals (18 by default)'
 )
-ENGINE = ReplacingMergeTree(global_sequence)
-PRIMARY KEY (address)
-ORDER BY (address);
+ENGINE = AggregatingMergeTree
+ORDER BY address;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS contracts_mv
 TO contracts AS
-SELECT * FROM erc20_contract_changes;
+SELECT * FROM contract_changes;
 
