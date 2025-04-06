@@ -30,7 +30,7 @@ TO balances AS
 SELECT * FROM native_balance_changes;
 
 -- latest balances by contract/address --
-CREATE MATERIALIZED VIEW IF NOT EXISTS erc20_balances_by_contract
+CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_contract
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (contract, address)
 ORDER BY (contract, address)

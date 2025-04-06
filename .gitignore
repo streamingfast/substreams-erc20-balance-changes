@@ -8,3 +8,4 @@ state.*.yaml
 .DS_Store
 build
 buf.gen.yaml
+substreams-sink-sql
