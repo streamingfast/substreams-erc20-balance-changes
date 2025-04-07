@@ -89,10 +89,8 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
 
-   -- log --
-   address              FixedString(42) COMMENT 'UniswapV2Pair pair address', -- log.address
-
    -- swaps --
+   address              FixedString(42) COMMENT 'UniswapV2Pair pair address', -- log.address
    amount0_in           UInt256 COMMENT 'UniswapV2Pair token0 amount in',
    amount0_out          UInt256 COMMENT 'UniswapV2Pair token0 amount out',
    amount1_in           UInt256 COMMENT 'UniswapV2Pair token1 amount in',
