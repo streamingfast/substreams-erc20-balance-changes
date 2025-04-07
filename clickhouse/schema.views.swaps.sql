@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS uniswap_swaps (
+CREATE TABLE IF NOT EXISTS swaps (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),
@@ -21,7 +21,9 @@ CREATE TABLE IF NOT EXISTS uniswap_swaps (
    recipient            FixedString(42) COMMENT 'recipient address',
    amount0              Int256 COMMENT 'token0 amount',
    amount1              Int256 COMMENT 'token1 amount',
-   price                Float64 COMMENT 'computed price'
+   -- TO-DO: add token0 and token1 addresses
+   price                Float64 COMMENT 'computed price',
+   exchange             LowCardinality(String) COMMENT 'exchange name', -- 'uniswap_v2' or 'uniswap_v3'
 )
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -44,7 +46,8 @@ SELECT
    `to` AS recipient,
    amount0_in - amount0_out AS amount0,
    amount1_in - amount1_out AS amount1,
-   abs((amount1_in - amount1_out) / (amount0_in - amount0_out)) AS price
+   abs((amount1_in - amount1_out) / (amount0_in - amount0_out)) AS price,
+   'uniswap_v2' AS exchange
 FROM uniswap_v2_swaps;
 
 -- Uniswap::V3::Pool:Swap --
@@ -64,5 +67,6 @@ SELECT
    recipient,
    amount0,
    amount1,
-   pow(1.0001, tick) AS price
+   pow(1.0001, tick) AS price,
+   'uniswap_v3' AS exchange
 FROM uniswap_v3_swaps;
