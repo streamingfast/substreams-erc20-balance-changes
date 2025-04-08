@@ -190,11 +190,7 @@ PRIMARY KEY (address)
 ORDER BY (address);
 
 
-
-
-
-
--- prices pairs created --
+-- Uniswap::V2::Factory:PairCreated --
 CREATE TABLE IF NOT EXISTS uniswap_v2_pairs_created (
    -- block --
    block_num            UInt32,
@@ -560,6 +556,66 @@ FROM native_balance_changes
 GROUP BY address, timestamp;
 
 
+-- Pools Created for Uniswap V2 & V3 --
+CREATE TABLE IF NOT EXISTS pools (
+   -- block --
+   block_num            UInt32,
+   block_hash           FixedString(66),
+   timestamp            DateTime(0, 'UTC'),
+
+   -- ordering --
+   global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+   -- transaction --
+   transaction_id       FixedString(66),
+
+   -- swaps --
+   factory              FixedString(42) COMMENT 'factory address', -- log.address
+   pool                 FixedString(42) COMMENT 'pool address',
+   token0               FixedString(42) COMMENT 'token0 address',
+   token1               FixedString(42) COMMENT 'token1 address',
+   fee                  UInt32 COMMENT 'pool fee (e.g., 3000 represents 0.30%)',
+   exchange             LowCardinality(String) COMMENT 'exchange name', -- 'uniswap_v2' or 'uniswap_v3'
+)
+ENGINE = ReplacingMergeTree(global_sequence)
+PRIMARY KEY (factory, pool)
+ORDER BY (factory, pool);
+
+-- Uniswap::V2::Factory:PairCreated --
+CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_pairs_created_mv
+TO pools AS
+SELECT
+   block_num,
+   block_hash,
+   timestamp,
+   global_sequence,
+   transaction_id,
+   address AS factory,
+   pair AS pool,
+   token0,
+   token1,
+   3000 AS fee, -- default Uniswap V2 fee
+   'uniswap_v2' AS exchange
+FROM uniswap_v2_pairs_created;
+
+-- Uniswap::V3::Factory:PoolCreated --
+CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v3_pools_created_mv
+TO pools AS
+SELECT
+   block_num,
+   block_hash,
+   timestamp,
+   global_sequence,
+   transaction_id,
+   address AS factory,
+   pool,
+   token0,
+   token1,
+   fee,
+   'uniswap_v3' AS exchange
+FROM uniswap_v3_pools_created;
+
+-- Swaps for Uniswap V2 & V3 --
 CREATE TABLE IF NOT EXISTS swaps (
    -- block --
    block_num            UInt32,
@@ -578,13 +634,12 @@ CREATE TABLE IF NOT EXISTS swaps (
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
 
    -- swaps --
-   address              FixedString(42) COMMENT 'pool address', -- log.address
+   pool                 FixedString(42) COMMENT 'pool address', -- log.address
    sender               FixedString(42) COMMENT 'sender address',
    recipient            FixedString(42) COMMENT 'recipient address',
    amount0              Int256 COMMENT 'token0 amount',
    amount1              Int256 COMMENT 'token1 amount',
-   -- TO-DO: add token0 and token1 addresses
-   price                Float64 COMMENT 'computed price',
+   price                Float64 COMMENT 'computed price for token0',
    exchange             LowCardinality(String) COMMENT 'exchange name', -- 'uniswap_v2' or 'uniswap_v3'
 )
 ENGINE = ReplacingMergeTree(global_sequence)
@@ -593,7 +648,7 @@ ORDER BY (timestamp, block_num, `index`);
 
 -- Uniswap::V2::Pair:Swap --
 CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_swaps_mv
-TO uniswap_swaps AS
+TO swaps AS
 SELECT
    block_num,
    block_hash,
@@ -603,7 +658,7 @@ SELECT
    global_sequence,
    transaction_id,
    caller,
-   address,
+   address as pool,
    sender,
    `to` AS recipient,
    amount0_in - amount0_out AS amount0,
@@ -614,7 +669,7 @@ FROM uniswap_v2_swaps;
 
 -- Uniswap::V3::Pool:Swap --
 CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v3_swaps_mv
-TO uniswap_swaps AS
+TO swaps AS
 SELECT
    block_num,
    block_hash,
@@ -624,7 +679,7 @@ SELECT
    global_sequence,
    transaction_id,
    caller,
-   address,
+   address as pool,
    sender,
    recipient,
    amount0,
@@ -632,4 +687,73 @@ SELECT
    pow(1.0001, tick) AS price,
    'uniswap_v3' AS exchange
 FROM uniswap_v3_swaps;
+
+-- OHLC prices including Uniswap V2 & V3 --
+CREATE TABLE IF NOT EXISTS ohlc_prices (
+   -- block --
+   timestamp            DateTime(0, 'UTC') COMMENT 'the start of the aggregate window',
+
+   -- pool --
+   factory              FixedString(42) COMMENT 'factory address',
+   pool                 FixedString(42) COMMENT 'pool address',
+   token0               FixedString(42) COMMENT 'token0 address',
+   token1               FixedString(42) COMMENT 'token1 address',
+
+   -- swaps --
+   open                 AggregateFunction(argMin, Float64, UInt64),
+   high                 SimpleAggregateFunction(max, Float64),
+   low                  SimpleAggregateFunction(min, Float64),
+   close                AggregateFunction(argMax, Float64, UInt64),
+   uaw                  AggregateFunction(uniq, FixedString(42)) COMMENT 'unique wallet addresses in the window',
+   transactions         AggregateFunction(sum, UInt8) COMMENT 'number of transactions in the window',
+   volume               AggregateFunction(sum, Float64) COMMENT 'total volume in token0 currency',
+)
+ENGINE = AggregatingMergeTree
+PRIMARY KEY (factory, pool, token0, token1, timestamp)
+ORDER BY (factory, pool, token0, token1, timestamp);
+
+-- Swaps --
+CREATE MATERIALIZED VIEW IF NOT EXISTS ohlc_swaps_mv
+TO ohlc_prices
+AS
+SELECT
+   toStartOfHour(timestamp) AS timestamp,
+   factory,
+   s.pool AS pool,
+   p.token0 as token0,
+   p.token1 as token1,
+   argMinState(price, s.global_sequence) AS open,
+   quantileDeterministic(0.95)(price, s.global_sequence) AS high,
+   quantileDeterministic(0.05)(price, s.global_sequence) AS low,
+   argMaxState(price, s.global_sequence) AS close,
+   uniqState(sender) AS uaw,
+   sumState(1) AS transactions,
+   sumState(price * abs(toDecimal256(amount0, 18))) AS volume
+FROM swaps AS s
+JOIN pools AS p
+   ON s.pool = p.pool
+GROUP BY factory, pool, token0, token1, timestamp;
+
+-- Swaps (Inverse) --
+CREATE MATERIALIZED VIEW IF NOT EXISTS ohlc_swaps_inverse_mv
+TO ohlc_prices
+AS
+SELECT
+   toStartOfHour(timestamp) AS timestamp,
+   factory,
+   s.pool AS pool,
+   p.token1 as token0,
+   p.token0 as token1,
+   argMinState(1 / price, s.global_sequence) AS open,
+   quantileDeterministic(0.95)(1 / price, s.global_sequence) AS high,
+   quantileDeterministic(0.05)(1 / price, s.global_sequence) AS low,
+   argMaxState(1 / price, s.global_sequence) AS close,
+   uniqState(sender) AS uaw,
+   sumState(0) AS transactions,
+   sumState(1 / price * abs(toDecimal256(amount1, 18))) AS volume
+FROM swaps AS s
+JOIN pools AS p
+   ON s.pool = p.pool
+GROUP BY factory, pool, token0, token1, timestamp;
+
 

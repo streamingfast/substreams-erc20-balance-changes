@@ -1,4 +1,4 @@
--- prices pairs created --
+-- Uniswap::V2::Factory:PairCreated --
 CREATE TABLE IF NOT EXISTS uniswap_v2_pairs_created (
    -- block --
    block_num            UInt32,

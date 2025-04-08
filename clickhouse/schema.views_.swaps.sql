@@ -1,3 +1,4 @@
+-- Swaps for Uniswap V2 & V3 --
 CREATE TABLE IF NOT EXISTS swaps (
    -- block --
    block_num            UInt32,
@@ -16,13 +17,12 @@ CREATE TABLE IF NOT EXISTS swaps (
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
 
    -- swaps --
-   address              FixedString(42) COMMENT 'pool address', -- log.address
+   pool                 FixedString(42) COMMENT 'pool address', -- log.address
    sender               FixedString(42) COMMENT 'sender address',
    recipient            FixedString(42) COMMENT 'recipient address',
    amount0              Int256 COMMENT 'token0 amount',
    amount1              Int256 COMMENT 'token1 amount',
-   -- TO-DO: add token0 and token1 addresses
-   price                Float64 COMMENT 'computed price',
+   price                Float64 COMMENT 'computed price for token0',
    exchange             LowCardinality(String) COMMENT 'exchange name', -- 'uniswap_v2' or 'uniswap_v3'
 )
 ENGINE = ReplacingMergeTree(global_sequence)
@@ -31,7 +31,7 @@ ORDER BY (timestamp, block_num, `index`);
 
 -- Uniswap::V2::Pair:Swap --
 CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_swaps_mv
-TO uniswap_swaps AS
+TO swaps AS
 SELECT
    block_num,
    block_hash,
@@ -41,7 +41,7 @@ SELECT
    global_sequence,
    transaction_id,
    caller,
-   address,
+   address as pool,
    sender,
    `to` AS recipient,
    amount0_in - amount0_out AS amount0,
@@ -52,7 +52,7 @@ FROM uniswap_v2_swaps;
 
 -- Uniswap::V3::Pool:Swap --
 CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v3_swaps_mv
-TO uniswap_swaps AS
+TO swaps AS
 SELECT
    block_num,
    block_hash,
@@ -62,7 +62,7 @@ SELECT
    global_sequence,
    transaction_id,
    caller,
-   address,
+   address as pool,
    sender,
    recipient,
    amount0,
