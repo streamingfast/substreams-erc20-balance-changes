@@ -42,7 +42,7 @@ SELECT
 FROM swaps AS s
 JOIN pools AS p
    ON s.pool = p.pool
-JOIN contracts AS c0
+JOIN contracts AS c
    ON p.token0 = c.address
 GROUP BY factory, pool, token0, token1, timestamp;
 
@@ -61,11 +61,11 @@ SELECT
    quantileDeterministic(0.05)(1 / price, s.global_sequence) AS low,
    argMaxState(1 / price, s.global_sequence) AS close,
    uniqState(sender) AS uaw,
-   sumState(0) AS transactions,
+   sumState(1) AS transactions,
    sumState(toDecimal256(amount1, 18) / pow(10, c.decimals) ) AS volume
 FROM swaps AS s
 JOIN pools AS p
    ON s.pool = p.pool
-JOIN contracts AS c1
+JOIN contracts AS c
    ON p.token1 = c.address
 GROUP BY factory, pool, token0, token1, timestamp;

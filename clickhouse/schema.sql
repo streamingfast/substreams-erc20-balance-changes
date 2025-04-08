@@ -423,45 +423,6 @@ PRIMARY KEY (address, pool)
 ORDER BY (address, pool);
 
 
--- latest balances by owner/contract --
-CREATE TABLE IF NOT EXISTS balances (
-   -- block --
-   block_num            UInt32,
-   timestamp            DateTime(0, 'UTC'),
-
-   -- ordering --
-   global_sequence      UInt64, -- block_num << 32 + index
-
-   -- balance change --
-   contract             FixedString(42) COMMENT 'ERC-20 & Native contract address',
-   address              FixedString(42) COMMENT 'wallet address',
-   new_balance          UInt256 COMMENT 'new balance',
-
-   -- indexes --
-   INDEX idx_block_num     (block_num)       TYPE minmax GRANULARITY 4,
-   INDEX idx_timestamp     (timestamp)       TYPE minmax GRANULARITY 4,
-   INDEX idx_new_balance   (new_balance)     TYPE minmax GRANULARITY 4,
-)
-ENGINE = ReplacingMergeTree(global_sequence)
-PRIMARY KEY (address, contract)
-ORDER BY (address, contract);
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS erc20_balances_mv
-TO balances AS
-SELECT * FROM erc20_balance_changes;
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS native_balances_mv
-TO balances AS
-SELECT * FROM native_balance_changes;
-
--- latest balances by contract/address --
-CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_contract
-ENGINE = ReplacingMergeTree(global_sequence)
-PRIMARY KEY (contract, address)
-ORDER BY (contract, address)
-AS
-SELECT * FROM balances;
-
 -- latest Token contracts --
 CREATE TABLE IF NOT EXISTS contracts  (
    -- block --
@@ -483,78 +444,6 @@ ORDER BY address;
 CREATE MATERIALIZED VIEW IF NOT EXISTS contracts_mv
 TO contracts AS
 SELECT * FROM contract_changes;
-
--- Historical ERC-20 balances by address/contract --
-CREATE TABLE IF NOT EXISTS historical_erc20_balances (
-   -- block --
-   timestamp            DateTime(0, 'UTC') COMMENT 'the start of the aggregate window',
-
-   -- balance change --
-   contract             FixedString(42) COMMENT 'contract address',
-   address              FixedString(42) COMMENT 'wallet address',
-
-   -- balance --
-   open           AggregateFunction(argMin, Float64, UInt64),
-   high           SimpleAggregateFunction(max, Float64),
-   low            SimpleAggregateFunction(min, Float64),
-   close          AggregateFunction(argMax, Float64, UInt64),
-   uaw            AggregateFunction(uniq, FixedString(42)) COMMENT 'unique wallet addresses that changed balance in the window',
-   transactions   AggregateFunction(sum, UInt8) COMMENT 'number of transactions that changed balance in the window'
-)
-ENGINE = AggregatingMergeTree
-PRIMARY KEY (address, contract, timestamp)
-ORDER BY (address, contract, timestamp);
-
--- ERC-20 balances --
-CREATE MATERIALIZED VIEW IF NOT EXISTS historical_erc20_balances_mv
-TO historical_erc20_balances
-AS
-SELECT
-   toStartOfHour(timestamp) AS timestamp,
-   address,
-   contract,
-   argMinState(toFloat64(new_balance / pow(10, contracts.decimals)), global_sequence) AS open,
-   max(toFloat64(new_balance / pow(10, contracts.decimals))) AS high,
-   min(toFloat64(new_balance / pow(10, contracts.decimals))) AS low,
-   argMaxState(toFloat64(new_balance / pow(10, contracts.decimals)), global_sequence) AS close,
-   uniqState(address) AS uaw,
-   sumState(1) AS transactions
-FROM erc20_balance_changes
-JOIN contracts
-   ON erc20_balance_changes.contract = contracts.address
-GROUP BY address, contract, timestamp;
-
--- Historical balances by contract/address --
-CREATE MATERIALIZED VIEW IF NOT EXISTS historical_erc20_balances_by_contract
-ENGINE = AggregatingMergeTree
-PRIMARY KEY (contract, address, timestamp)
-ORDER BY (contract, address, timestamp)
-AS
-SELECT * FROM historical_erc20_balances;
-
-
--- Historical ERC-20 balances by address/contract --
-CREATE TABLE IF NOT EXISTS historical_native_balances as historical_erc20_balances
-ENGINE = AggregatingMergeTree
-PRIMARY KEY (address, timestamp)
-ORDER BY (address, timestamp);
-
--- Native balances --
-CREATE MATERIALIZED VIEW IF NOT EXISTS historical_native_balances_mv
-TO historical_native_balances
-AS
-SELECT
-   toStartOfHour(timestamp) AS timestamp,
-   address,
-   argMinState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS open,
-   max(toFloat64(new_balance / pow(10, 18))) AS high,
-   min(toFloat64(new_balance / pow(10, 18))) AS low,
-   argMaxState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS close,
-   uniqState(address) AS uaw,
-   sumState(1) AS transactions
-FROM native_balance_changes
-GROUP BY address, timestamp;
-
 
 -- Pools Created for Uniswap V2 & V3 --
 CREATE TABLE IF NOT EXISTS pools (
@@ -688,6 +577,117 @@ SELECT
    'uniswap_v3' AS exchange
 FROM uniswap_v3_swaps;
 
+-- latest balances by owner/contract --
+CREATE TABLE IF NOT EXISTS balances (
+   -- block --
+   block_num            UInt32,
+   timestamp            DateTime(0, 'UTC'),
+
+   -- ordering --
+   global_sequence      UInt64, -- block_num << 32 + index
+
+   -- balance change --
+   contract             FixedString(42) COMMENT 'ERC-20 & Native contract address',
+   address              FixedString(42) COMMENT 'wallet address',
+   new_balance          UInt256 COMMENT 'new balance',
+
+   -- indexes --
+   INDEX idx_block_num     (block_num)       TYPE minmax GRANULARITY 4,
+   INDEX idx_timestamp     (timestamp)       TYPE minmax GRANULARITY 4,
+   INDEX idx_new_balance   (new_balance)     TYPE minmax GRANULARITY 4,
+)
+ENGINE = ReplacingMergeTree(global_sequence)
+PRIMARY KEY (address, contract)
+ORDER BY (address, contract);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS erc20_balances_mv
+TO balances AS
+SELECT * FROM erc20_balance_changes;
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS native_balances_mv
+TO balances AS
+SELECT * FROM native_balance_changes;
+
+-- latest balances by contract/address --
+CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_contract
+ENGINE = ReplacingMergeTree(global_sequence)
+PRIMARY KEY (contract, address)
+ORDER BY (contract, address)
+AS
+SELECT * FROM balances;
+
+-- Historical ERC-20 balances by address/contract --
+CREATE TABLE IF NOT EXISTS historical_erc20_balances (
+   -- block --
+   timestamp            DateTime(0, 'UTC') COMMENT 'the start of the aggregate window',
+
+   -- balance change --
+   contract             FixedString(42) COMMENT 'contract address',
+   address              FixedString(42) COMMENT 'wallet address',
+
+   -- balance --
+   open           AggregateFunction(argMin, Float64, UInt64),
+   high           SimpleAggregateFunction(max, Float64),
+   low            SimpleAggregateFunction(min, Float64),
+   close          AggregateFunction(argMax, Float64, UInt64),
+   uaw            AggregateFunction(uniq, FixedString(42)) COMMENT 'unique wallet addresses that changed balance in the window',
+   transactions   AggregateFunction(sum, UInt8) COMMENT 'number of transactions that changed balance in the window'
+)
+ENGINE = AggregatingMergeTree
+PRIMARY KEY (address, contract, timestamp)
+ORDER BY (address, contract, timestamp);
+
+-- ERC-20 balances --
+CREATE MATERIALIZED VIEW IF NOT EXISTS historical_erc20_balances_mv
+TO historical_erc20_balances
+AS
+SELECT
+   toStartOfHour(timestamp) AS timestamp,
+   address,
+   contract,
+   argMinState(toFloat64(new_balance / pow(10, contracts.decimals)), global_sequence) AS open,
+   max(toFloat64(new_balance / pow(10, contracts.decimals))) AS high,
+   min(toFloat64(new_balance / pow(10, contracts.decimals))) AS low,
+   argMaxState(toFloat64(new_balance / pow(10, contracts.decimals)), global_sequence) AS close,
+   uniqState(address) AS uaw,
+   sumState(1) AS transactions
+FROM erc20_balance_changes
+JOIN contracts
+   ON erc20_balance_changes.contract = contracts.address
+GROUP BY address, contract, timestamp;
+
+-- Historical balances by contract/address --
+CREATE MATERIALIZED VIEW IF NOT EXISTS historical_erc20_balances_by_contract
+ENGINE = AggregatingMergeTree
+PRIMARY KEY (contract, address, timestamp)
+ORDER BY (contract, address, timestamp)
+AS
+SELECT * FROM historical_erc20_balances;
+
+
+-- Historical ERC-20 balances by address/contract --
+CREATE TABLE IF NOT EXISTS historical_native_balances as historical_erc20_balances
+ENGINE = AggregatingMergeTree
+PRIMARY KEY (address, timestamp)
+ORDER BY (address, timestamp);
+
+-- Native balances --
+CREATE MATERIALIZED VIEW IF NOT EXISTS historical_native_balances_mv
+TO historical_native_balances
+AS
+SELECT
+   toStartOfHour(timestamp) AS timestamp,
+   address,
+   argMinState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS open,
+   max(toFloat64(new_balance / pow(10, 18))) AS high,
+   min(toFloat64(new_balance / pow(10, 18))) AS low,
+   argMaxState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS close,
+   uniqState(address) AS uaw,
+   sumState(1) AS transactions
+FROM native_balance_changes
+GROUP BY address, timestamp;
+
+
 -- OHLC prices including Uniswap V2 & V3 --
 CREATE TABLE IF NOT EXISTS ohlc_prices (
    -- block --
@@ -728,10 +728,12 @@ SELECT
    argMaxState(price, s.global_sequence) AS close,
    uniqState(sender) AS uaw,
    sumState(1) AS transactions,
-   sumState(price * abs(toDecimal256(amount0, 18))) AS volume
+   sumState(toDecimal256(amount0, 18) / pow(10, c.decimals) ) AS volume
 FROM swaps AS s
 JOIN pools AS p
    ON s.pool = p.pool
+JOIN contracts AS c
+   ON p.token0 = c.address
 GROUP BY factory, pool, token0, token1, timestamp;
 
 -- Swaps (Inverse) --
@@ -749,11 +751,13 @@ SELECT
    quantileDeterministic(0.05)(1 / price, s.global_sequence) AS low,
    argMaxState(1 / price, s.global_sequence) AS close,
    uniqState(sender) AS uaw,
-   sumState(0) AS transactions,
-   sumState(1 / price * abs(toDecimal256(amount1, 18))) AS volume
+   sumState(1) AS transactions,
+   sumState(toDecimal256(amount1, 18) / pow(10, c.decimals) ) AS volume
 FROM swaps AS s
 JOIN pools AS p
    ON s.pool = p.pool
+JOIN contracts AS c
+   ON p.token1 = c.address
 GROUP BY factory, pool, token0, token1, timestamp;
 
 
