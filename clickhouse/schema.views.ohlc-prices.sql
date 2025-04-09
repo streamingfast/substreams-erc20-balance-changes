@@ -38,15 +38,15 @@ SELECT
 
    -- swaps --
    argMinState(price, global_sequence) AS open0,
-   quantileDeterministic(0.95)(price, global_sequence) AS high0,
-   quantileDeterministic(0.05)(price, global_sequence) AS low0,
+   quantileExact(0.95)(price) AS high0,
+   quantileExact(0.05)(price) AS low0,
    argMaxState(price, global_sequence) AS close0,
    sumState(toDecimal256(abs(amount0), 18) / pow(10, 18) ) AS volume0, -- normalize to 18 decimals to fit as Float64
 
    -- swaps (inverse) --
    argMinState(1 / price, global_sequence) AS open1,
-   quantileDeterministic(0.95)(1 / price, global_sequence) AS high1,
-   quantileDeterministic(0.05)(1 / price, global_sequence) AS low1,
+   quantileExact(0.95)(1 / price) AS high1,
+   quantileExact(0.05)(1 / price) AS low1,
    argMaxState(1 / price, global_sequence) AS close1,
    sumState(toDecimal256(abs(amount1), 18) / pow(10, 18) ) AS volume1, -- normalize to 18 decimals to fit as Float64
 

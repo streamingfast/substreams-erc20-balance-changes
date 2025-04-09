@@ -1,45 +1,32 @@
 -- OHLC Prices by Pool --
 SELECT
-      pool,
       timestamp,
+      'WETH/USDT' AS ticker,
 
-      -- swaps --
-      argMinMerge(open0) * pow(10, 12)       AS open0,
-      max(high0) * pow(10, 12)               AS high0,
-      min(low0) * pow(10, 12)                AS low0,
-      argMaxMerge(close0) * pow(10, 12)      AS close0,
-      sumMerge(volume0)                      AS volume0, -- volume is in wei, so we need to convert it to ether
-      volume0 * 100 / pow(10, 6)             AS fee0, -- Uniswap V3 fee 0.01%
+      -- OHLC --
+      floor(argMinMerge(open0) * pow(10, 18-6), 2)       AS open,
+      floor(quantile(0.95)(high0) * pow(10, 18-6), 2)    AS high,
+      floor(quantile(0.05)(low0) * pow(10, 18-6), 2)     AS low,
+      floor(argMaxMerge(close0) * pow(10, 18-6), 2)      AS close,
+      floor(sumMerge(volume0), 2)                        AS "volume (ETH)" -- volume is in wei, no need to convert it
+FROM ohlc_prices
+WHERE pool = '0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b' -- Uniswap V3 WETH/USDT
+GROUP BY pool, timestamp
+ORDER BY timestamp DESC
+LIMIT 10;
 
-      -- swaps (inverse) --
-      argMinMerge(open1) / pow(10, 12)       AS open1,
-      max(high1) / pow(10, 12)               AS high1,
-      min(low1) / pow(10, 12)                AS low1,
-      argMaxMerge(close1) / pow(10, 12)      AS close1,
-      sumMerge(volume1) * pow(10, 12)        AS volume1, -- volume is in wei, so we need to convert it to USDT precision 6
-      volume1 * 100 / pow(10, 6)             AS fee1, -- Uniswap V3 fee 0.01%
+-- 24h Volume & Fees by Pool --
+SELECT
+      toDate(timestamp) as date,
+      'WETH/USDT' AS ticker,
+
+      -- Volume in USDT --
+      floor(sumMerge(volume1) * pow(10, 18-6), 2)        AS "volume (USDT)", -- volume is in wei, so we need to convert it to USDT precision 6
+      floor("volume (USDT)" * 100 / 1000000, 2)              AS fee, -- Uniswap V3 fee 0.01% (1=basis point)
 
       -- universal --
       uniqMerge(uaw) AS uaw,
       sumMerge(transactions) AS transactions
 FROM ohlc_prices
-WHERE pool = '0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b' -- WETH/USDT
-GROUP BY pool, timestamp
-ORDER BY timestamp DESC\G;
-
--- Unique Active Wallets & Transactions by ERC-20 Contracts --
-SELECT
-      contract,
-      timestamp,
-      uniqMerge(uaw) AS uaw,
-      sumMerge(transactions) AS transactions
-FROM historical_erc20_balances_by_contract
-GROUP by contract,timestamp;
-
--- Unique Active Wallets & Transactions by Native asset (ex: ETH/BNB) --
-SELECT
-      timestamp,
-      uniqMerge(uaw) AS uaw,
-      sumMerge(transactions) AS transactions
-FROM historical_native_balances
-GROUP by timestamp;
+WHERE pool = '0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b' -- Uniswap V3 WETH/USDT
+GROUP BY pool, date;
