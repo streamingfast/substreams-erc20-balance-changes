@@ -464,7 +464,7 @@ CREATE TABLE IF NOT EXISTS pools (
    token0               FixedString(42) COMMENT 'token0 address',
    token1               FixedString(42) COMMENT 'token1 address',
    fee                  UInt32 COMMENT 'pool fee (e.g., 3000 represents 0.30%)',
-   exchange             LowCardinality(String) COMMENT 'exchange name', -- 'uniswap_v2' or 'uniswap_v3'
+   protocol             LowCardinality(String) COMMENT 'protocol name', -- 'uniswap_v2' or 'uniswap_v3'
 )
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (factory, pool)
@@ -484,7 +484,7 @@ SELECT
    token0,
    token1,
    3000 AS fee, -- default Uniswap V2 fee
-   'uniswap_v2' AS exchange
+   'uniswap_v2' AS protocol
 FROM uniswap_v2_pairs_created;
 
 -- Uniswap::V3::Factory:PoolCreated --
@@ -501,7 +501,7 @@ SELECT
    token0,
    token1,
    fee,
-   'uniswap_v3' AS exchange
+   'uniswap_v3' AS protocol
 FROM uniswap_v3_pools_created;
 
 -- Swaps for Uniswap V2 & V3 --
@@ -529,7 +529,7 @@ CREATE TABLE IF NOT EXISTS swaps (
    amount0              Int256 COMMENT 'token0 amount',
    amount1              Int256 COMMENT 'token1 amount',
    price                Float64 COMMENT 'computed price for token0',
-   exchange             LowCardinality(String) COMMENT 'exchange name', -- 'uniswap_v2' or 'uniswap_v3'
+   protocol             LowCardinality(String) COMMENT 'protocol name', -- 'uniswap_v2' or 'uniswap_v3'
 )
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -553,7 +553,7 @@ SELECT
    amount0_in - amount0_out AS amount0,
    amount1_in - amount1_out AS amount1,
    abs((amount1_in - amount1_out) / (amount0_in - amount0_out)) AS price,
-   'uniswap_v2' AS exchange
+   'uniswap_v2' AS protocol
 FROM uniswap_v2_swaps;
 
 -- Uniswap::V3::Pool:Swap --
@@ -574,7 +574,7 @@ SELECT
    amount0,
    amount1,
    pow(1.0001, tick) AS price,
-   'uniswap_v3' AS exchange
+   'uniswap_v3' AS protocol
 FROM uniswap_v3_swaps;
 
 -- latest balances by owner/contract --

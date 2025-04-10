@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS swaps (
    amount0              Int256 COMMENT 'token0 amount',
    amount1              Int256 COMMENT 'token1 amount',
    price                Float64 COMMENT 'computed price for token0',
-   exchange             LowCardinality(String) COMMENT 'exchange name', -- 'uniswap_v2' or 'uniswap_v3'
+   protocol             LowCardinality(String) COMMENT 'protocol name', -- 'uniswap_v2' or 'uniswap_v3'
 )
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -47,7 +47,7 @@ SELECT
    amount0_in - amount0_out AS amount0,
    amount1_in - amount1_out AS amount1,
    abs((amount1_in - amount1_out) / (amount0_in - amount0_out)) AS price,
-   'uniswap_v2' AS exchange
+   'uniswap_v2' AS protocol
 FROM uniswap_v2_swaps;
 
 -- Uniswap::V3::Pool:Swap --
@@ -68,5 +68,5 @@ SELECT
    amount0,
    amount1,
    pow(1.0001, tick) AS price,
-   'uniswap_v3' AS exchange
+   'uniswap_v3' AS protocol
 FROM uniswap_v3_swaps;

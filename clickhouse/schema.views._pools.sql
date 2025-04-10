@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS pools (
    token0               FixedString(42) COMMENT 'token0 address',
    token1               FixedString(42) COMMENT 'token1 address',
    fee                  UInt32 COMMENT 'pool fee (e.g., 3000 represents 0.30%)',
-   exchange             LowCardinality(String) COMMENT 'exchange name', -- 'uniswap_v2' or 'uniswap_v3'
+   protocol             LowCardinality(String) COMMENT 'protocol name', -- 'uniswap_v2' or 'uniswap_v3'
 )
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (factory, pool)
@@ -37,7 +37,7 @@ SELECT
    token0,
    token1,
    3000 AS fee, -- default Uniswap V2 fee
-   'uniswap_v2' AS exchange
+   'uniswap_v2' AS protocol
 FROM uniswap_v2_pairs_created;
 
 -- Uniswap::V3::Factory:PoolCreated --
@@ -54,5 +54,5 @@ SELECT
    token0,
    token1,
    fee,
-   'uniswap_v3' AS exchange
+   'uniswap_v3' AS protocol
 FROM uniswap_v3_pools_created;
