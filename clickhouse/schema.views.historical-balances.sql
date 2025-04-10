@@ -9,10 +9,10 @@ CREATE TABLE IF NOT EXISTS historical_balances (
    address              FixedString(42) COMMENT 'wallet address',
 
    -- balance --
-   open           AggregateFunction(argMin, Float64, UInt64),
-   high           SimpleAggregateFunction(max, Float64),
-   low            SimpleAggregateFunction(min, Float64),
-   close          AggregateFunction(argMax, Float64, UInt64),
+   open           AggregateFunction(argMin, UInt256, UInt64),
+   high           SimpleAggregateFunction(max, UInt256),
+   low            SimpleAggregateFunction(min, UInt256),
+   close          AggregateFunction(argMax, UInt256, UInt64),
    uaw            AggregateFunction(uniq, FixedString(42)) COMMENT 'unique wallet addresses that changed balance in the window',
    transactions   AggregateFunction(sum, UInt8) COMMENT 'number of transactions that changed balance in the window'
 )
@@ -29,10 +29,10 @@ SELECT
    min(block_num) AS block_num,
    address,
    contract,
-   argMinState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS open, -- normalized to wei (18 decimals)
-   max(toFloat64(new_balance / pow(10, 18))) AS high, -- normalized to wei (18 decimals)
-   min(toFloat64(new_balance / pow(10, 18))) AS low, -- normalized to wei (18 decimals)
-   argMaxState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS close, -- normalized to wei (18 decimals)
+   argMinState(new_balance, global_sequence) AS open, -- normalized to wei (18 decimals)
+   max(new_balance) AS high, -- normalized to wei (18 decimals)
+   min(new_balance) AS low, -- normalized to wei (18 decimals)
+   argMaxState(new_balance, global_sequence) AS close, -- normalized to wei (18 decimals)
    uniqState(address) AS uaw,
    sumState(1) AS transactions
 FROM erc20_balance_changes
@@ -52,10 +52,10 @@ SELECT
    address,
 
    -- balance --
-   argMinState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS open,
-   max(toFloat64(new_balance / pow(10, 18))) AS high,
-   min(toFloat64(new_balance / pow(10, 18))) AS low,
-   argMaxState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS close,
+   argMinState(new_balance, global_sequence) AS open,
+   max(new_balance) AS high,
+   min(new_balance) AS low,
+   argMaxState(new_balance, global_sequence) AS close,
    uniqState(address) AS uaw,
    sumState(1) AS transactions
 FROM native_balance_changes
