@@ -5,10 +5,13 @@ SELECT
 
       -- OHLC --
       floor(argMinMerge(open0) * pow(10, 18-6), 2)       AS open,
-      floor(quantile(0.95)(high0) * pow(10, 18-6), 2)    AS high,
-      floor(quantile(0.05)(low0) * pow(10, 18-6), 2)     AS low,
+      floor(quantileDeterministicMerge(0.99)(high0) * pow(10, 18-6), 2)    AS high,
+      floor(quantileDeterministicMerge(0.01)(low0) * pow(10, 18-6), 2)     AS low,
       floor(argMaxMerge(close0) * pow(10, 18-6), 2)      AS close,
-      floor(sumMerge(volume0), 2)                        AS "volume (ETH)" -- volume is in wei, no need to convert it
+      floor(sumMerge(volume0), 2)                        AS "volume (ETH)", -- volume is in wei, no need to convert it
+      floor(sumMerge(volume1) * pow(10, 18-6))           AS "volume (USDT)",
+      uniqMerge(uaw)                                     AS wallets,
+      sumMerge(transactions)                             AS tx_count
 FROM ohlc_prices
 WHERE pool = lower('0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b') -- Uniswap V3 WETH/USDT
 GROUP BY pool, timestamp
@@ -38,8 +41,8 @@ SELECT
 
       -- OHLC --
       floor(argMinMerge(open0) * pow(10, 18-6), 8)       AS open,
-      floor(quantile(0.95)(high0) * pow(10, 18-6), 8)    AS high,
-      floor(quantile(0.05)(low0) * pow(10, 18-6), 8)     AS low,
+      floor(quantileDeterministicMerge(0.99)(high0) * pow(10, 18-6), 8)    AS high,
+      floor(quantileDeterministicMerge(0.01)(low0) * pow(10, 18-6), 8)     AS low,
       floor(argMaxMerge(close0) * pow(10, 18-6), 8)      AS close,
       floor(sumMerge(volume0))                           AS "volume (DAI)" -- volume is in wei, no need to convert it
 FROM ohlc_prices
@@ -54,8 +57,8 @@ SELECT
 
       -- OHLC --
       floor(argMinMerge(open0) * pow(10, 8-6), 2)       AS open,
-      floor(quantile(0.95)(high0) * pow(10, 8-6), 2)    AS high,
-      floor(quantile(0.05)(low0) * pow(10, 8-6), 2)     AS low,
+      floor(quantileDeterministicMerge(0.99)(high0) * pow(10, 8-6), 2)    AS high,
+      floor(quantileDeterministicMerge(0.01)(low0) * pow(10, 8-6), 2)     AS low,
       floor(argMaxMerge(close0) * pow(10, 8-6), 2)      AS close,
       floor(sumMerge(volume0) * pow(10, 18-8), 3)       AS "volume (WBTC)",
       floor(sumMerge(volume1) * pow(10, 18-6))          AS "volume (USDC)"

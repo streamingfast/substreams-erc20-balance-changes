@@ -43,10 +43,15 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS historical_native_balances_mv
 TO historical_balances
 AS
 SELECT
-   toStartOfHour(timestamp) AS timestamp,
+   -- block --
    min(block_num) AS block_num,
-   address,
+   toStartOfHour(timestamp) AS timestamp,
+
+   -- balance change --
    '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' AS contract,
+   address,
+
+   -- balance --
    argMinState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS open,
    max(toFloat64(new_balance / pow(10, 18))) AS high,
    min(toFloat64(new_balance / pow(10, 18))) AS low,

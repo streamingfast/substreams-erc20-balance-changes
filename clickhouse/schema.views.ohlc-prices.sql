@@ -9,16 +9,10 @@ CREATE TABLE IF NOT EXISTS ohlc_prices (
 
    -- swaps --
    open0                AggregateFunction(argMin, Float64, UInt64),
-   high0                SimpleAggregateFunction(max, Float64),
-   low0                 SimpleAggregateFunction(min, Float64),
+   high0                AggregateFunction(quantileDeterministic, Float64, UInt64),
+   low0                 AggregateFunction(quantileDeterministic, Float64, UInt64),
    close0               AggregateFunction(argMax, Float64, UInt64),
    volume0              AggregateFunction(sum, Float64),
-
-   -- swaps (inverse) --
-   open1                AggregateFunction(argMin, Float64, UInt64),
-   high1                SimpleAggregateFunction(max, Float64),
-   low1                 SimpleAggregateFunction(min, Float64),
-   close1               AggregateFunction(argMax, Float64, UInt64),
    volume1              AggregateFunction(sum, Float64),
 
    -- universal --
@@ -34,23 +28,20 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ohlc_swaps_mv
 TO ohlc_prices
 AS
 SELECT
-   toStartOfHour(timestamp) AS timestamp,
+   -- block --
    min(block_num) AS block_num,
+   toStartOfHour(timestamp) AS timestamp,
+
+   -- pool --
    pool,
 
    -- swaps --
    argMinState(price, global_sequence) AS open0,
-   quantileExact(0.95)(price) AS high0,
-   quantileExact(0.05)(price) AS low0,
+   quantileDeterministicState(0.99)(price, global_sequence) AS high0,
+   quantileDeterministicState(0.01)(price, global_sequence) AS low0,
    argMaxState(price, global_sequence) AS close0,
-   sumState(toDecimal256(abs(amount0), 18) / pow(10, 18) ) AS volume0, -- normalize to 18 decimals to fit as Float64
-
-   -- swaps (inverse) --
-   argMinState(1 / price, global_sequence) AS open1,
-   quantileExact(0.95)(1 / price) AS high1,
-   quantileExact(0.05)(1 / price) AS low1,
-   argMaxState(1 / price, global_sequence) AS close1,
-   sumState(toDecimal256(abs(amount1), 18) / pow(10, 18) ) AS volume1, -- normalize to 18 decimals to fit as Float64
+   sumState(toDecimal256(abs(amount0), 18) / pow(10, 18) ) AS volume0,
+   sumState(toDecimal256(abs(amount1), 18) / pow(10, 18) ) AS volume1,
 
    -- universal --
    uniqState(sender) AS uaw,
