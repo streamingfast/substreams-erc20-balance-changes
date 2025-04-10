@@ -1,7 +1,7 @@
 -- OHLC prices including Uniswap V2 & V3 --
 CREATE TABLE IF NOT EXISTS ohlc_prices (
    -- block --
-   block_num            UInt32,
+   block_num            SimpleAggregateFunction(min, UInt32),
    timestamp            DateTime(0, 'UTC') COMMENT 'the start of the aggregate window',
 
    -- pool --
@@ -35,7 +35,7 @@ TO ohlc_prices
 AS
 SELECT
    toStartOfHour(timestamp) AS timestamp,
-   argMinState(block_num, global_sequence) AS block_num,
+   min(block_num) AS block_num,
    pool,
 
    -- swaps --

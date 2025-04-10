@@ -1,7 +1,7 @@
 -- Historical ERC-20 balances by address/contract --
 CREATE TABLE IF NOT EXISTS historical_balances (
    -- block --
-   block_num            UInt32,
+   block_num            SimpleAggregateFunction(min, UInt32),
    timestamp            DateTime(0, 'UTC') COMMENT 'the start of the aggregate window',
 
    -- balance change --
@@ -26,7 +26,7 @@ TO historical_balances
 AS
 SELECT
    toStartOfHour(timestamp) AS timestamp,
-   argMinState(block_num, global_sequence) AS block_num,
+   min(block_num) AS block_num,
    address,
    contract,
    argMinState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS open, -- normalized to wei (18 decimals)
@@ -44,7 +44,7 @@ TO historical_balances
 AS
 SELECT
    toStartOfHour(timestamp) AS timestamp,
-   argMinState(block_num, global_sequence) AS block_num,
+   min(block_num) AS block_num,
    address,
    argMinState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS open,
    max(toFloat64(new_balance / pow(10, 18))) AS high,
