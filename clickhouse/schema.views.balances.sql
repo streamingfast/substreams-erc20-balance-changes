@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS balances (
    global_sequence      UInt64, -- block_num << 32 + index
 
    -- balance change --
-   contract             FixedString(42) COMMENT 'ERC-20 & Native contract address',
+   contract             FixedString(42) COMMENT 'contract address',
    address              FixedString(42) COMMENT 'wallet address',
    new_balance          UInt256 COMMENT 'new balance',
 

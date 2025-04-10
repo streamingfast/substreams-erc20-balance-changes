@@ -9,8 +9,7 @@ SELECT
       sumMerge(transactions) AS transactions
 FROM historical_erc20_balances
 WHERE
-      address = '0x000000fee13a103a10d593b9ae06b3e05f2e7e1c' AND
-      contract = '0x6fa7760abf096d94f9b330d96c05615991fb9026'
+      address = '0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b'
 GROUP BY address,contract,timestamp;
 
 -- Unique Active Wallets & Transactions by ERC-20 Contracts --
