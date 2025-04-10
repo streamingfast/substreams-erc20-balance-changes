@@ -3,15 +3,21 @@ SELECT
       timestamp,
       'WETH/USDT' AS ticker,
 
-      -- OHLC --
+      -- -- OHLC --
       floor(argMinMerge(open0) * pow(10, 18-6), 2)       AS open,
       floor(quantileDeterministicMerge(0.99)(high0) * pow(10, 18-6), 2)    AS high,
       floor(quantileDeterministicMerge(0.01)(low0) * pow(10, 18-6), 2)     AS low,
       floor(argMaxMerge(close0) * pow(10, 18-6), 2)      AS close,
-      floor(sumMerge(volume0), 2)                        AS "volume (ETH)", -- volume is in wei, no need to convert it
-      floor(sumMerge(volume1) * pow(10, 18-6))           AS "volume (USDT)",
-      uniqMerge(uaw)                                     AS wallets,
-      sumMerge(transactions)                             AS tx_count
+
+      -- volume --
+      floor(sum(gross_volume0 / 10e18), 2)                    AS "gross volume (ETH)", -- volume is in wei, no need to convert it
+      floor(sum(gross_volume1 / 10e6))                   AS "gross volume (USDT)",
+      floor(sum(net_flow0 / 10e18), 2)                        AS "net flow (ETH)", -- volume is in wei, no need to convert it
+      floor(sum(net_flow1 / 10e6))           AS "net flow (USDT)",
+
+      -- universal --
+      uniqMerge(uaw)                                  AS wallets,
+      sum(transactions)                               AS tx_count
 FROM ohlc_prices
 WHERE pool = lower('0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b') -- Uniswap V3 WETH/USDT
 GROUP BY pool, timestamp
