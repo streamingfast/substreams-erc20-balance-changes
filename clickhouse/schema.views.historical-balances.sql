@@ -46,6 +46,7 @@ SELECT
    toStartOfHour(timestamp) AS timestamp,
    min(block_num) AS block_num,
    address,
+   '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' AS contract,
    argMinState(toFloat64(new_balance / pow(10, 18)), global_sequence) AS open,
    max(toFloat64(new_balance / pow(10, 18))) AS high,
    min(toFloat64(new_balance / pow(10, 18))) AS low,

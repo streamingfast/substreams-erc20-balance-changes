@@ -2,29 +2,35 @@
 SELECT
       contract,
       timestamp,
-      argMinMerge(open)  AS open,
-      max(high)     AS high,
-      min(low)      AS low,
-      argMaxMerge(close) AS close,
-      sumMerge(transactions) AS transactions
-FROM historical_erc20_balances
+      floor(argMinMerge(open), 4)  AS open,
+      floor(max(high), 4)     AS high,
+      floor(min(low), 4)      AS low,
+      floor(argMaxMerge(close), 4) AS close
+FROM historical_balances
 WHERE
-      address = '0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b'
-GROUP BY address,contract,timestamp;
+      address = lower('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045') -- Vitalik Buterin
+      AND contract != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' -- Native ETH asset
+GROUP BY address,contract,timestamp
+ORDER BY timestamp DESC;
 
 -- Unique Active Wallets & Transactions by ERC-20 Contracts --
 SELECT
-      contract,
       timestamp,
       uniqMerge(uaw) AS uaw,
       sumMerge(transactions) AS transactions
-FROM historical_erc20_balances_by_contract
-GROUP by contract,timestamp;
+FROM historical_balances_by_contract
+WHERE contract = '0xdac17f958d2ee523a2206206994597c13d831ec7' -- USDT
+GROUP by contract,timestamp
+ORDER BY timestamp DESC
+LIMIT 24; -- last 24 hours
 
--- Unique Active Wallets & Transactions by Native asset (ex: ETH/BNB) --
+-- Unique Active Wallets & Transactions by Native asset (ex: ETH,BNB) --
 SELECT
       timestamp,
       uniqMerge(uaw) AS uaw,
       sumMerge(transactions) AS transactions
-FROM historical_native_balances
-GROUP by timestamp;
+FROM historical_balances_by_contract
+WHERE contract = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' -- Native ETH asset
+GROUP by timestamp
+ORDER BY timestamp DESC
+LIMIT 24; -- last 24 hours
