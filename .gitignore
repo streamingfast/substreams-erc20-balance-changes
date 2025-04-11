@@ -9,3 +9,4 @@ state.*.yaml
 build
 buf.gen.yaml
 substreams-sink-sql
+cluster*

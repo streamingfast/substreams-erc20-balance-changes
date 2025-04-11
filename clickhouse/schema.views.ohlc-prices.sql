@@ -45,8 +45,8 @@ SELECT
 
    -- swaps --
    argMinState(price, global_sequence) AS open0,
-   quantileDeterministicState(0.99)(price, global_sequence) AS high0,
-   quantileDeterministicState(0.01)(price, global_sequence) AS low0,
+   quantileDeterministicState(price, global_sequence) AS high0,
+   quantileDeterministicState(price, global_sequence) AS low0,
    argMaxState(price, global_sequence) AS close0,
 
    -- volume --
