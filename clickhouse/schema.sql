@@ -94,8 +94,8 @@ CREATE TABLE IF NOT EXISTS erc20_transfers  (
    INDEX idx_caller             (caller)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_value              (value)              TYPE minmax GRANULARITY 4,
    INDEX idx_algorithm          (algorithm)          TYPE set(32) GRANULARITY 4,
-   INDEX idx_trx_type           (trx_type)            TYPE set(32) GRANULARITY 4,
-   INDEX idx_call_type          (call_type)           TYPE set(32) GRANULARITY 4,
+   INDEX idx_trx_type           (trx_type)           TYPE set(32) GRANULARITY 4,
+   INDEX idx_call_type          (call_type)          TYPE set(32) GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -587,39 +587,18 @@ SELECT
 FROM uniswap_v3_swaps;
 
 -- latest balances by owner/contract --
-CREATE TABLE IF NOT EXISTS balances (
-   -- block --
-   block_num            UInt32,
-   timestamp            DateTime(0, 'UTC'),
-
-   -- ordering --
-   global_sequence      UInt64, -- block_num << 32 + index
-
-   -- balance change --
-   contract             FixedString(42) DEFAULT '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' COMMENT 'contract address',
-   address              FixedString(42) COMMENT 'wallet address',
-   new_balance          UInt256 COMMENT 'new balance',
-
-   -- debug --
-   algorithm            LowCardinality(String),
-   trx_type             LowCardinality(String),
-   call_type            LowCardinality(String),
-   reason               LowCardinality(String),
-
-   -- indexes --
-   INDEX idx_block_num     (block_num)       TYPE minmax GRANULARITY 4,
-   INDEX idx_timestamp     (timestamp)       TYPE minmax GRANULARITY 4,
-   INDEX idx_new_balance   (new_balance)     TYPE minmax GRANULARITY 4,
-)
+CREATE TABLE IF NOT EXISTS balances AS erc20_balance_changes
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (address, contract)
 ORDER BY (address, contract);
 
+-- insert ERC20 balance changes --
 CREATE MATERIALIZED VIEW IF NOT EXISTS erc20_balances_mv
 TO balances AS
 SELECT * FROM erc20_balance_changes
 WHERE algorithm != 'ALGORITHM_BALANCE_NOT_MATCH_TRANSFER'; -- not implemented yet
 
+-- insert Native balance changes --
 CREATE MATERIALIZED VIEW IF NOT EXISTS native_balances_mv
 TO balances AS
 SELECT * FROM native_balance_changes;
