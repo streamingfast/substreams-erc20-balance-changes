@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS erc20_balance_changes  (
    algorithm            LowCardinality(String),
    trx_type             LowCardinality(String),
    call_type            LowCardinality(String),
-   reason               LowCardinality(String),
+   reason               LowCardinality(String) COMMENT 'only available in native_balance_changes',
 
    -- indexes --
    INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
@@ -591,6 +591,12 @@ CREATE TABLE IF NOT EXISTS balances (
    address              FixedString(42) COMMENT 'wallet address',
    new_balance          UInt256 COMMENT 'new balance',
 
+   -- debug --
+   algorithm            LowCardinality(String),
+   trx_type             LowCardinality(String),
+   call_type            LowCardinality(String),
+   reason               LowCardinality(String),
+
    -- indexes --
    INDEX idx_block_num     (block_num)       TYPE minmax GRANULARITY 4,
    INDEX idx_timestamp     (timestamp)       TYPE minmax GRANULARITY 4,
@@ -602,7 +608,8 @@ ORDER BY (address, contract);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS erc20_balances_mv
 TO balances AS
-SELECT * FROM erc20_balance_changes;
+SELECT * FROM erc20_balance_changes
+WHERE algorithm != 'ALGORITHM_BALANCE_NOT_MATCH_TRANSFER'; -- not implemented yet
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS native_balances_mv
 TO balances AS

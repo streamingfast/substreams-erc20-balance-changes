@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS erc20_balance_changes  (
    algorithm            LowCardinality(String),
    trx_type             LowCardinality(String),
    call_type            LowCardinality(String),
-   reason               LowCardinality(String),
+   reason               LowCardinality(String) COMMENT 'only available in native_balance_changes',
 
    -- indexes --
    INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
