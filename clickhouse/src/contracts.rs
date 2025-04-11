@@ -19,13 +19,18 @@ pub fn process_contracts(tables: &mut substreams_database_change::tables::Tables
 
 fn process_contract_change(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: ContractChange, index: u64) {
     let key = common_key(clock, index);
+
+    // handle Nullable values
+    let decimals = event.decimals
+        .map(|d| d.to_string())   // only allocate when we have a value
+        .unwrap_or_default();
+
     let row = tables
         .create_row("contract_changes", key)
         .set("address", &bytes_to_hex(&event.address))
         .set("name", &event.name.unwrap_or("".to_string()))
         .set("symbol", &event.symbol.unwrap_or("".to_string()))
-        .set("decimals", event.decimals.unwrap_or(0).to_string());
-    // TO-DO handle Nullable values
+        .set("decimals", decimals);
 
     set_caller(event.caller, row);
     set_ordering(index, event.ordinal, clock, row);

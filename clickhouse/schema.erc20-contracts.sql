@@ -18,9 +18,9 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
 
    -- contract --
    address              FixedString(42) COMMENT 'ERC-20 contract address',
-   name                 String COMMENT 'ERC-20 contract name (typically 3-8 characters)',
-   symbol               String COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
-   decimals             UInt8 COMMENT 'ERC-20 contract decimals (18 by default)',
+   name                 String COMMENT '(Optional) ERC-20 contract name (typically 3-8 characters)',
+   symbol               String COMMENT '(Optional) ERC-20 contract symbol (typically 3-4 characters)',
+   decimals             String COMMENT '(Optional UInt8) ERC-20 contract decimals (18 by default)',
 
    -- indexes --
    INDEX idx_transaction_id      (transaction_id)     TYPE bloom_filter GRANULARITY 4,

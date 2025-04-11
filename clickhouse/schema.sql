@@ -122,9 +122,9 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
 
    -- contract --
    address              FixedString(42) COMMENT 'ERC-20 contract address',
-   name                 String COMMENT 'ERC-20 contract name (typically 3-8 characters)',
-   symbol               String COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
-   decimals             UInt8 COMMENT 'ERC-20 contract decimals (18 by default)',
+   name                 String COMMENT '(Optional) ERC-20 contract name (typically 3-8 characters)',
+   symbol               String COMMENT '(Optional) ERC-20 contract symbol (typically 3-4 characters)',
+   decimals             String COMMENT '(Optional UInt8) ERC-20 contract decimals (18 by default)',
 
    -- indexes --
    INDEX idx_transaction_id      (transaction_id)     TYPE bloom_filter GRANULARITY 4,
@@ -434,16 +434,25 @@ CREATE TABLE IF NOT EXISTS contracts  (
 
    -- contract --
    address              FixedString(42) COMMENT 'ERC-20 contract address',
-   name                 SimpleAggregateFunction(anyLast, String) COMMENT 'ERC-20 contract name (typically 3-8 characters)',
-   symbol               SimpleAggregateFunction(anyLast, String) COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
-   decimals             SimpleAggregateFunction(anyLast, UInt8) COMMENT 'ERC-20 contract decimals (18 by default)'
+   name                 SimpleAggregateFunction(anyLast, Nullable(String)) COMMENT 'ERC-20 contract name (typically 3-8 characters)',
+   symbol               SimpleAggregateFunction(anyLast, Nullable(String)) COMMENT 'ERC-20 contract symbol (typically 3-4 characters)',
+   decimals             SimpleAggregateFunction(anyLast, Nullable(UInt8)) COMMENT 'ERC-20 contract decimals (18 by default)'
 )
 ENGINE = AggregatingMergeTree
 ORDER BY address;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS contracts_mv
 TO contracts AS
-SELECT * FROM contract_changes;
+SELECT
+   block_num,
+   timestamp,
+   global_sequence,
+   address,
+   -- replace empty strings with NULLs --
+   IF (name = '', Null, name) AS name,
+   IF (symbol = '', Null, symbol) AS symbol,
+   IF (decimals = '', Null, CAST(decimals AS UInt8)) AS decimals
+FROM contract_changes;
 
 -- Pools Created for Uniswap V2 & V3 --
 CREATE TABLE IF NOT EXISTS pools (
