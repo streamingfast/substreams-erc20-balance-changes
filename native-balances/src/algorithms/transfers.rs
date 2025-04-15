@@ -92,9 +92,15 @@ pub fn get_transfer_from_call(call: &Call) -> Option<TransferStruct> {
 
 pub fn get_transfer_from_transaction_fee(trx: &TransactionTrace, base_fee_per_gas: &BigInt, coinbase: &Address) -> Vec<TransferStruct> {
     let mut transfers = Vec::new();
-    let gas_price = match trx.gas_price {
-        Some(ref data) => BigInt::from_unsigned_bytes_be(&data.bytes),
-        None => BigInt::zero(),
+
+    let gas_price = match trx.gas_price.as_ref() {
+        // valid price, 20 bytes or fewer (assumption that 20 bytes is the maximum size of a gas price)
+        // https://github.com/pinax-network/substreams-evm-tokens/issues/34
+        Some(data) if data.bytes.len() <= 20 =>
+            BigInt::from_unsigned_bytes_be(&data.bytes),
+
+        // `None` **or** more than 20 bytes → treat as zero
+        _ => BigInt::zero(),
     };
     let gas_used = BigInt::from(trx.gas_used);
     let transaction_fee = gas_price * &gas_used;
