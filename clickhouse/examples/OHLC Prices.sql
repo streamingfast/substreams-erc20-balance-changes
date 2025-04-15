@@ -15,9 +15,9 @@ WITH (
 
       -- volume --
       floor(sum(gross_volume0) / pow(10, decimals0), precision)         AS "gross volume (ETH)",
-      floor(sum(gross_volume1) / pow(10, decimals1), precision)         AS "gross volume (USDT)",
+      floor(sum(gross_volume1) / pow(10, decimals1), precision)         AS "gross volume (USD)",
       floor(sum(net_flow0) / pow(10, decimals0), precision)             AS "net flow (ETH)",
-      floor(sum(net_flow1) / pow(10, decimals1), precision)             AS "net flow (USDT)",
+      floor(sum(net_flow1) / pow(10, decimals1), precision)             AS "net flow (USD)",
 
       -- universal --
       uniqMerge(uaw)          AS uaw,

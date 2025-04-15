@@ -18,7 +18,7 @@ SELECT
       uniqMerge(uaw) AS uaw,
       sumMerge(transactions) AS transactions
 FROM historical_balances_by_contract
-WHERE contract = '0xdac17f958d2ee523a2206206994597c13d831ec7' -- USDT
+WHERE contract = lower('0xdac17f958d2ee523a2206206994597c13d831ec7') -- USDT (ETH Mainnet)
 GROUP by contract,timestamp
 ORDER BY timestamp DESC
 LIMIT 24; -- last 24 hours
@@ -29,7 +29,7 @@ SELECT
       uniqMerge(uaw) AS uaw,
       sumMerge(transactions) AS transactions
 FROM historical_balances_by_contract
-WHERE contract = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' -- Native ETH asset
+WHERE contract = '' -- Native ETH asset
 GROUP by timestamp
 ORDER BY timestamp DESC
 LIMIT 24; -- last 24 hours
