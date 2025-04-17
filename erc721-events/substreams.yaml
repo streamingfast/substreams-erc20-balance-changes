@@ -24,7 +24,7 @@ modules:
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:eth.erc721.events.v1.Events
+      type: proto:evm.erc721.events.v1.Events
 
   - name: map_mints_with_uri
     kind: map
@@ -32,4 +32,4 @@ modules:
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:eth.erc721.events.v1.Mints
+      type: proto:evm.erc721.events.v1.Mints
