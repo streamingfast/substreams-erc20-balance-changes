@@ -55,7 +55,7 @@ message Transaction {
   uint64 block_number = 1;
   uint64 block_timestamp = 2;
   bytes block_hash = 3;
-  uint32 index = 4;
+  uint32 position = 4;
   bytes tx_hash = 5;
   uint64 nonce = 6;
   bytes from_address = 7;

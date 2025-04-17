@@ -1,9 +1,8 @@
 use crate::pb::events::Transfer;
+use common::is_zero_address;
 use substreams_abis::evm::token::erc721;
 use substreams_ethereum::pb::eth::v2 as eth;
 use substreams_ethereum::Event;
-
-const ZERO_ADDRESS: [u8; 20] = [0u8; 20];
 
 /// Helper that extracts ERC721 transfer events from a block
 fn extract_erc721_events<'a, T, F>(blk: &'a eth::Block, process_event: F) -> impl Iterator<Item = T> + 'a
@@ -102,8 +101,4 @@ pub fn get_burns<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> + 'a
             None
         }
     })
-}
-
-fn is_zero_address<T: AsRef<[u8]>>(addr: T) -> bool {
-    addr.as_ref() == ZERO_ADDRESS
 }

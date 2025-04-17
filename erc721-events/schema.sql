@@ -1,27 +1,27 @@
 -- ERC-721 Transfers Table
-CREATE TABLE IF NOT EXISTS transfers (
+CREATE TABLE IF NOT EXISTS erc721_transfers (
     block_num        UInt64,
     tx_hash          FixedString(66),
     log_index        UInt64,
     contract         FixedString(42),
     from             FixedString(42),
     to               FixedString(42),
-    token_id         String
-    uri              Nullable(String)
-    symbol           Nullable(String)
-    name             Nullable(String)
+    token_id         String,
+    uri              String,
+    symbol           String,
+    name             String
 ) ENGINE = ReplacingMergeTree
 PRIMARY KEY (block_num, tx_hash, log_index)
 ORDER BY (block_num, tx_hash, log_index);
 
 -- ERC-721 Transactions Table
-CREATE TABLE IF NOT EXISTS transactions (
+CREATE TABLE IF NOT EXISTS erc721_transactions (
     block_number             UInt64,
     block_timestamp          UInt64,
     block_hash               FixedString(66),
     tx_hash                  FixedString(66),
     nonce                    UInt64,
-    index                 UInt32,
+    position                 UInt32,
     from_address             FixedString(42),
     to_address               FixedString(42),
     value                    String,

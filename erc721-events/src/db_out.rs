@@ -1,16 +1,19 @@
-use crate::pb::events::{Events, Mints};
-use common::bytes_to_hex;
+use crate::pb::events::{Events, Mints, Token};
+use common::{bytes_to_hex, is_zero_address};
+use std::collections::HashMap;
 use substreams_database_change::pb::database::DatabaseChanges;
 use substreams_database_change::tables::Tables;
 
 #[substreams::handlers::map]
-pub fn db_out(events: Events, _mints: Mints) -> Result<DatabaseChanges, substreams::errors::Error> {
+pub fn db_out(mut events: Events, mints: Mints) -> Result<DatabaseChanges, substreams::errors::Error> {
     let mut tables = Tables::new();
 
+    merge_metadata(&mut events.transfers, &mints.tokens);
+
     // Transfers
-    for transfer in events.transfers.iter() {
+    for transfer in events.transfers {
         let row = tables.create_row(
-            "transfers",
+            "erc721_transfers",
             [
                 ("block_num", transfer.block_num.to_string()),
                 ("tx_hash", bytes_to_hex(&transfer.tx_hash)),
@@ -20,19 +23,22 @@ pub fn db_out(events: Events, _mints: Mints) -> Result<DatabaseChanges, substrea
         row.set("contract", bytes_to_hex(&transfer.contract))
             .set("from", bytes_to_hex(&transfer.from))
             .set("to", bytes_to_hex(&transfer.to))
-            .set("token_id", &transfer.token_id);
+            .set("token_id", &transfer.token_id)
+            .set("uri", transfer.uri.as_deref().unwrap_or(""))
+            .set("symbol", transfer.symbol.as_deref().unwrap_or(""))
+            .set("name", transfer.name.as_deref().unwrap_or(""));
     }
 
     // Transactions
-    for tx in events.transactions.iter() {
+    for tx in events.transactions {
         let row = tables.create_row(
-            "transactions",
+            "erc721_transactions",
             [("block_number", tx.block_number.to_string()), ("tx_hash", bytes_to_hex(&tx.tx_hash))],
         );
         row.set("block_timestamp", tx.block_timestamp.to_string())
             .set("block_hash", bytes_to_hex(&tx.block_hash))
             .set("nonce", tx.nonce.to_string())
-            .set("index", tx.index.to_string())
+            .set("position", tx.position.to_string())
             .set("from_address", bytes_to_hex(&tx.from_address))
             .set("to_address", bytes_to_hex(&tx.to_address))
             .set("value", &tx.value)
@@ -51,4 +57,18 @@ pub fn db_out(events: Events, _mints: Mints) -> Result<DatabaseChanges, substrea
     }
 
     Ok(tables.to_database_changes())
+}
+
+fn merge_metadata(transfers: &mut Vec<crate::pb::events::Transfer>, tokens: &[Token]) {
+    let mint_map: HashMap<(&[u8], &str), &Token> = tokens.iter().map(|token| ((token.contract.as_ref(), token.token_id.as_str()), token)).collect();
+
+    for transfer in transfers {
+        if is_zero_address(&transfer.from) {
+            if let Some(token) = mint_map.get(&(transfer.contract.as_ref(), &transfer.token_id)) {
+                transfer.uri = token.uri.clone();
+                transfer.symbol = token.symbol.clone();
+                transfer.name = token.name.clone();
+            }
+        }
+    }
 }

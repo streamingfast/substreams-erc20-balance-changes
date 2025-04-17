@@ -16,7 +16,7 @@ pub fn get_transactions(blk: &eth::Block, event_tx_hashes: &std::collections::Ha
             block_hash: block_hash.clone().into(),
             tx_hash: trace.hash.clone().into(),
             nonce: trace.nonce,
-            index: trace.index,
+            position: trace.index,
             from_address: trace.from.clone().into(),
             to_address: trace.to.clone().into(),
             gas_limit: trace.gas_limit,
