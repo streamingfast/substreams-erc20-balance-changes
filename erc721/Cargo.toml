@@ -1,5 +1,5 @@
 [package]
-name = "erc721-events"
+name = "erc721"
 version = "0.1.0"
 description = "ERC721 events substreams package"
 edition = "2021"

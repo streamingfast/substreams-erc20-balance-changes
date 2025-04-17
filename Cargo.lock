@@ -229,7 +229,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "erc721-events"
+name = "erc721"
 version = "0.1.0"
 dependencies = [
  "common",

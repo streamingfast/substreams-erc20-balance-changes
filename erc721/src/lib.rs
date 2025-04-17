@@ -3,7 +3,7 @@ mod events;
 mod pb;
 mod transactions;
 
-use pb::events::{Events, Mints, Token, Transfer};
+use pb::evm::erc721::events::v1::{Events, Mints, Token, Transfer};
 use substreams::scalar::BigInt;
 use substreams_abis::evm::token::erc721;
 use substreams_ethereum::pb::eth::v2 as eth;

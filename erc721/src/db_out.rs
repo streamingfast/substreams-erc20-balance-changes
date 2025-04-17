@@ -1,4 +1,4 @@
-use crate::pb::events::{Events, Mints, Token};
+use crate::pb::evm::erc721::events::v1::{Events, Mints, Token, Transfer};
 use common::{bytes_to_hex, is_zero_address};
 use std::collections::HashMap;
 use substreams_database_change::pb::database::DatabaseChanges;
@@ -59,7 +59,7 @@ pub fn db_out(mut events: Events, mints: Mints) -> Result<DatabaseChanges, subst
     Ok(tables.to_database_changes())
 }
 
-fn merge_metadata(transfers: &mut Vec<crate::pb::events::Transfer>, tokens: &[Token]) {
+fn merge_metadata(transfers: &mut Vec<Transfer>, tokens: &[Token]) {
     let mint_map: HashMap<(&[u8], &str), &Token> = tokens.iter().map(|token| ((token.contract.as_ref(), token.token_id.as_str()), token)).collect();
 
     for transfer in transfers {

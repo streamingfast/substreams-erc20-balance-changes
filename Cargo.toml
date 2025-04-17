@@ -11,7 +11,7 @@ members = [
   "proto",
   "common",
   "clickhouse",
-  "erc721-events"
+  "erc721"
 ]
 resolver = "2"
 

@@ -1,4 +1,4 @@
-use crate::pb::events::Transfer;
+use crate::pb::evm::erc721::events::v1::Transfer;
 use common::is_zero_address;
 use substreams_abis::evm::token::erc721;
 use substreams_ethereum::pb::eth::v2 as eth;
