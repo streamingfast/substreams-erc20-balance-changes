@@ -235,6 +235,7 @@ dependencies = [
  "prost 0.13.5",
  "substreams",
  "substreams-abis",
+ "substreams-database-change",
  "substreams-ethereum",
 ]
 

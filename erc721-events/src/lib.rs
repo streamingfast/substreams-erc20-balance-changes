@@ -1,3 +1,4 @@
+mod db_out;
 mod events;
 mod pb;
 mod transactions;

@@ -33,3 +33,11 @@ modules:
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:evm.erc721.events.v1.Mints
+
+  - name: db_out
+    kind: map
+    inputs:
+      - map: map_events
+      - map: map_mints_with_uri
+    output:
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
