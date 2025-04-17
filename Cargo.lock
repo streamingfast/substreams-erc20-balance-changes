@@ -229,6 +229,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "erc721-events"
+version = "0.1.0"
+dependencies = [
+ "prost 0.13.5",
+ "substreams",
+ "substreams-abis",
+ "substreams-ethereum",
+]
+
+[[package]]
 name = "errno"
 version = "0.3.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"

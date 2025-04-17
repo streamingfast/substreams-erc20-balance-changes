@@ -1,0 +1,20 @@
+[package]
+name = "erc721-events"
+version = "0.1.0"
+description = "ERC721 events substreams package"
+edition = "2021"
+license = "Apache-2.0"
+authors = [
+    "Yaro Shkvorets <yaro@pinax.network>"
+]
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+substreams = { workspace = true }
+substreams-ethereum = { workspace = true }
+substreams-abis = { workspace = true }
+prost = "0.13"
+
+[profile.release]
+lto = true

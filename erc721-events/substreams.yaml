@@ -1,0 +1,35 @@
+specVersion: v0.1.0
+package:
+  name: erc721_events
+  version: v0.1.0
+  url: https://githubcom/pinax-network/substreams-evm-tokens
+  description: ERC721 events substreams package
+  image: ../image.png
+
+protobuf:
+  files:
+    - events.proto
+  importPaths:
+    - ./proto
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ../target/wasm32-unknown-unknown/release/erc721_events.wasm
+
+modules:
+  - name: map_events
+    kind: map
+    initialBlock: 0
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:eth.erc721.events.v1.Events
+
+  - name: map_mints_with_uri
+    kind: map
+    initialBlock: 0
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:eth.erc721.events.v1.Mints

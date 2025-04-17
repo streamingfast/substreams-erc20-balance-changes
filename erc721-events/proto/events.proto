@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package eth.erc721.events.v1;
+
+message Events {
+  repeated Mint mints = 1;
+  repeated Transfer transfers = 2;
+  repeated Burn burns = 3;
+  repeated Transaction transactions = 4;
+}
+
+message Mints {
+  repeated Mint mints = 1;
+}
+
+message Mint {
+  // Block number for the mint event
+  uint64 block_num = 1;
+
+  // The transaction hash that generated that transfer.
+  bytes tx_hash = 2;
+
+  // The index of the log within the transaction's receipts of the block.
+  uint64 log_index = 3;
+
+  // The contract address of the token.
+  bytes contract = 4;
+
+  // The person that received the transfer.
+  bytes to = 5;
+
+  // TokenID the identifier of the token for which the transfer is happening.
+  string token_id = 6;
+
+  // URI of the token.
+  optional string uri = 7;
+}
+
+message Transfer {
+  // Block number for the transfer event
+  uint64 block_num = 1;
+
+  // The transaction hash that generated that transfer.
+  bytes tx_hash = 2;
+
+  // The index of the log within the transaction's receipts of the block.
+  uint64 log_index = 3;
+
+  // The contract address of the token.
+  bytes contract = 4;
+
+  // The person that sent the transfer.
+  bytes from = 5;
+
+  // The person that received the transfer.
+  bytes to = 6;
+
+  // TokenID the identifier of the token for which the transfer is happening.
+  string token_id = 7;
+}
+
+message Burn {
+  // Block number for the burn event
+  uint64 block_num = 1;
+
+  // The transaction hash that generated that transfer.
+  bytes tx_hash = 2;
+
+  // The index of the log within the transaction's receipts of the block.
+  uint64 log_index = 3;
+
+  // The contract address of the token.
+  bytes contract = 4;
+
+  // The person that sent the burn.
+  bytes from = 5;
+
+  // TokenID the identifier of the token for which the burn is happening.
+  string token_id = 6;
+}
+
+message Transaction {
+  uint64 block_number = 1;
+  uint64 block_timestamp = 2;
+  bytes block_hash = 3;
+  bytes tx_hash = 4;
+  uint64 nonce = 5;
+  uint32 position = 6;
+  bytes from_address = 7;
+  bytes to_address = 8;
+  string value = 9;
+  string tx_fee = 10;
+  string gas_price = 11;
+  uint64 gas_limit = 12;
+  uint64 gas_used = 13;
+  uint64 cumulative_gas_used = 14;
+  string max_fee_per_gas = 15;
+  string max_priority_fee_per_gas = 16;
+  bytes input = 17;
+  int32 type = 18;
+  bytes v = 19;
+  bytes r = 20;
+  bytes s = 21;
+}
