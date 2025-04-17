@@ -232,6 +232,7 @@ dependencies = [
 name = "erc721-events"
 version = "0.1.0"
 dependencies = [
+ "common",
  "prost 0.13.5",
  "substreams",
  "substreams-abis",

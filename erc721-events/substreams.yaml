@@ -12,6 +12,10 @@ protobuf:
   importPaths:
     - ./proto
 
+imports:
+  database_changes: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v2.0.0/substreams-database-change-v2.0.0.spkg
+  sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
+
 binaries:
   default:
     type: wasm/rust-v1
@@ -26,7 +30,7 @@ modules:
     output:
       type: proto:evm.erc721.events.v1.Events
 
-  - name: map_mints_with_uri
+  - name: map_mints
     kind: map
     initialBlock: 0
     inputs:
@@ -38,6 +42,17 @@ modules:
     kind: map
     inputs:
       - map: map_events
-      - map: map_mints_with_uri
+      - map: map_mints
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+
+sink:
+  module: db_out
+  type: sf.substreams.sink.sql.v1.Service
+  config:
+    schema: "./schema.sql"
+    engine: clickhouse
+    postgraphile_frontend:
+      enabled: false
+
+network: mainnet

@@ -24,4 +24,10 @@ gui: build
 
 .PHONY: mints
 mints: build
-	substreams gui -e $(ENDPOINT) substreams.yaml map_mints_with_uri -s 10000000 -t +100
+	substreams gui -e $(ENDPOINT) substreams.yaml map_mints -s 10000000 -t +100
+
+
+.PHONY: db_out
+db_out: build
+	substreams gui -e $(ENDPOINT) substreams.yaml db_out -s 10000000 -t +100
+

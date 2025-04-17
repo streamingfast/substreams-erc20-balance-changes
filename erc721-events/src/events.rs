@@ -1,4 +1,4 @@
-use crate::pb::events::{Burn, Mint, Transfer};
+use crate::pb::events::Transfer;
 use substreams_abis::evm::token::erc721;
 use substreams_ethereum::pb::eth::v2 as eth;
 use substreams_ethereum::Event;
@@ -24,6 +24,22 @@ where
     })
 }
 
+pub fn get_all<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> + 'a {
+    extract_erc721_events(blk, |block_num, hash, log_index, contract, event| {
+        Some(Transfer {
+            block_num,
+            tx_hash: hash.to_vec().into(),
+            log_index,
+            contract: contract.to_vec().into(),
+            from: event.from.to_vec().into(),
+            to: event.to.to_vec().into(),
+            token_id: event.token_id.to_string(),
+            ..Default::default()
+        })
+    })
+}
+
+#[allow(dead_code)]
 pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> + 'a {
     extract_erc721_events(blk, |block_num, hash, log_index, contract, event| {
         let from = &event.from;
@@ -38,6 +54,7 @@ pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> 
                 from: from.to_vec().into(),
                 to: to.to_vec().into(),
                 token_id: event.token_id.to_string(),
+                ..Default::default()
             })
         } else {
             None
@@ -45,20 +62,20 @@ pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> 
     })
 }
 
-pub fn get_mints<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Mint> + 'a {
+pub fn get_mints<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> + 'a {
     extract_erc721_events(blk, |block_num, hash, log_index, contract, event| {
         let from = &event.from;
         let to = &event.to;
 
         if is_zero_address(from.as_ref() as &[u8]) {
-            Some(Mint {
+            Some(Transfer {
                 block_num,
                 tx_hash: hash.to_vec().into(),
                 log_index,
                 contract: contract.to_vec().into(),
                 to: to.to_vec().into(),
                 token_id: event.token_id.to_string(),
-                uri: None,
+                ..Default::default()
             })
         } else {
             None
@@ -66,18 +83,20 @@ pub fn get_mints<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Mint> + 'a {
     })
 }
 
-pub fn get_burns<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Burn> + 'a {
+#[allow(dead_code)]
+pub fn get_burns<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> + 'a {
     extract_erc721_events(blk, |block_num, hash, log_index, contract, event| {
         let to = &event.to;
         let from = &event.from;
         if is_zero_address(to.as_ref() as &[u8]) {
-            Some(Burn {
+            Some(Transfer {
                 block_num,
                 tx_hash: hash.to_vec().into(),
                 log_index,
                 contract: contract.to_vec().into(),
                 from: from.to_vec().into(),
                 token_id: event.token_id.to_string(),
+                ..Default::default()
             })
         } else {
             None
