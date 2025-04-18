@@ -3,6 +3,8 @@ mod events;
 mod pb;
 mod transactions;
 
+use std::collections::HashMap;
+
 use pb::evm::erc721::events::v1::{Events, Mints, Token, Transfer};
 use substreams::scalar::BigInt;
 use substreams_abis::evm::token::erc721;
@@ -25,16 +27,19 @@ fn map_events(blk: eth::Block) -> Result<Events, substreams::errors::Error> {
 /// We do this in a separate module to avoid re-processing RPC calls if we change something in map_events
 #[substreams::handlers::map]
 fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
+    let mut cache: HashMap<Vec<u8>, (Option<String>, Option<String>)> = HashMap::new();
+
     let mints = events::get_mints(&blk)
         .map(|mint| {
             let token_id = mint.token_id.parse::<BigInt>().expect("invalid token_id");
             let uri = get_uri(mint.contract.clone().into(), token_id);
-            let symbol = get_symbol(mint.contract.clone().into());
-            let name = get_name(mint.contract.clone().into());
+            let (symbol, name) = cache
+                .entry(mint.contract.clone())
+                .or_insert_with(|| (get_symbol(mint.contract.clone().into()), get_name(mint.contract.clone().into())));
             Token {
                 uri,
-                symbol,
-                name,
+                symbol: symbol.clone(),
+                name: name.clone(),
                 contract: mint.contract,
                 token_id: mint.token_id,
             }

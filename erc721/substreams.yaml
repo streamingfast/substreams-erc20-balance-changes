@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: erc721
-  version: v0.1.0
+  version: v0.1.1
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: ERC721 events substreams package
   image: ../image.png
@@ -19,7 +19,7 @@ imports:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/erc721_events.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc721.wasm
 
 modules:
   - name: map_events
