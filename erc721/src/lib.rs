@@ -30,48 +30,40 @@ fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
     if mints.is_empty() {
         return Ok(Mints { tokens: vec![] });
     }
+
     let contracts: HashSet<_> = mints.iter().map(|m| &m.contract).collect();
-    let mut symbols: HashMap<Vec<u8>, (Option<String>, Option<String>)> = HashMap::new();
-    let mut batch = RpcBatch::new();
-    for address in &contracts {
-        batch = batch.add(functions::Name {}, address.to_vec()).add(functions::Symbol {}, address.to_vec());
-    }
+    let batch = contracts.iter().fold(RpcBatch::new(), |batch, address| {
+        batch.add(functions::Name {}, address.to_vec()).add(functions::Symbol {}, address.to_vec())
+    });
     let responses = batch.execute().expect("failed to execute rpc batch").responses;
+
+    let mut symbols: HashMap<&[u8], (Option<String>, Option<String>)> = HashMap::new();
     for (i, address) in contracts.iter().enumerate() {
         let name = RpcBatch::decode::<String, functions::Name>(&responses[i * 2]);
         let symbol = RpcBatch::decode::<String, functions::Symbol>(&responses[i * 2 + 1]);
-        symbols.insert(address.to_vec(), (symbol, name));
+        symbols.insert(address, (symbol, name));
     }
 
-    let mint_keys: Vec<(&Vec<u8>, &String)> = mints.iter().map(|mint| (&mint.contract, &mint.token_id)).collect();
-    let mut uris: HashMap<(&Vec<u8>, &String), Option<String>> = HashMap::new();
-    for chunk in mint_keys.chunks(50) {
-        let mut batch = RpcBatch::new();
-        for (contract, token_id) in chunk {
+    let mint_keys: Vec<(&[u8], &str)> = mints.iter().map(|mint| (mint.contract.as_ref(), mint.token_id.as_str())).collect();
+    let mut tokens = vec![];
+    for chunk in mint_keys.chunks(10) {
+        let batch = chunk.iter().fold(RpcBatch::new(), |batch, (contract, token_id)| {
             let token_id = token_id.parse::<BigInt>().expect("invalid token_id");
-            batch = batch.add(functions::TokenUri { token_id }, contract.to_vec());
-        }
-        let responses = batch.execute().unwrap().responses;
+            batch.add(functions::TokenUri { token_id }, contract.to_vec())
+        });
+        let responses = batch.execute().expect("failed to execute rpc batch").responses;
         for (i, (contract, token_id)) in chunk.iter().enumerate() {
             let uri = RpcBatch::decode::<String, functions::TokenUri>(&responses[i]);
-            uris.insert((contract, token_id), uri);
-        }
-    }
-
-    let tokens = mints
-        .iter()
-        .map(|mint| {
-            let (symbol, name) = symbols.get(&mint.contract).cloned().unwrap_or((None, None));
-            let uri = uris.get(&(&mint.contract, &mint.token_id)).cloned().unwrap_or(None);
-            Token {
+            let (symbol, name) = symbols.get(contract).cloned().unwrap_or((None, None));
+            tokens.push(Token {
                 uri,
                 symbol,
                 name,
-                contract: mint.contract.clone(),
-                token_id: mint.token_id.clone(),
-            }
-        })
-        .collect::<Vec<_>>();
+                contract: contract.to_vec(),
+                token_id: token_id.to_string(),
+            });
+        }
+    }
 
     substreams::log::info!("contracts: {}, mints: {}", contracts.len(), tokens.len());
 
