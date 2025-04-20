@@ -31,17 +31,18 @@ fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
         return Ok(Mints { tokens: vec![] });
     }
 
-    let contracts: HashSet<_> = mints.iter().map(|m| &m.contract).collect();
-    let batch = contracts.iter().fold(RpcBatch::new(), |batch, address| {
-        batch.add(functions::Name {}, address.to_vec()).add(functions::Symbol {}, address.to_vec())
-    });
-    let responses = batch.execute().expect("failed to execute symbol rpc batch").responses;
-
+    let contracts = mints.iter().map(|m| &m.contract).collect::<HashSet<_>>().into_iter().collect::<Vec<_>>();
     let mut symbols: HashMap<&[u8], (Option<String>, Option<String>)> = HashMap::new();
-    for (i, address) in contracts.iter().enumerate() {
-        let name = RpcBatch::decode::<String, functions::Name>(&responses[i * 2]);
-        let symbol = RpcBatch::decode::<String, functions::Symbol>(&responses[i * 2 + 1]);
-        symbols.insert(address, (symbol, name));
+    for contract_chunk in contracts.chunks(10) {
+        let batch = contract_chunk.iter().fold(RpcBatch::new(), |batch, address| {
+            batch.add(functions::Name {}, address.to_vec()).add(functions::Symbol {}, address.to_vec())
+        });
+        let responses = batch.execute().expect("failed to execute symbol rpc batch").responses;
+        for (i, address) in contract_chunk.iter().enumerate() {
+            let name = RpcBatch::decode::<String, functions::Name>(&responses[i * 2]);
+            let symbol = RpcBatch::decode::<String, functions::Symbol>(&responses[i * 2 + 1]);
+            symbols.insert(address.as_ref(), (symbol, name));
+        }
     }
 
     let mut tokens = vec![];
@@ -63,6 +64,8 @@ fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
             });
         }
     }
+
+    substreams::log::info!("{} contracts, {} mints", contracts.len(), tokens.len());
 
     Ok(Mints { tokens })
 }
