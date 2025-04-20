@@ -40,3 +40,34 @@ CREATE TABLE IF NOT EXISTS erc721_transactions (
 ) ENGINE = ReplacingMergeTree
 PRIMARY KEY (block_number, tx_hash)
 ORDER BY (block_number, tx_hash);
+
+CREATE TABLE IF NOT EXISTS erc721_tokens (
+    block_num   UInt64,
+    tx_hash     FixedString(66),
+    log_index   UInt64,
+    contract    FixedString(42),
+    first_owner FixedString(42),
+    token_id    String,
+    uri         String,
+    symbol      String,
+    name        String
+) ENGINE = ReplacingMergeTree
+PRIMARY KEY (block_num, tx_hash, log_index)
+ORDER BY (block_num, tx_hash, log_index);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS erc721_tokens_mv
+TO erc721_tokens
+AS
+SELECT
+    block_num,
+    tx_hash,
+    log_index,
+    contract,
+    to AS first_owner,
+    token_id,
+    uri,
+    symbol,
+    name
+FROM erc721_transfers
+WHERE from = '0x0000000000000000000000000000000000000000'
+  AND uri != '';
