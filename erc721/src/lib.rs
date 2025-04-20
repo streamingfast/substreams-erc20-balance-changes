@@ -44,23 +44,22 @@ fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
         symbols.insert(address, (symbol, name));
     }
 
-    let mint_keys: Vec<(&[u8], &str)> = mints.iter().map(|mint| (mint.contract.as_ref(), mint.token_id.as_str())).collect();
     let mut tokens = vec![];
-    for chunk in mint_keys.chunks(10) {
-        let batch = chunk.iter().fold(RpcBatch::new(), |batch, (contract, token_id)| {
-            let token_id = token_id.parse::<BigInt>().expect("invalid token_id");
-            batch.add(functions::TokenUri { token_id }, contract.to_vec())
+    for chunk in mints.chunks(10) {
+        let batch = chunk.iter().fold(RpcBatch::new(), |batch, mint| {
+            let token_id = mint.token_id.parse::<BigInt>().expect("invalid token_id");
+            batch.add(functions::TokenUri { token_id }, mint.contract.to_vec())
         });
         let responses = batch.execute().expect("failed to execute rpc batch").responses;
-        for (i, (contract, token_id)) in chunk.iter().enumerate() {
+        for (i, mint) in chunk.into_iter().enumerate() {
             let uri = RpcBatch::decode::<String, functions::TokenUri>(&responses[i]);
-            let (symbol, name) = symbols.get(contract).cloned().unwrap_or((None, None));
+            let (symbol, name) = symbols.get(&mint.contract.as_ref()).cloned().unwrap_or((None, None));
             tokens.push(Token {
                 uri,
                 symbol,
                 name,
-                contract: contract.to_vec(),
-                token_id: token_id.to_string(),
+                contract: mint.contract.clone(),
+                token_id: mint.token_id.clone(),
             });
         }
     }
