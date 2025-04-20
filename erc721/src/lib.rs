@@ -3,12 +3,11 @@ mod events;
 mod pb;
 mod transactions;
 
-use std::collections::HashMap;
-
 use pb::evm::erc721::events::v1::{Events, Mints, Token, Transfer};
+use std::collections::{HashMap, HashSet};
 use substreams::scalar::BigInt;
-use substreams_abis::evm::token::erc721;
-use substreams_ethereum::pb::eth::v2 as eth;
+use substreams_abis::evm::token::erc721::functions;
+use substreams_ethereum::{pb::eth::v2 as eth, rpc::RpcBatch};
 
 /// Extracts events events from the logs
 #[substreams::handlers::map]
@@ -27,36 +26,54 @@ fn map_events(blk: eth::Block) -> Result<Events, substreams::errors::Error> {
 /// We do this in a separate module to avoid re-processing RPC calls if we change something in map_events
 #[substreams::handlers::map]
 fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
-    let mut cache: HashMap<Vec<u8>, (Option<String>, Option<String>)> = HashMap::new();
+    let mints: Vec<Transfer> = events::get_mints(&blk).collect();
+    if mints.is_empty() {
+        return Ok(Mints { tokens: vec![] });
+    }
+    let contracts: HashSet<_> = mints.iter().map(|m| &m.contract).collect();
+    let mut symbols: HashMap<Vec<u8>, (Option<String>, Option<String>)> = HashMap::new();
+    let mut batch = RpcBatch::new();
+    for address in &contracts {
+        batch = batch.add(functions::Name {}, address.to_vec()).add(functions::Symbol {}, address.to_vec());
+    }
+    let responses = batch.execute().expect("failed to execute rpc batch").responses;
+    for (i, address) in contracts.iter().enumerate() {
+        let name = RpcBatch::decode::<String, functions::Name>(&responses[i * 2]);
+        let symbol = RpcBatch::decode::<String, functions::Symbol>(&responses[i * 2 + 1]);
+        symbols.insert(address.to_vec(), (symbol, name));
+    }
 
-    let mints = events::get_mints(&blk)
+    let mint_keys: Vec<(&Vec<u8>, &String)> = mints.iter().map(|mint| (&mint.contract, &mint.token_id)).collect();
+    let mut uris: HashMap<(&Vec<u8>, &String), Option<String>> = HashMap::new();
+    for chunk in mint_keys.chunks(50) {
+        let mut batch = RpcBatch::new();
+        for (contract, token_id) in chunk {
+            let token_id = token_id.parse::<BigInt>().expect("invalid token_id");
+            batch = batch.add(functions::TokenUri { token_id }, contract.to_vec());
+        }
+        let responses = batch.execute().unwrap().responses;
+        for (i, (contract, token_id)) in chunk.iter().enumerate() {
+            let uri = RpcBatch::decode::<String, functions::TokenUri>(&responses[i]);
+            uris.insert((contract, token_id), uri);
+        }
+    }
+
+    let tokens = mints
+        .iter()
         .map(|mint| {
-            let token_id = mint.token_id.parse::<BigInt>().expect("invalid token_id");
-            let uri = get_uri(mint.contract.clone().into(), token_id);
-            let (symbol, name) = cache
-                .entry(mint.contract.clone())
-                .or_insert_with(|| (get_symbol(mint.contract.clone().into()), get_name(mint.contract.clone().into())));
+            let (symbol, name) = symbols.get(&mint.contract).cloned().unwrap_or((None, None));
+            let uri = uris.get(&(&mint.contract, &mint.token_id)).cloned().unwrap_or(None);
             Token {
                 uri,
-                symbol: symbol.clone(),
-                name: name.clone(),
-                contract: mint.contract,
-                token_id: mint.token_id,
+                symbol,
+                name,
+                contract: mint.contract.clone(),
+                token_id: mint.token_id.clone(),
             }
         })
-        .collect();
+        .collect::<Vec<_>>();
 
-    Ok(Mints { tokens: mints })
-}
+    substreams::log::info!("contracts: {}, mints: {}", contracts.len(), tokens.len());
 
-fn get_uri(address: Vec<u8>, token_id: BigInt) -> Option<String> {
-    erc721::functions::TokenUri { token_id }.call(address)
-}
-
-fn get_symbol(address: Vec<u8>) -> Option<String> {
-    erc721::functions::Symbol {}.call(address)
-}
-
-fn get_name(address: Vec<u8>) -> Option<String> {
-    erc721::functions::Name {}.call(address)
+    Ok(Mints { tokens })
 }
