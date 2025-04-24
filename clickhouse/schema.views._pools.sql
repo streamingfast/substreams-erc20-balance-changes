@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS pools (
    INDEX idx_protocol             (protocol)          TYPE set(8) GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree(global_sequence)
-ORDER BY pool;
+ORDER BY (pool, factory);
 
 -- Uniswap::V2::Factory:PairCreated --
 CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_pairs_created_mv
