@@ -12,7 +12,7 @@ protogen:
 
 .PHONY: pack
 pack: build
-	substreams pack -o erc721-rpc.spkg ./substreams.yaml
+	substreams pack
 
 .PHONY: run
 run: build
