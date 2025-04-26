@@ -1,14 +1,15 @@
 [package]
 name = "erc721"
-version = "0.1.3"
+version = "0.2.0"
 description = "ERC721 events substreams package"
 edition = "2021"
 license = "Apache-2.0"
 authors = [
     "Yaro Shkvorets <yaro@pinax.network>"
 ]
+
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 substreams = { workspace = true }

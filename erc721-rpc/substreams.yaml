@@ -1,29 +1,27 @@
 specVersion: v0.1.0
 package:
-  name: erc1155
-  version: v0.1.0
+  name: erc721_rpc
+  version: v0.2.0
   url: https://github.com/pinax-network/substreams-evm-tokens
-  description: ERC1155 events substreams package
+  description: ERC721 mints substreams package
   image: ../image.png
 
 protobuf:
   files:
-    - events.proto
+    - mints.proto
   importPaths:
     - ./proto
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/erc1155.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc721_rpc.wasm
 
 modules:
-  - name: map_events
+  - name: map_mints
     kind: map
     initialBlock: 0
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.erc1155.events.v1.Events
-
-network: mainnet
+      type: proto:evm.erc721.mints.v1.Mints

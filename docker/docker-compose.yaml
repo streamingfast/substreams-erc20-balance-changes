@@ -3,6 +3,7 @@ services:
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     container_name: clickhouse
+    init: true
     environment:
       - CLICKHOUSE_DB=default
       - CLICKHOUSE_USER=default

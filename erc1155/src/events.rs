@@ -1,8 +1,8 @@
-use crate::pb::evm::erc1155::events::v1::{Token, Transfer};
-use substreams_abis::evm::token::erc1155::events::{TransferBatch, TransferSingle, Uri};
+use crate::pb::evm::erc1155::events::v1::{Transfer, Uri};
+use substreams_abis::evm::token::erc1155::events::{TransferBatch, TransferSingle, Uri as UriEvent};
 use substreams_ethereum::{pb::eth::v2 as eth, Event as _};
 
-// Extracts ERC1155 Transfer events (both TransferSingle and TransferBatch) using receipt-based log processing for full context
+// Extracts ERC1155 Transfer events (both TransferSingle and TransferBatch)
 pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> + 'a {
     blk.receipts().flat_map(move |receipt| {
         let hash = &receipt.transaction.hash;
@@ -53,19 +53,19 @@ pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> 
     })
 }
 
-// Extracts ERC1155 Uri events as Token metadata using receipt-based log processing
-pub fn get_tokens<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Token> + 'a {
+// Extracts ERC1155 Uri events
+pub fn get_uris<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Uri> + 'a {
     blk.receipts().flat_map(move |receipt| {
         let contract = &receipt.transaction.to;
         receipt.receipt.logs.iter().filter_map(move |log| {
-            if let Some(event) = Uri::match_and_decode(log) {
-                Some(Token {
+            if let Some(event) = UriEvent::match_and_decode(log) {
+                Some(Uri {
                     block_num: blk.number,
                     tx_hash: receipt.transaction.hash.clone(),
                     log_index: log.block_index as u64,
                     contract: contract.clone(),
                     token_id: event.id.to_string(),
-                    uri: Some(event.value.clone()),
+                    uri: event.value.clone(),
                 })
             } else {
                 None
