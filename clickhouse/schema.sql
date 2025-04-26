@@ -681,7 +681,7 @@ CREATE TABLE IF NOT EXISTS pools (
    INDEX idx_protocol             (protocol)          TYPE set(8) GRANULARITY 4,
 )
 ENGINE = ReplacingMergeTree(global_sequence)
-ORDER BY pool;
+ORDER BY (pool, factory);
 
 -- Uniswap::V2::Factory:PairCreated --
 CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_pairs_created_mv
@@ -745,7 +745,6 @@ CREATE TABLE IF NOT EXISTS swaps (
    protocol             LowCardinality(String) COMMENT 'protocol name', -- 'uniswap_v2' or 'uniswap_v3'
 )
 ENGINE = ReplacingMergeTree(global_sequence)
-PRIMARY KEY (timestamp, block_num, `index`)
 ORDER BY (timestamp, block_num, `index`);
 
 -- Uniswap::V2::Pair:Swap --
