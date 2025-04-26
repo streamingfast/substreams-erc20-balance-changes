@@ -11,6 +11,7 @@ members = [
   "proto",
   "common",
   "clickhouse",
+  "ens",
   "erc721",
   "erc1155"
 ]
@@ -23,5 +24,5 @@ version = "0.0.0"
 
 [workspace.dependencies]
 substreams = "0.6.1"
-substreams-abis = "0.2.2"
-substreams-ethereum = "0.10.3"
+substreams-abis = "0.3.0"
+substreams-ethereum = "0.10.4"
