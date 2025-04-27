@@ -208,7 +208,6 @@ dependencies = [
  "prost 0.13.5",
  "substreams",
  "substreams-abis",
- "substreams-database-change",
  "substreams-ethereum",
 ]
 
@@ -268,10 +267,9 @@ name = "erc721"
 version = "0.2.0"
 dependencies = [
  "common",
- "prost 0.13.5",
+ "proto",
  "substreams",
  "substreams-abis",
- "substreams-database-change",
  "substreams-ethereum",
 ]
 
@@ -280,7 +278,7 @@ name = "erc721-rpc"
 version = "0.2.0"
 dependencies = [
  "common",
- "prost 0.13.5",
+ "proto",
  "substreams",
  "substreams-abis",
  "substreams-ethereum",

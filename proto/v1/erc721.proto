@@ -7,6 +7,18 @@ message Events {
   repeated Transaction transactions = 4;
 }
 
+message Mints {
+  repeated Token tokens = 1;
+}
+
+message Token {
+  bytes contract = 1;
+  string token_id = 2;
+  optional string uri = 3;
+  optional string symbol = 4;
+  optional string name = 5;
+}
+
 message Transfer {
   // Block number for the transfer event
   uint64 block_num = 2;

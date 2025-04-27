@@ -10,36 +10,56 @@ pub struct Events {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Mints {
+    #[prost(message, repeated, tag="1")]
+    pub tokens: ::prost::alloc::vec::Vec<Token>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Token {
+    #[prost(bytes="vec", tag="1")]
+    pub contract: ::prost::alloc::vec::Vec<u8>,
+    #[prost(string, tag="2")]
+    pub token_id: ::prost::alloc::string::String,
+    #[prost(string, optional, tag="3")]
+    pub uri: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag="4")]
+    pub symbol: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag="5")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Transfer {
     /// Block number for the transfer event
-    #[prost(uint64, tag="1")]
+    #[prost(uint64, tag="2")]
     pub block_num: u64,
     /// The transaction hash that generated that transfer.
-    #[prost(bytes="vec", tag="2")]
+    #[prost(bytes="vec", tag="3")]
     pub tx_hash: ::prost::alloc::vec::Vec<u8>,
     /// The index of the log within the transaction's receipts of the block.
-    #[prost(uint64, tag="3")]
+    #[prost(uint64, tag="4")]
     pub log_index: u64,
     /// The contract address of the token.
-    #[prost(bytes="vec", tag="4")]
+    #[prost(bytes="vec", tag="5")]
     pub contract: ::prost::alloc::vec::Vec<u8>,
     /// The person that sent the transfer.
-    #[prost(bytes="vec", tag="5")]
+    #[prost(bytes="vec", tag="6")]
     pub from: ::prost::alloc::vec::Vec<u8>,
     /// The person that received the transfer.
-    #[prost(bytes="vec", tag="6")]
+    #[prost(bytes="vec", tag="7")]
     pub to: ::prost::alloc::vec::Vec<u8>,
     /// TokenID the identifier of the token for which the transfer is happening.
-    #[prost(string, tag="7")]
+    #[prost(string, tag="8")]
     pub token_id: ::prost::alloc::string::String,
     /// URI of the token.
-    #[prost(string, optional, tag="8")]
+    #[prost(string, optional, tag="9")]
     pub uri: ::core::option::Option<::prost::alloc::string::String>,
     /// Symbol of the token.
-    #[prost(string, optional, tag="9")]
+    #[prost(string, optional, tag="10")]
     pub symbol: ::core::option::Option<::prost::alloc::string::String>,
     /// Name of the token.
-    #[prost(string, optional, tag="10")]
+    #[prost(string, optional, tag="11")]
     pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]

@@ -8,9 +8,9 @@ package:
 
 protobuf:
   files:
-    - mints.proto
+    - erc721.proto
   importPaths:
-    - ./proto
+    - ../proto/v1
 
 binaries:
   default:
@@ -24,4 +24,4 @@ modules:
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.erc721.mints.v1.Mints
+      type: proto:evm.erc721.events.v1.Mints

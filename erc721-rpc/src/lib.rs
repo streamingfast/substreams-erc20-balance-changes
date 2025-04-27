@@ -1,7 +1,5 @@
 mod events;
-mod pb;
-
-use pb::evm::erc721::mints::v1::{Mints, Token};
+use proto::pb::evm::erc721::events::v1::{Mints, Token};
 use std::collections::{HashMap, HashSet};
 use substreams::scalar::BigInt;
 use substreams_abis::evm::token::erc721::functions;

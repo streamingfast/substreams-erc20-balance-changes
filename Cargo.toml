@@ -29,3 +29,6 @@ version = "0.0.0"
 substreams = "0.6.1"
 substreams-abis = "0.3.0"
 substreams-ethereum = "0.10.4"
+
+[profile.release]
+lto = true

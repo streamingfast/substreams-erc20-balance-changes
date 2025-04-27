@@ -8,9 +8,9 @@ package:
 
 protobuf:
   files:
-    - events.proto
+    - erc721.proto
   importPaths:
-    - ./proto
+    - ../proto/v1
 
 imports:
   # erc721_rpc: ../erc721-rpc/erc721-rpc-v0.2.0.spkg

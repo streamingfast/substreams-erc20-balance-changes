@@ -1,10 +1,8 @@
 mod events;
-pub mod pb;
 mod transactions;
 
 use common::is_zero_address;
-use pb::evm::erc721::events::v1::{Events, Transfer};
-use pb::evm::erc721::mints::v1::{Mints, Token};
+use proto::pb::evm::erc721::events::v1::{Events, Mints, Token, Transfer};
 use std::collections::HashMap;
 use substreams_ethereum::pb::eth::v2 as eth;
 
