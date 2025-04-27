@@ -1,63 +1,26 @@
 specVersion: v0.1.0
 package:
-  name: ens_resolver
-  version: v0.1.0
+  name: ens
+  version: v1.12.0
+  url: https://githubcom/pinax-network/substreams-evm-tokens
+  description: ENS
+  image: ../image.png
 
-imports:
-  ethereum: https://github.com/streamingfast/substreams-ethereum/releases/download/v0.10.4/substreams-ethereum-v0.10.4.spkg
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ../target/wasm32-unknown-unknown/release/ens.wasm
 
 protobuf:
   files:
     - ens.proto
   importPaths:
-    - ./
-
-binaries:
-  default:
-    type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/substreams_ens.wasm
+    - ../proto/v1
 
 modules:
   - name: map_events
     kind: map
-    initialBlock: 3327417 # ENS Registry deployment block
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:ens.v1.EnsEvents
-
-  - name: store_ens_names
-    kind: store
-    updatePolicy: set
-    valueType: proto:ens.v1.EnsName
-    inputs:
-      - map: map_events
-
-  - name: store_ens_names_delta
-    kind: store
-    updatePolicy: set
-    valueType: proto:ens.v1.EnsName
-    inputs:
-      - map: map_events
-
-  - name: resolve_ens_name
-    kind: map
-    initialBlock: 15900000  # Changed to be closer to test block
-    inputs:
-      - params: string  # Moved to first position
-      - source: sf.ethereum.type.v2.Block
-      - store: store_ens_names_delta
-        mode: deltas
-    output:
-      type: proto:ens.v1.StringMessage
-
-  - name: reverse_resolve
-    kind: map
-    initialBlock: 15900000  # Changed to be closer to test block
-    inputs:
-      - params: string  # Moved to first position
-      - source: sf.ethereum.type.v2.Block
-      - store: store_ens_names_delta
-        mode: deltas
-    output:
-      type: proto:ens.v1.StringMessage
+      type: proto:evm.tokens.ens.v1.Events

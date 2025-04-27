@@ -15,6 +15,13 @@ pub mod evm {
                 // @@protoc_insertion_point(evm.tokens.contracts.v1)
             }
         }
+        pub mod ens {
+            // @@protoc_insertion_point(attribute:evm.tokens.ens.v1)
+            pub mod v1 {
+                include!("evm.tokens.ens.v1.rs");
+                // @@protoc_insertion_point(evm.tokens.ens.v1)
+            }
+        }
         pub mod uniswap {
             // @@protoc_insertion_point(attribute:evm.tokens.uniswap.v2)
             pub mod v2 {

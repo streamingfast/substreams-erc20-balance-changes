@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package evm.tokens.ens.v1;
+
+message Events {
+    repeated AddrChanged address_changed = 1;
+    repeated NameChanged name_changed = 2;
+    repeated NameRegistered name_registered = 3;
+    repeated NameRenewed name_renewed = 4;
+    repeated NameTransferred name_transferred = 5;
+    repeated NewOwner new_owner = 6;
+    repeated NewResolver new_resolver = 7;
+    repeated NewTTL new_ttl = 8;
+    repeated Transfer transfer = 9;
+    repeated ReverseClaimed reverse_claimed = 10;
+    repeated ContentHashChanged content_hash_changed = 11;
+    repeated TextChanged text_changed = 12;
+}
+
+message NewOwner {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes node = 10;
+    bytes label = 11;
+    bytes owner = 12;
+}
+
+message Transfer {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes node = 10;
+    bytes owner = 11;
+}
+
+message NewResolver {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes node = 10;
+    bytes resolver = 11;
+}
+
+message NewTTL {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes node = 10;
+    uint64 ttl = 11;
+}
+
+message NameRegistered {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    string name = 10;
+    bytes label = 11;
+    bytes owner = 12;
+    uint64 base_cost = 13;
+    uint64 expires = 14;
+}
+
+message NameRenewed {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    string name = 10;
+    bytes label = 11;
+    uint64 cost = 12;
+    uint64 expires = 13;
+}
+
+message NameTransferred {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes name = 10;
+    bytes label = 11;
+    bytes owner = 12;
+}
+
+message AddrChanged {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes node = 10;
+    bytes address = 11;
+}
+
+message NameChanged {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes node = 10;
+    string name = 11;
+}
+
+message ReverseClaimed {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes node = 10;
+    bytes address = 11;
+}
+
+message ContentHashChanged {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes node = 10;
+    bytes hash = 11;
+}
+
+message TextChanged {
+    bytes contract = 1;
+    bytes transaction_hash = 2;
+    bytes caller = 3;
+    bytes node = 10;
+    string key = 11;
+    string value = 12;
+}
