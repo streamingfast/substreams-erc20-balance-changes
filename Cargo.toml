@@ -10,12 +10,13 @@ members = [
   "uniswap-v3",
   "proto",
   "common",
-  "clickhouse",
   "ens",
   "erc721",
   "erc721-rpc",
   "erc1155",
-  "clickhouse-nfts"
+  "clickhouse",
+  "clickhouse-nfts",
+  # "clickhouse-ens",
 ]
 resolver = "2"
 

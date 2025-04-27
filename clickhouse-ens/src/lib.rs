@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use substreams::errors::Error;
 use substreams_database_change::pb::database::DatabaseChanges;
 use substreams_database_change::tables::Tables;
-use substreams_ethereum::pb::eth::v2::Block;
 use substreams_ens::EnsEvents;
+use substreams_ethereum::pb::eth::v2::Block;
 
 // Cache to store node to name mappings during processing
 struct NodeNameCache {
@@ -12,9 +12,7 @@ struct NodeNameCache {
 
 impl NodeNameCache {
     fn new() -> Self {
-        Self {
-            node_to_name: HashMap::new(),
-        }
+        Self { node_to_name: HashMap::new() }
     }
 
     fn add_node_name(&mut self, node: &str, name: &str) {
@@ -26,17 +24,11 @@ impl NodeNameCache {
     }
 }
 
-pub fn db_out(
-    block: &Block,
-    events: &EnsEvents,
-) -> Result<DatabaseChanges, Error> {
+pub fn db_out(block: &Block, events: &EnsEvents) -> Result<DatabaseChanges, Error> {
     let block_number = block.number;
     // Improved timestamp handling
-    let timestamp = block.header.as_ref()
-        .and_then(|h| h.timestamp.as_ref())
-        .map(|ts| ts.seconds)
-        .unwrap_or(0);
-        
+    let timestamp = block.header.as_ref().and_then(|h| h.timestamp.as_ref()).map(|ts| ts.seconds).unwrap_or(0);
+
     let block_time = chrono::DateTime::<chrono::Utc>::from_timestamp(timestamp, 0)
         .unwrap_or_default()
         .format("%Y-%m-%d %H:%M:%S")
@@ -107,7 +99,7 @@ pub fn db_out(
         if event.name.ends_with(".addr.reverse") {
             // This is a reverse claim
             let address = event.name.strip_suffix(".addr.reverse").unwrap_or("");
-            
+
             // Insert into raw events table
             tables
                 .create_row("ens_reverse_claim", format!("{}-{}", block_number, &event.transaction_hash))
@@ -116,7 +108,7 @@ pub fn db_out(
                 .set("transaction_hash", &event.transaction_hash)
                 .set("address", address)
                 .set("node", &event.node);
-            
+
             // If we have a valid address, update the reverse resolution table
             if !address.is_empty() {
                 // Look for any existing name for this address
@@ -154,15 +146,13 @@ pub fn db_out(
         if !event.name.ends_with(".addr.reverse") {
             // Add to our cache for future reference
             cache.add_node_name(&event.node, &event.name);
-            
+
             // Check if we already have a record for this name
             let existing_name = get_name_record(&tables, &event.name);
-            
+
             if existing_name {
                 // Just update the name record
-                tables
-                    .create_row("ens_names", &event.name)
-                    .set("updated_at", block_time.clone());
+                tables.create_row("ens_names", &event.name).set("updated_at", block_time.clone());
             } else {
                 // Create a new name record
                 tables
