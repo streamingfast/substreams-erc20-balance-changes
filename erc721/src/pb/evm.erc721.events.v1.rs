@@ -44,26 +44,6 @@ pub struct Transfer {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Mints {
-    #[prost(message, repeated, tag="1")]
-    pub tokens: ::prost::alloc::vec::Vec<Token>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Token {
-    #[prost(bytes="vec", tag="1")]
-    pub contract: ::prost::alloc::vec::Vec<u8>,
-    #[prost(string, tag="2")]
-    pub token_id: ::prost::alloc::string::String,
-    #[prost(string, optional, tag="3")]
-    pub uri: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag="4")]
-    pub symbol: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag="5")]
-    pub name: ::core::option::Option<::prost::alloc::string::String>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Transaction {
     #[prost(uint64, tag="1")]
     pub block_number: u64,

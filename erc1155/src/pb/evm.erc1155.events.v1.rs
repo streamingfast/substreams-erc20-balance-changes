@@ -6,7 +6,7 @@ pub struct Events {
     #[prost(message, repeated, tag="2")]
     pub transfers: ::prost::alloc::vec::Vec<Transfer>,
     #[prost(message, repeated, tag="3")]
-    pub tokens: ::prost::alloc::vec::Vec<Token>,
+    pub uris: ::prost::alloc::vec::Vec<Uri>,
     #[prost(message, repeated, tag="4")]
     pub transactions: ::prost::alloc::vec::Vec<Transaction>,
 }
@@ -40,13 +40,13 @@ pub struct Transfer {
     /// Amount of tokens transferred.
     #[prost(string, tag="9")]
     pub amount: ::prost::alloc::string::String,
-    /// URI of the token.
+    /// URI of the token
     #[prost(string, optional, tag="10")]
     pub uri: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Token {
+pub struct Uri {
     #[prost(uint64, tag="1")]
     pub block_num: u64,
     #[prost(bytes="vec", tag="2")]
@@ -57,8 +57,8 @@ pub struct Token {
     pub contract: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="5")]
     pub token_id: ::prost::alloc::string::String,
-    #[prost(string, optional, tag="6")]
-    pub uri: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, tag="6")]
+    pub uri: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

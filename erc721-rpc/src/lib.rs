@@ -1,36 +1,16 @@
 mod events;
-pub mod pb;
-mod transactions;
+mod pb;
 
-use common::is_zero_address;
-use pb::evm::erc721::events::v1::{Events, Transfer};
 use pb::evm::erc721::mints::v1::{Mints, Token};
 use std::collections::{HashMap, HashSet};
 use substreams::scalar::BigInt;
 use substreams_abis::evm::token::erc721::functions;
 use substreams_ethereum::{pb::eth::v2 as eth, rpc::RpcBatch};
 
-/// Extracts events events from the logs
-#[substreams::handlers::map]
-fn map_events(blk: eth::Block, mints: Mints) -> Result<Events, substreams::errors::Error> {
-    let mut transfers: Vec<Transfer> = events::get_all(&blk).collect();
-
-    // Merge metadata from mints into transfers
-    merge_metadata(&mut transfers, &mints.tokens);
-
-    // Collect all transaction hashes involved in any ERC721 event
-    let event_tx_hashes: std::collections::HashSet<Vec<u8>> = transfers.iter().map(|t| t.tx_hash.to_vec()).collect();
-
-    let transactions = transactions::get_transactions(&blk, &event_tx_hashes);
-
-    Ok(Events { transfers, transactions })
-}
-
 /// Extracts mints with uri, symbol and name from the logs
-/// We do this in a separate module to avoid re-processing RPC calls if we change something in map_events
 #[substreams::handlers::map]
 fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
-    let mints: Vec<Transfer> = events::get_mints(&blk).collect();
+    let mints: Vec<Token> = events::get_mints(&blk).collect();
     if mints.is_empty() {
         return Ok(Mints { tokens: vec![] });
     }
@@ -72,18 +52,4 @@ fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
     substreams::log::info!("{} contracts, {} mints", contracts.len(), tokens.len());
 
     Ok(Mints { tokens })
-}
-
-fn merge_metadata(transfers: &mut [Transfer], tokens: &[Token]) {
-    let mint_map: HashMap<(&[u8], &str), &Token> = tokens.iter().map(|token| ((token.contract.as_ref(), token.token_id.as_str()), token)).collect();
-
-    for transfer in transfers {
-        if is_zero_address(&transfer.from) {
-            if let Some(token) = mint_map.get(&(transfer.contract.as_ref(), &transfer.token_id)) {
-                transfer.uri = token.uri.clone();
-                transfer.symbol = token.symbol.clone();
-                transfer.name = token.name.clone();
-            }
-        }
-    }
 }

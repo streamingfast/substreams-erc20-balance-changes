@@ -9,46 +9,34 @@ message Events {
 
 message Transfer {
   // Block number for the transfer event
-  uint64 block_num = 1;
+  uint64 block_num = 2;
 
   // The transaction hash that generated that transfer.
-  bytes tx_hash = 2;
+  bytes tx_hash = 3;
 
   // The index of the log within the transaction's receipts of the block.
-  uint64 log_index = 3;
+  uint64 log_index = 4;
 
   // The contract address of the token.
-  bytes contract = 4;
+  bytes contract = 5;
 
   // The person that sent the transfer.
-  bytes from = 5;
+  bytes from = 6;
 
   // The person that received the transfer.
-  bytes to = 6;
+  bytes to = 7;
 
   // TokenID the identifier of the token for which the transfer is happening.
-  string token_id = 7;
+  string token_id = 8;
 
   // URI of the token.
-  optional string uri = 8;
+  optional string uri = 9;
 
   // Symbol of the token.
-  optional string symbol = 9;
+  optional string symbol = 10;
 
   // Name of the token.
-  optional string name = 10;
-}
-
-message Mints {
-  repeated Token tokens = 1;
-}
-
-message Token {
-  bytes contract = 1;
-  string token_id = 2;
-  optional string uri = 3;
-  optional string symbol = 4;
-  optional string name = 5;
+  optional string name = 11;
 }
 
 message Transaction {

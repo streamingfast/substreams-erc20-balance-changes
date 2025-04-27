@@ -1,0 +1,16 @@
+[package]
+name = "clickhouse-nfts"
+description = { workspace = true }
+edition = { workspace = true }
+version = { workspace = true }
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+substreams = { workspace = true }
+substreams-database-change = "2.0"
+proto = { path = "../proto" }
+common = { path = "../common" }
+erc721 = { path = "../erc721" }
+erc1155 = { path = "../erc1155" }
