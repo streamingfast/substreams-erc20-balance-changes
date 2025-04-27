@@ -13,8 +13,8 @@ protobuf:
     - ./proto
 
 imports:
-  v0_2_0: ../erc721-rpc/erc721-rpc-v0.2.0.spkg
-  # v0_2_0: https://github.com/pinax-network/substreams-evm-tokens/releases/download/nfts-v0.2.0/erc721-rpc-v0.2.0.spkg
+  # erc721_rpc: ../erc721-rpc/erc721-rpc-v0.2.0.spkg
+  erc721_rpc: https://github.com/pinax-network/substreams-evm-tokens/releases/download/nfts-v0.2.0/erc721-rpc-v0.2.0.spkg
 
 binaries:
   default:
@@ -27,6 +27,6 @@ modules:
     initialBlock: 0
     inputs:
       - source: sf.ethereum.type.v2.Block
-      - map: v0_2_0:map_mints
+      - map: erc721_rpc:map_mints
     output:
       type: proto:evm.erc721.events.v1.Events
