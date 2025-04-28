@@ -211,10 +211,9 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "erc1155"
-version = "0.2.1"
+version = "0.0.0"
 dependencies = [
  "common",
- "prost 0.13.5",
  "proto",
  "substreams",
  "substreams-abis",
@@ -274,7 +273,7 @@ dependencies = [
 
 [[package]]
 name = "erc721"
-version = "0.2.1"
+version = "0.0.0"
 dependencies = [
  "common",
  "proto",
@@ -285,7 +284,7 @@ dependencies = [
 
 [[package]]
 name = "erc721-rpc"
-version = "0.2.1"
+version = "0.0.0"
 dependencies = [
  "common",
  "proto",

@@ -1,10 +1,11 @@
 [package]
 name = "erc721-rpc"
-version = "0.2.1"
 description = "ERC721 mints substreams package"
-edition = "2021"
-license = "Apache-2.0"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
 authors = ["Yaro Shkvorets <yaro@pinax.network>"]
+
 [lib]
 crate-type = ["cdylib"]
 

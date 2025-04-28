@@ -1,16 +1,16 @@
 specVersion: v0.1.0
 package:
   name: erc721_rpc
-  version: v0.2.1
+  version: v0.2.2
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: ERC721 mints substreams package
   image: ../image.png
 
-# protobuf:
-#   files:
-#     - erc721.proto
-#   importPaths:
-#     - ../proto/v1
+protobuf:
+  files:
+    - erc721.proto
+  importPaths:
+    - ../proto/v1
 
 binaries:
   default:

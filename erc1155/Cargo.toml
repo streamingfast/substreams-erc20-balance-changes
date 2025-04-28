@@ -1,10 +1,11 @@
 [package]
 name = "erc1155"
-version = "0.2.1"
 description = "ERC1155 events substreams package"
-edition = "2021"
-license = "Apache-2.0"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
 authors = ["Yaro Shkvorets <yaro@pinax.network>"]
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 
@@ -12,7 +13,6 @@ crate-type = ["cdylib", "rlib"]
 substreams = { workspace = true }
 substreams-ethereum = { workspace = true }
 substreams-abis = { workspace = true }
-prost = "0.13"
 common = { path = "../common" }
 proto = { path = "../proto" }
 

@@ -24,6 +24,7 @@ resolver = "2"
 description = "EVM Tokens"
 edition = "2021"
 version = "0.0.0"
+license = "Apache-2.0"
 
 [workspace.dependencies]
 substreams = "0.6.1"

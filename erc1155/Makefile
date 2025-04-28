@@ -16,7 +16,7 @@ run: build
 
 .PHONY: gui
 gui: build
-	substreams gui -e $(ENDPOINT) substreams.yaml map_events -s 10000000 -t +100 --limit-processed-blocks 0
+	substreams gui -e $(ENDPOINT) substreams.yaml map_events -s 20000000 -t +100 --limit-processed-blocks 0
 
 .PHONY: mints
 mints: build
