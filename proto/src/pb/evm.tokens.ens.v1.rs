@@ -37,6 +37,9 @@ pub struct NewOwner {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub node: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="11")]
@@ -53,6 +56,9 @@ pub struct Transfer {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub node: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="11")]
@@ -67,6 +73,9 @@ pub struct NewResolver {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub node: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="11")]
@@ -81,6 +90,9 @@ pub struct NewTtl {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub node: ::prost::alloc::vec::Vec<u8>,
     #[prost(uint64, tag="11")]
@@ -95,6 +107,9 @@ pub struct NameRegistered {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(string, tag="10")]
     pub name: ::prost::alloc::string::String,
     #[prost(bytes="vec", tag="11")]
@@ -115,6 +130,9 @@ pub struct NameRenewed {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(string, tag="10")]
     pub name: ::prost::alloc::string::String,
     #[prost(bytes="vec", tag="11")]
@@ -133,6 +151,9 @@ pub struct NameTransferred {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub name: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="11")]
@@ -149,6 +170,9 @@ pub struct AddrChanged {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub node: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="11")]
@@ -163,6 +187,9 @@ pub struct NameChanged {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub node: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="11")]
@@ -177,6 +204,9 @@ pub struct ReverseClaimed {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub node: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="11")]
@@ -191,6 +221,9 @@ pub struct ContentHashChanged {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub node: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="11")]
@@ -205,6 +238,9 @@ pub struct TextChanged {
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="3")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// log.ordinal
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
     #[prost(bytes="vec", tag="10")]
     pub node: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="11")]

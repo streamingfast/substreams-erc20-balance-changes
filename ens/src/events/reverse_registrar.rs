@@ -12,6 +12,7 @@ pub fn insert_reverse_registrar<'a>(events: &mut ens::Events, transaction: &'a T
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
+            ordinal: log.ordinal,
             node: event.node.to_vec(),
             address: event.addr.to_vec(),
         });

@@ -12,6 +12,7 @@ pub fn insert_public_resolver<'a>(events: &mut ens::Events, transaction: &'a Tra
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
+            ordinal: log.ordinal,
             node: event.node.to_vec(),
             address: event.a.to_vec(),
         });
@@ -23,6 +24,7 @@ pub fn insert_public_resolver<'a>(events: &mut ens::Events, transaction: &'a Tra
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
+            ordinal: log.ordinal,
             node: event.node.to_vec(),
             name: event.name,
         });
@@ -36,6 +38,7 @@ pub fn insert_public_resolver<'a>(events: &mut ens::Events, transaction: &'a Tra
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
+            ordinal: log.ordinal,
             node: node.to_vec(),
             hash: hash.to_vec(),
         });
@@ -47,6 +50,7 @@ pub fn insert_public_resolver<'a>(events: &mut ens::Events, transaction: &'a Tra
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
+            ordinal: log.ordinal,
             node: event.node.to_vec(),
             key: event.key,
             value: event.value,

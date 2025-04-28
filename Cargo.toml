@@ -16,7 +16,7 @@ members = [
   "erc1155",
   "clickhouse",
   "clickhouse-nfts",
-  # "clickhouse-ens",
+  "clickhouse-ens",
 ]
 resolver = "2"
 

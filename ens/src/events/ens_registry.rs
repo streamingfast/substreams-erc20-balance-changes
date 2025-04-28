@@ -12,6 +12,7 @@ pub fn insert_ens_registry<'a>(events: &mut ens::Events, transaction: &'a Transa
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
+            ordinal: log.ordinal,
             node: event.node.to_vec(),
             label: event.label.to_vec(),
             owner: event.owner.to_vec(),
@@ -24,6 +25,7 @@ pub fn insert_ens_registry<'a>(events: &mut ens::Events, transaction: &'a Transa
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
+            ordinal: log.ordinal,
             node: event.node.to_vec(),
             owner: event.owner.to_vec(),
         });
@@ -35,6 +37,7 @@ pub fn insert_ens_registry<'a>(events: &mut ens::Events, transaction: &'a Transa
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
+            ordinal: log.ordinal,
             node: event.node.to_vec(),
             resolver: event.resolver.to_vec(),
         });
@@ -46,6 +49,7 @@ pub fn insert_ens_registry<'a>(events: &mut ens::Events, transaction: &'a Transa
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
+            ordinal: log.ordinal,
             node: event.node.to_vec(),
             ttl: event.ttl.to_u64(),
         });

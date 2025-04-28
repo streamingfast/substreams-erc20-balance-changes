@@ -21,8 +21,9 @@ fn process_contract_change(tables: &mut substreams_database_change::tables::Tabl
     let key = common_key(clock, index);
 
     // handle Nullable values
-    let decimals = event.decimals
-        .map(|d| d.to_string())   // only allocate when we have a value
+    let decimals = event
+        .decimals
+        .map(|d| d.to_string()) // only allocate when we have a value
         .unwrap_or_default();
 
     let row = tables

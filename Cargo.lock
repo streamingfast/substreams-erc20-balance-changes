@@ -102,6 +102,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "clickhouse-ens"
+version = "0.0.0"
+dependencies = [
+ "clickhouse",
+ "common",
+ "proto",
+ "substreams",
+ "substreams-database-change",
+]
+
+[[package]]
 name = "clickhouse-nfts"
 version = "0.0.0"
 dependencies = [
