@@ -1,6 +1,6 @@
 use common::{bytes_to_hex, to_global_sequence, update_genesis_clock};
-use erc1155::pb::evm::erc1155::events::v1::Events as ERC1155Events;
-use erc721::pb::evm::erc721::events::v1::Events as ERC721Events;
+use proto::pb::evm::erc1155::events::v1::Events as ERC1155Events;
+use proto::pb::evm::erc721::events::v1::Events as ERC721Events;
 use substreams::pb::substreams::Clock;
 use substreams::scalar::BigInt;
 use substreams_database_change::pb::database::DatabaseChanges;

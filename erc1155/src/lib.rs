@@ -1,11 +1,10 @@
 mod events;
-pub mod pb;
 mod transactions;
 
 use std::collections::HashMap;
 
 use common::is_zero_address;
-use pb::evm::erc1155::events::v1::{Events, Transfer, Uri};
+use proto::pb::evm::erc1155::events::v1::{Events, Transfer, Uri};
 use substreams_ethereum::pb::eth::v2 as eth;
 
 /// Extracts events events from the logs

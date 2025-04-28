@@ -1,4 +1,4 @@
-use crate::pb::evm::erc1155::events::v1::Transaction;
+use proto::pb::evm::erc1155::events::v1::Transaction;
 use substreams::scalar::BigInt;
 use substreams_ethereum::pb::eth::v2 as eth;
 

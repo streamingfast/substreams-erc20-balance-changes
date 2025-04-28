@@ -1,4 +1,4 @@
-use crate::pb::evm::erc1155::events::v1::{Transfer, Uri};
+use proto::pb::evm::erc1155::events::v1::{Transfer, Uri};
 use substreams_abis::evm::token::erc1155::events::{TransferBatch, TransferSingle, Uri as UriEvent};
 use substreams_ethereum::{pb::eth::v2 as eth, Event as _};
 

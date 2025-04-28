@@ -1,6 +1,6 @@
 [package]
 name = "erc1155"
-version = "0.2.0"
+version = "0.2.1"
 description = "ERC1155 events substreams package"
 edition = "2021"
 license = "Apache-2.0"
@@ -14,3 +14,5 @@ substreams-ethereum = { workspace = true }
 substreams-abis = { workspace = true }
 prost = "0.13"
 common = { path = "../common" }
+proto = { path = "../proto" }
+
