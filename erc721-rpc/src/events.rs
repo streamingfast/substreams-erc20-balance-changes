@@ -6,13 +6,12 @@ use substreams_ethereum::Event as _;
 
 pub fn get_mints<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Token> + 'a {
     blk.receipts().flat_map(move |receipt| {
-        let contract = &receipt.transaction.to;
         receipt.receipt.logs.iter().filter_map(move |log| {
             if let Some(event) = erc721::events::Transfer::match_and_decode(log) {
                 if is_zero_address(event.from.as_ref() as &[u8]) {
                     Some(Token {
-                        contract: contract.to_vec().into(),
-                        token_id: event.token_id.to_string(),
+                        contract: log.address.to_vec().into(),
+                        token_id: event.token_id.into(),
                         ..Default::default()
                     })
                 } else {

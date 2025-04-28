@@ -45,9 +45,11 @@ pub fn db_out(mut clock: Clock, erc721_events: ERC721Events, erc1155_events: ERC
     );
     let mut tables = Tables::new();
     clock = update_genesis_clock(clock);
+    let mut i = 0;
 
     // Transfers
     for transfer in erc721_events.transfers {
+        i += 1;
         let row = tables.create_row(
             "nft_transfers",
             [
@@ -58,8 +60,8 @@ pub fn db_out(mut clock: Clock, erc721_events: ERC721Events, erc1155_events: ERC
         );
         row.set("contract", bytes_to_hex(&transfer.contract))
             .set("timestamp", clock.timestamp.unwrap().seconds)
-            .set("global_sequence", to_global_sequence(&clock, transfer.log_index))
-            .set("operator", bytes_to_hex(&transfer.from))
+            .set("global_sequence", to_global_sequence(&clock, i))
+            .set("operator", "")
             .set("from", bytes_to_hex(&transfer.from))
             .set("to", bytes_to_hex(&transfer.to))
             .set("token_id", &transfer.token_id)
@@ -76,6 +78,7 @@ pub fn db_out(mut clock: Clock, erc721_events: ERC721Events, erc1155_events: ERC
         let Ok(amount) = u64::try_from(BigInt::try_from(&transfer.amount).expect("invalid amount")) else {
             continue;
         };
+        i += 1;
         let row = tables.create_row(
             "nft_transfers",
             [
@@ -86,7 +89,7 @@ pub fn db_out(mut clock: Clock, erc721_events: ERC721Events, erc1155_events: ERC
         );
         row.set("contract", bytes_to_hex(&transfer.contract))
             .set("timestamp", clock.timestamp.unwrap().seconds)
-            .set("global_sequence", to_global_sequence(&clock, transfer.log_index))
+            .set("global_sequence", to_global_sequence(&clock, i))
             .set("from", bytes_to_hex(&transfer.from))
             .set("to", bytes_to_hex(&transfer.to))
             .set("token_id", &transfer.token_id)

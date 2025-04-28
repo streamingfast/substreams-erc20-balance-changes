@@ -15,7 +15,7 @@ fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
 
     let contracts = mints.iter().map(|m| &m.contract).collect::<HashSet<_>>().into_iter().collect::<Vec<_>>();
     let mut symbols: HashMap<&[u8], (Option<String>, Option<String>)> = HashMap::new();
-    for contract_chunk in contracts.chunks(10) {
+    for contract_chunk in contracts.chunks(50) {
         let batch = contract_chunk.iter().fold(RpcBatch::new(), |batch, address| {
             batch.add(functions::Name {}, address.to_vec()).add(functions::Symbol {}, address.to_vec())
         });

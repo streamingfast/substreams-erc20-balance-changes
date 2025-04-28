@@ -5,8 +5,6 @@ use substreams_ethereum::{pb::eth::v2 as eth, Event as _};
 // Extracts ERC1155 Transfer events (both TransferSingle and TransferBatch)
 pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> + 'a {
     blk.receipts().flat_map(move |receipt| {
-        let hash = &receipt.transaction.hash;
-        let contract = &receipt.transaction.to;
         receipt.receipt.logs.iter().flat_map(move |log| {
             // Try TransferSingle
             if let Some(event) = TransferSingle::match_and_decode(log) {
@@ -14,12 +12,12 @@ pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> 
                 let amount = event.value.to_string();
                 return vec![Transfer {
                     block_num: blk.number,
-                    tx_hash: hash.clone(),
+                    tx_hash: receipt.transaction.hash.to_vec().into(),
                     log_index: log.block_index as u64,
-                    contract: contract.clone(),
-                    operator: event.operator.clone(),
-                    from: event.from.clone(),
-                    to: event.to.clone(),
+                    contract: log.address.to_vec().into(),
+                    operator: event.operator.into(),
+                    from: event.from.into(),
+                    to: event.to.into(),
                     token_id,
                     amount,
                     uri: None,
@@ -34,14 +32,14 @@ pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> 
                     .zip(event.values.iter())
                     .map(|(id, value)| Transfer {
                         block_num: blk.number,
-                        tx_hash: hash.clone(),
+                        tx_hash: receipt.transaction.hash.to_vec().into(),
                         log_index: log.block_index as u64,
-                        contract: contract.clone(),
-                        operator: event.operator.clone(),
-                        from: event.from.clone(),
-                        to: event.to.clone(),
-                        token_id: id.to_string(),
-                        amount: value.to_string(),
+                        contract: log.address.to_vec().into(),
+                        operator: event.operator.to_vec().into(),
+                        from: event.from.to_vec().into(),
+                        to: event.to.to_vec().into(),
+                        token_id: id.into(),
+                        amount: value.into(),
                         uri: None,
                     })
                     .collect::<Vec<_>>()
@@ -56,16 +54,15 @@ pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> 
 // Extracts ERC1155 Uri events
 pub fn get_uris<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Uri> + 'a {
     blk.receipts().flat_map(move |receipt| {
-        let contract = &receipt.transaction.to;
         receipt.receipt.logs.iter().filter_map(move |log| {
             if let Some(event) = UriEvent::match_and_decode(log) {
                 Some(Uri {
                     block_num: blk.number,
-                    tx_hash: receipt.transaction.hash.clone(),
+                    tx_hash: receipt.transaction.hash.to_vec().into(),
                     log_index: log.block_index as u64,
-                    contract: contract.clone(),
-                    token_id: event.id.to_string(),
-                    uri: event.value.clone(),
+                    contract: log.address.to_vec().into(),
+                    token_id: event.id.into(),
+                    uri: event.value.into(),
                 })
             } else {
                 None
