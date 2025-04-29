@@ -9,12 +9,12 @@ CREATE TABLE IF NOT EXISTS historical_balances (
    address              FixedString(42) COMMENT 'wallet address',
 
    -- balance --
-   open           AggregateFunction(argMin, UInt256, UInt64),
-   high           SimpleAggregateFunction(max, UInt256),
-   low            SimpleAggregateFunction(min, UInt256),
-   close          AggregateFunction(argMax, UInt256, UInt64),
-   uaw            AggregateFunction(uniq, FixedString(42)) COMMENT 'unique wallet addresses that changed balance in the window',
-   transactions   AggregateFunction(sum, UInt8) COMMENT 'number of transactions that changed balance in the window'
+   open                 AggregateFunction(argMin, UInt256, UInt64),
+   high                 SimpleAggregateFunction(max, UInt256),
+   low                  SimpleAggregateFunction(min, UInt256),
+   close                AggregateFunction(argMax, UInt256, UInt64),
+   uaw                  AggregateFunction(uniq, FixedString(42)) COMMENT 'unique wallet addresses that changed balance in the window',
+   transactions         AggregateFunction(sum, UInt8) COMMENT 'number of transactions that changed balance in the window'
 )
 ENGINE = AggregatingMergeTree
 PRIMARY KEY (address, contract, timestamp)

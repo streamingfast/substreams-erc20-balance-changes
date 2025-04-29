@@ -64,6 +64,7 @@ message NameRegistered {
     bytes owner = 12;
     uint64 base_cost = 13;
     uint64 expires = 14;
+    bytes node = 15;
 }
 
 message NameRenewed {
@@ -75,6 +76,7 @@ message NameRenewed {
     bytes label = 11;
     uint64 cost = 12;
     uint64 expires = 13;
+    bytes node = 14;
 }
 
 message NameTransferred {

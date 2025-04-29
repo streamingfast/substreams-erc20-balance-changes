@@ -120,6 +120,8 @@ pub struct NameRegistered {
     pub base_cost: u64,
     #[prost(uint64, tag="14")]
     pub expires: u64,
+    #[prost(bytes="vec", tag="15")]
+    pub node: ::prost::alloc::vec::Vec<u8>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -141,6 +143,8 @@ pub struct NameRenewed {
     pub cost: u64,
     #[prost(uint64, tag="13")]
     pub expires: u64,
+    #[prost(bytes="vec", tag="14")]
+    pub node: ::prost::alloc::vec::Vec<u8>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

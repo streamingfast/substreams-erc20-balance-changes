@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS erc20_balance_changes  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash       FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'ERC-20 caller address', -- call.caller
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS erc20_balance_changes  (
    reason               LowCardinality(String) COMMENT 'only available in native_balance_changes',
 
    -- indexes --
-   INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash            (tx_hash)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contract           (contract)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address            (address)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS erc20_transfers  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'ERC-20 contract caller address', -- call.caller
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS erc20_transfers  (
    call_type            LowCardinality(String),
 
    -- indexes --
-   INDEX idx_transaction_id     (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash            (tx_hash)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contract           (contract)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_from               (`from`)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_to                 (`to`)               TYPE bloom_filter GRANULARITY 4,
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash       FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'contract creator/modifier address',
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    decimals             String COMMENT '(Optional UInt8) ERC-20 contract decimals (18 by default)',
 
    -- indexes --
-   INDEX idx_transaction_id      (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash             (tx_hash)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller              (caller)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address             (address)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_name                (name)               TYPE bloom_filter GRANULARITY 4,
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS contract_creations  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash       FixedString(66),
    `from`               FixedString(42),
    `to`                 FixedString(42),
 
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS contract_creations  (
    -- indexes --
    INDEX idx_block_num          (block_num)           TYPE minmax GRANULARITY 4,
    INDEX idx_timestamp          (timestamp)           TYPE minmax GRANULARITY 4,
-   INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash            (tx_hash)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_from               (`from`)              TYPE bloom_filter GRANULARITY 4,
    INDEX idx_to                 (`to`)                TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_pairs_created (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash       FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'factory creator', -- call.caller
@@ -219,7 +219,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_pairs_created (
    -- indexes --
    INDEX idx_block_num        (block_num)          TYPE minmax GRANULARITY 4,
    INDEX idx_timestamp        (timestamp)          TYPE minmax GRANULARITY 4,
-   INDEX idx_transaction_id   (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash          (tx_hash)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token0           (token0)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token1           (token1)             TYPE bloom_filter GRANULARITY 4,
 )
@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_syncs  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_syncs  (
    reserve1             UInt256 COMMENT 'UniswapV2Pair token1 reserve',
 
    -- indexes --
-   INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash            (tx_hash)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address            (address)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_reserve0_minmax    (reserve0)            TYPE minmax       GRANULARITY 4,
@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -291,7 +291,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v2_swaps (
    `to`                 FixedString(42) COMMENT 'UniswapV2Pair recipient address',
 
    -- indexes --
-   INDEX idx_transaction_id   (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash          (tx_hash)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller           (caller)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address          (address)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_sender           (sender)             TYPE bloom_filter GRANULARITY 4,
@@ -320,7 +320,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_swaps (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -336,7 +336,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_swaps (
    liquidity            UInt128 COMMENT 'UniswapV3Pool liquidity',
 
    -- indexes --
-   INDEX idx_transaction_id    (transaction_id)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash           (tx_hash)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller            (caller)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address           (address)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_sender            (sender)            TYPE bloom_filter GRANULARITY 4,
@@ -364,7 +364,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_initializes (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -375,7 +375,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_initializes (
    tick                 Int32 COMMENT 'UniswapV3Pool tick',
 
    -- indexes --
-   INDEX idx_transaction_id    (transaction_id)    TYPE bloom_filter    GRANULARITY 4,
+   INDEX idx_tx_hash           (tx_hash)           TYPE bloom_filter    GRANULARITY 4,
    INDEX idx_caller            (caller)            TYPE bloom_filter    GRANULARITY 4,
    INDEX idx_sqrt_price_x96    (sqrt_price_x96)    TYPE minmax          GRANULARITY 4,
    INDEX idx_tick              (tick)              TYPE minmax          GRANULARITY 4,
@@ -397,7 +397,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_pools_created (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -411,7 +411,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_pools_created (
    fee                  UInt32 COMMENT 'UniswapV3Pool fee (e.g., 3000 represents 0.30%)',
 
    -- indexes --
-   INDEX idx_transaction_id    (transaction_id)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash           (tx_hash)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller            (caller)            TYPE bloom_filter    GRANULARITY 4,
    INDEX idx_token0            (token0)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token1            (token1)            TYPE bloom_filter GRANULARITY 4,
@@ -465,7 +465,7 @@ CREATE TABLE IF NOT EXISTS pools (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- swaps --
    factory              FixedString(42) COMMENT 'factory address', -- log.address
@@ -476,7 +476,7 @@ CREATE TABLE IF NOT EXISTS pools (
    protocol             LowCardinality(String) COMMENT 'protocol name', -- 'uniswap_v2' or 'uniswap_v3'
 
    -- indexes --
-   INDEX idx_transaction_id       (transaction_id)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash              (tx_hash)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_factory              (factory)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token0               (token0)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token1               (token1)            TYPE bloom_filter GRANULARITY 4,
@@ -494,7 +494,7 @@ SELECT
    block_hash,
    timestamp,
    global_sequence,
-   transaction_id,
+   tx_hash,
    address AS factory,
    pair AS pool,
    token0,
@@ -511,7 +511,7 @@ SELECT
    block_hash,
    timestamp,
    global_sequence,
-   transaction_id,
+   tx_hash,
    address AS factory,
    pool,
    token0,
@@ -533,7 +533,7 @@ CREATE TABLE IF NOT EXISTS swaps (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -560,7 +560,7 @@ SELECT
    ordinal,
    `index`,
    global_sequence,
-   transaction_id,
+   tx_hash,
    caller,
    address as pool,
    sender,
@@ -581,7 +581,7 @@ SELECT
    ordinal,
    `index`,
    global_sequence,
-   transaction_id,
+   tx_hash,
    caller,
    address as pool,
    sender,
@@ -628,12 +628,12 @@ CREATE TABLE IF NOT EXISTS historical_balances (
    address              FixedString(42) COMMENT 'wallet address',
 
    -- balance --
-   open           AggregateFunction(argMin, UInt256, UInt64),
-   high           SimpleAggregateFunction(max, UInt256),
-   low            SimpleAggregateFunction(min, UInt256),
-   close          AggregateFunction(argMax, UInt256, UInt64),
-   uaw            AggregateFunction(uniq, FixedString(42)) COMMENT 'unique wallet addresses that changed balance in the window',
-   transactions   AggregateFunction(sum, UInt8) COMMENT 'number of transactions that changed balance in the window'
+   open                 AggregateFunction(argMin, UInt256, UInt64),
+   high                 SimpleAggregateFunction(max, UInt256),
+   low                  SimpleAggregateFunction(min, UInt256),
+   close                AggregateFunction(argMax, UInt256, UInt64),
+   uaw                  AggregateFunction(uniq, FixedString(42)) COMMENT 'unique wallet addresses that changed balance in the window',
+   transactions         AggregateFunction(sum, UInt8) COMMENT 'number of transactions that changed balance in the window'
 )
 ENGINE = AggregatingMergeTree
 PRIMARY KEY (address, contract, timestamp)

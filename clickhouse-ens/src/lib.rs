@@ -1,4 +1,5 @@
-use common::clickhouse::{common_key, set_bytes, set_caller, set_clock, set_ordering, set_transaction_id};
+use common::bytes_to_hex;
+use common::clickhouse::{common_key, set_caller, set_clock, set_ordering, set_tx_hash};
 use proto::pb::evm::tokens::ens::v1::Events;
 use substreams::pb::substreams::Clock;
 use substreams_database_change::pb::database::DatabaseChanges;
@@ -9,96 +10,97 @@ pub fn db_out(clock: Clock, events: Events) -> Result<DatabaseChanges, substream
     let mut tables = Tables::new();
     let mut index = 0; // incremental index for each event
 
-    // Process NameRegistered events
     for event in events.name_registered {
         let key = common_key(&clock, index);
         let row = tables
             .create_row("name_registered", key)
+            .set("contract", bytes_to_hex(&event.contract))
             .set("name", &event.name)
-            .set("label", &event.label)
+            .set("label", &bytes_to_hex(&event.label))
+            .set("node", &bytes_to_hex(&event.node))
             .set("owner", &event.owner)
             .set("base_cost", event.base_cost)
             .set("expires", event.expires);
 
-        set_bytes(Some(event.contract), "contract", row);
         set_caller(Some(event.caller), row);
-        set_transaction_id(Some(event.transaction_hash), row);
+        set_tx_hash(Some(event.transaction_hash), row);
         set_ordering(index, Some(event.ordinal), &clock, row);
         set_clock(&clock, row);
         index += 1;
     }
 
-    // Process TextChanged events
     for event in events.text_changed {
         let key = common_key(&clock, index);
         let row = tables
             .create_row("text_changed", key)
+            .set("contract", bytes_to_hex(&event.contract))
             .set("node", &event.node)
             .set("key", &event.key)
             .set("value", &event.value);
 
-        set_bytes(Some(event.contract), "contract", row);
         set_caller(Some(event.caller), row);
         set_ordering(index, Some(event.ordinal), &clock, row);
-        set_transaction_id(Some(event.transaction_hash), row);
+        set_tx_hash(Some(event.transaction_hash), row);
         set_clock(&clock, row);
         index += 1;
     }
 
-    // Process ReverseClaimed events (from name_changed events with .addr.reverse suffix)
     for event in events.reverse_claimed {
         let key = common_key(&clock, index);
         let row = tables
             .create_row("reverse_claimed", key)
-            .set("address", &event.address)
-            .set("node", &event.node);
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("address", bytes_to_hex(&event.address))
+            .set("node", bytes_to_hex(&event.node));
 
-        set_bytes(Some(event.contract), "contract", row);
         set_caller(Some(event.caller), row);
         set_ordering(index, Some(event.ordinal), &clock, row);
-        set_transaction_id(Some(event.transaction_hash), row);
+        set_tx_hash(Some(event.transaction_hash), row);
         set_clock(&clock, row);
         index += 1;
     }
 
-    // Process NameChanged events
     for event in events.name_changed {
         let key = common_key(&clock, index);
-        let row = tables.create_row("name_changed", key).set("name", &event.name).set("node", &event.node);
+        let row = tables
+            .create_row("name_changed", key)
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("name", &event.name)
+            .set("node", bytes_to_hex(&event.node));
 
-        set_bytes(Some(event.contract), "contract", row);
         set_caller(Some(event.caller), row);
         set_ordering(index, Some(event.ordinal), &clock, row);
-        set_transaction_id(Some(event.transaction_hash), row);
+        set_tx_hash(Some(event.transaction_hash), row);
         set_clock(&clock, row);
         index += 1;
     }
 
-    // Process AddrChanged events
     for event in events.address_changed {
         let key = common_key(&clock, index);
         let row = tables
             .create_row("address_changed", key)
-            .set("address", &event.address)
-            .set("node", &event.node);
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("address", bytes_to_hex(&event.address))
+            .set("node", bytes_to_hex(&event.node));
 
-        set_bytes(Some(event.contract), "contract", row);
         set_caller(Some(event.caller), row);
         set_ordering(index, Some(event.ordinal), &clock, row);
-        set_transaction_id(Some(event.transaction_hash), row);
+        set_tx_hash(Some(event.transaction_hash), row);
         set_clock(&clock, row);
         index += 1;
     }
 
-    // Process ContenthashChanged events
     for event in events.content_hash_changed {
         let key = common_key(&clock, index);
-        let row = tables.create_row("content_hash_changed", key).set("hash", &event.hash).set("node", &event.node);
+        let row = tables
+            .create_row("content_hash_changed", key)
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("hash", bytes_to_hex(&event.hash))
+            .set("node", bytes_to_hex(&event.node));
 
-        set_bytes(Some(event.contract), "contract", row);
         set_caller(Some(event.caller), row);
         set_ordering(index, Some(event.ordinal), &clock, row);
-        set_transaction_id(Some(event.transaction_hash), row);
+        set_tx_hash(Some(event.transaction_hash), row);
         set_clock(&clock, row);
         index += 1;
     }

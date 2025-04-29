@@ -19,8 +19,8 @@ pub fn set_clock(clock: &Clock, row: &mut Row) {
         .set("timestamp", clock.timestamp.as_ref().expect("missing timestamp").seconds.to_string());
 }
 
-pub fn set_transaction_id(transaction_id: Option<Hash>, row: &mut Row) {
-    set_bytes(transaction_id, "transaction_id", row);
+pub fn set_tx_hash(tx_hash: Option<Hash>, row: &mut Row) {
+    set_bytes(tx_hash, "tx_hash", row);
 }
 
 pub fn set_caller(caller: Option<Hash>, row: &mut Row) {
