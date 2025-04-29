@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS swaps (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -38,7 +38,7 @@ SELECT
    ordinal,
    `index`,
    global_sequence,
-   transaction_id,
+   tx_hash,
    caller,
    address as pool,
    sender,
@@ -59,7 +59,7 @@ SELECT
    ordinal,
    `index`,
    global_sequence,
-   transaction_id,
+   tx_hash,
    caller,
    address as pool,
    sender,

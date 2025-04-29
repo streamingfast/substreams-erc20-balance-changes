@@ -2,7 +2,7 @@ use common::bytes_to_hex;
 use proto::pb::evm::tokens::uniswap::v3::{Events, Initialize, PoolCreated, Swap};
 use substreams::pb::substreams::Clock;
 
-use common::clickhouse::{common_key, set_caller, set_clock, set_ordering, set_transaction_id};
+use common::clickhouse::{common_key, set_caller, set_clock, set_ordering, set_tx_hash};
 
 pub fn process_uniswap_v3(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events, mut index: u64) -> u64 {
     for event in events.swaps {
@@ -37,7 +37,7 @@ fn process_uniswap_v3_swaps(tables: &mut substreams_database_change::tables::Tab
 
     set_caller(Some(event.caller), row);
     set_ordering(index, Some(event.ordinal), clock, row);
-    set_transaction_id(Some(event.transaction_id), row);
+    set_tx_hash(Some(event.transaction_id), row);
     set_clock(clock, row);
 }
 
@@ -51,7 +51,7 @@ fn process_uniswap_v3_initializes(tables: &mut substreams_database_change::table
 
     set_caller(Some(event.caller), row);
     set_ordering(index, Some(event.ordinal), clock, row);
-    set_transaction_id(Some(event.transaction_id), row);
+    set_tx_hash(Some(event.transaction_id), row);
     set_clock(clock, row);
 }
 
@@ -68,6 +68,6 @@ fn process_uniswap_v3_pools_created(tables: &mut substreams_database_change::tab
 
     set_caller(Some(event.caller), row);
     set_ordering(index, Some(event.ordinal), clock, row);
-    set_transaction_id(Some(event.transaction_id), row);
+    set_tx_hash(Some(event.transaction_id), row);
     set_clock(clock, row);
 }

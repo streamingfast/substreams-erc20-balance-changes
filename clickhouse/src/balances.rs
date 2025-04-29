@@ -7,7 +7,7 @@ use proto::pb::{
 use substreams::pb::substreams::Clock;
 use substreams_database_change::tables::Row;
 
-use common::clickhouse::{common_key, set_caller, set_clock, set_ordering, set_transaction_id};
+use common::clickhouse::{common_key, set_caller, set_clock, set_ordering, set_tx_hash};
 
 pub fn process_balances(prefix: &str, tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events, mut index: u64) -> u64 {
     // Process ERC-20 balance changes
@@ -36,7 +36,7 @@ fn process_balance_change(prefix: &str, tables: &mut substreams_database_change:
     set_debug(event.algorithm(), event.trx_type(), event.call_type(), Some(event.reason()), row);
     set_caller(event.caller, row);
     set_ordering(index, event.ordinal, clock, row);
-    set_transaction_id(event.transaction_id, row);
+    set_tx_hash(event.transaction_id, row);
     set_clock(clock, row);
 }
 
@@ -52,7 +52,7 @@ fn process_transfer(prefix: &str, tables: &mut substreams_database_change::table
     set_debug(event.algorithm(), event.trx_type(), event.call_type(), None, row);
     set_ordering(index, Some(event.ordinal), clock, row);
     set_caller(event.caller, row);
-    set_transaction_id(event.transaction_id, row);
+    set_tx_hash(event.transaction_id, row);
     set_clock(clock, row);
 }
 

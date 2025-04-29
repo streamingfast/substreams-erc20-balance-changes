@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS erc20_balance_changes  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash       FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'ERC-20 caller address', -- call.caller
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS erc20_balance_changes  (
    reason               LowCardinality(String) COMMENT 'only available in native_balance_changes',
 
    -- indexes --
-   INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash            (tx_hash)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contract           (contract)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address            (address)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS erc20_transfers  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'ERC-20 contract caller address', -- call.caller
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS erc20_transfers  (
    call_type            LowCardinality(String),
 
    -- indexes --
-   INDEX idx_transaction_id     (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash            (tx_hash)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_contract           (contract)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_from               (`from`)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_to                 (`to`)               TYPE bloom_filter GRANULARITY 4,

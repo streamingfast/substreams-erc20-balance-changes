@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash       FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'contract creator/modifier address',
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS contract_changes  (
    decimals             String COMMENT '(Optional UInt8) ERC-20 contract decimals (18 by default)',
 
    -- indexes --
-   INDEX idx_transaction_id      (transaction_id)     TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash             (tx_hash)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller              (caller)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address             (address)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_name                (name)               TYPE bloom_filter GRANULARITY 4,

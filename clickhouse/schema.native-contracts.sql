@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS contract_creations  (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash       FixedString(66),
    `from`               FixedString(42),
    `to`                 FixedString(42),
 
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS contract_creations  (
    -- indexes --
    INDEX idx_block_num          (block_num)           TYPE minmax GRANULARITY 4,
    INDEX idx_timestamp          (timestamp)           TYPE minmax GRANULARITY 4,
-   INDEX idx_transaction_id     (transaction_id)      TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash            (tx_hash)             TYPE bloom_filter GRANULARITY 4,
    INDEX idx_from               (`from`)              TYPE bloom_filter GRANULARITY 4,
    INDEX idx_to                 (`to`)                TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller             (caller)              TYPE bloom_filter GRANULARITY 4,

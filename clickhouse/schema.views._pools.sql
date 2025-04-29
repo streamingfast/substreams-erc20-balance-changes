@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS pools (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- swaps --
    factory              FixedString(42) COMMENT 'factory address', -- log.address
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS pools (
    protocol             LowCardinality(String) COMMENT 'protocol name', -- 'uniswap_v2' or 'uniswap_v3'
 
    -- indexes --
-   INDEX idx_transaction_id       (transaction_id)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash              (tx_hash)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_factory              (factory)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token0               (token0)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token1               (token1)            TYPE bloom_filter GRANULARITY 4,
@@ -38,7 +38,7 @@ SELECT
    block_hash,
    timestamp,
    global_sequence,
-   transaction_id,
+   tx_hash,
    address AS factory,
    pair AS pool,
    token0,
@@ -55,7 +55,7 @@ SELECT
    block_hash,
    timestamp,
    global_sequence,
-   transaction_id,
+   tx_hash,
    address AS factory,
    pool,
    token0,

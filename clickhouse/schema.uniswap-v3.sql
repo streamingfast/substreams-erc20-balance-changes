@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_swaps (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_swaps (
    liquidity            UInt128 COMMENT 'UniswapV3Pool liquidity',
 
    -- indexes --
-   INDEX idx_transaction_id    (transaction_id)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash           (tx_hash)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller            (caller)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_address           (address)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_sender            (sender)            TYPE bloom_filter GRANULARITY 4,
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_initializes (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_initializes (
    tick                 Int32 COMMENT 'UniswapV3Pool tick',
 
    -- indexes --
-   INDEX idx_transaction_id    (transaction_id)    TYPE bloom_filter    GRANULARITY 4,
+   INDEX idx_tx_hash           (tx_hash)           TYPE bloom_filter    GRANULARITY 4,
    INDEX idx_caller            (caller)            TYPE bloom_filter    GRANULARITY 4,
    INDEX idx_sqrt_price_x96    (sqrt_price_x96)    TYPE minmax          GRANULARITY 4,
    INDEX idx_tick              (tick)              TYPE minmax          GRANULARITY 4,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_pools_created (
    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
 
    -- transaction --
-   transaction_id       FixedString(66),
+   tx_hash              FixedString(66),
 
    -- call --
    caller               FixedString(42) COMMENT 'caller address', -- call.caller
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v3_pools_created (
    fee                  UInt32 COMMENT 'UniswapV3Pool fee (e.g., 3000 represents 0.30%)',
 
    -- indexes --
-   INDEX idx_transaction_id    (transaction_id)    TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_tx_hash           (tx_hash)           TYPE bloom_filter GRANULARITY 4,
    INDEX idx_caller            (caller)            TYPE bloom_filter    GRANULARITY 4,
    INDEX idx_token0            (token0)            TYPE bloom_filter GRANULARITY 4,
    INDEX idx_token1            (token1)            TYPE bloom_filter GRANULARITY 4,
