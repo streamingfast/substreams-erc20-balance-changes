@@ -24,3 +24,5 @@ modules:
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:evm.tokens.ens.v1.Events
+
+network: mainnet

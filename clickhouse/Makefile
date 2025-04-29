@@ -9,7 +9,7 @@ build:
 
 .PHONY: gui
 gui: build
-	substreams gui substreams.yaml db_out -e eth.substreams.pinax.network:443 -s 22211598 -t 0 --network eth --production-mode
+	substreams gui substreams.yaml db_out -e eth.substreams.pinax.network:443 -s 22211598 --network eth --production-mode
 
 .PHONY: noop
 noop: build

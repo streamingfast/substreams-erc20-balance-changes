@@ -105,7 +105,6 @@ dependencies = [
 name = "clickhouse-ens"
 version = "0.0.0"
 dependencies = [
- "clickhouse",
  "common",
  "proto",
  "substreams",
@@ -129,6 +128,7 @@ dependencies = [
  "prost 0.13.5",
  "prost-types 0.13.5",
  "substreams",
+ "substreams-database-change",
 ]
 
 [[package]]

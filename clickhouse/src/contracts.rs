@@ -2,7 +2,7 @@ use common::bytes_to_hex;
 use proto::pb::evm::tokens::contracts::v1::{ContractChange, ContractCreation, Events};
 use substreams::pb::substreams::Clock;
 
-use crate::common::{common_key, set_caller, set_clock, set_ordering, set_transaction_id};
+use common::clickhouse::{common_key, set_caller, set_clock, set_ordering, set_transaction_id};
 
 pub fn process_contracts(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events, mut index: u64) -> u64 {
     for event in events.contract_creations {

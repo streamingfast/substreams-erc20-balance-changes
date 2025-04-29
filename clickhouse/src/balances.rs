@@ -1,8 +1,13 @@
 use common::bytes_to_hex;
 use proto::pb::evm::tokens::balances::v1::{BalanceChange, Events, Transfer};
+use proto::pb::{
+    evm::tokens::balances::v1::Algorithm,
+    sf::ethereum::r#type::v2::{balance_change::Reason, transaction_trace::Type, CallType},
+};
 use substreams::pb::substreams::Clock;
+use substreams_database_change::tables::Row;
 
-use crate::common::{common_key, set_caller, set_clock, set_debug, set_ordering, set_transaction_id};
+use common::clickhouse::{common_key, set_caller, set_clock, set_ordering, set_transaction_id};
 
 pub fn process_balances(prefix: &str, tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events, mut index: u64) -> u64 {
     // Process ERC-20 balance changes
@@ -49,4 +54,13 @@ fn process_transfer(prefix: &str, tables: &mut substreams_database_change::table
     set_caller(event.caller, row);
     set_transaction_id(event.transaction_id, row);
     set_clock(clock, row);
+}
+
+pub fn set_debug(algorithm: Algorithm, trx_type: Type, call_type: CallType, reason: Option<Reason>, row: &mut Row) {
+    row.set("algorithm", algorithm.as_str_name())
+        .set("trx_type", trx_type.as_str_name())
+        .set("call_type", call_type.as_str_name());
+    if let Some(reason) = reason {
+        row.set("reason", reason.as_str_name());
+    }
 }

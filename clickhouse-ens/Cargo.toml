@@ -10,6 +10,5 @@ crate-type = ["cdylib"]
 [dependencies]
 substreams = { workspace = true }
 substreams-database-change = "2.0"
-clickhouse = { path = "../clickhouse" }
 proto = { path = "../proto" }
 common = { path = "../common" }

@@ -9,5 +9,6 @@ crate-type = ["rlib"]
 
 [dependencies]
 substreams = { workspace = true }
+substreams-database-change = "2.0"
 prost = "0.13"
 prost-types = "0.13"

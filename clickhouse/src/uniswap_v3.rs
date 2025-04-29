@@ -1,8 +1,8 @@
 use common::bytes_to_hex;
-use proto::pb::evm::tokens::uniswap::v3::{Initialize, Swap, PoolCreated, Events};
+use proto::pb::evm::tokens::uniswap::v3::{Events, Initialize, PoolCreated, Swap};
 use substreams::pb::substreams::Clock;
 
-use crate::common::{common_key, set_caller, set_clock, set_ordering, set_transaction_id};
+use common::clickhouse::{common_key, set_caller, set_clock, set_ordering, set_transaction_id};
 
 pub fn process_uniswap_v3(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, events: Events, mut index: u64) -> u64 {
     for event in events.swaps {
@@ -56,10 +56,7 @@ fn process_uniswap_v3_initializes(tables: &mut substreams_database_change::table
 }
 
 fn process_uniswap_v3_pools_created(tables: &mut substreams_database_change::tables::Tables, clock: &Clock, event: PoolCreated, index: u64) {
-    let key = [
-        ("address", bytes_to_hex(&event.address)),
-        ("pool", bytes_to_hex(&event.pool))
-    ];
+    let key = [("address", bytes_to_hex(&event.address)), ("pool", bytes_to_hex(&event.pool))];
     let row = tables
         .create_row("uniswap_v3_pools_created", key)
         .set("address", &bytes_to_hex(&event.address))

@@ -1,3 +1,4 @@
+pub mod clickhouse;
 use prost_types::Timestamp;
 use substreams::{hex, log, pb::substreams::Clock, scalar::BigInt, Hex};
 
