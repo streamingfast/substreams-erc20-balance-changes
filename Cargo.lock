@@ -122,6 +122,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "clickhouse-transactions"
+version = "0.0.0"
+dependencies = [
+ "common",
+ "substreams",
+ "substreams-database-change",
+ "substreams-ethereum",
+]
+
+[[package]]
 name = "common"
 version = "0.0.0"
 dependencies = [
