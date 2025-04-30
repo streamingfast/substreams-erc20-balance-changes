@@ -18,16 +18,26 @@ pub fn insert_v0_eth_registrar_controller<'a>(events: &mut ens::Events, transact
             return;
         };
         events.name_registered.push(ens::NameRegistered {
-            contract: log.address.to_vec(),
+            // -- transaction --
             transaction_hash: transaction.hash.to_vec(),
+
+            // -- call --
+            contract: log.address.to_vec(),
+
+            // -- log --
             caller: call.caller.to_vec(),
             ordinal: log.ordinal,
-            name: event.name,
-            label: event.label.to_vec(),
+
+            // -- event --
             owner: event.owner.to_vec(),
-            base_cost: 0,
             expires,
-            node: node.to_vec(),
+
+            // -- event (optional) --
+            name: Some(event.name),
+            label: Some(event.label.to_vec()),
+            node: Some(node.to_vec()),
+            base_cost: None,
+            token_id: None,
         });
     }
 

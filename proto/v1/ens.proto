@@ -55,16 +55,24 @@ message NewTTL {
 }
 
 message NameRegistered {
-    bytes contract = 1;
-    bytes transaction_hash = 2;
-    bytes caller = 3;
-    uint64 ordinal = 4; // log.ordinal
-    string name = 10;
-    bytes label = 11;
-    bytes owner = 12;
-    uint64 base_cost = 13;
-    uint64 expires = 14;
-    bytes node = 15;
+    // -- transaction --
+    bytes transaction_hash = 1;
+
+    // -- call --
+    bytes caller = 2;
+
+    // -- log --
+    uint64 ordinal = 3; // log.ordinal
+    bytes contract = 4; // log.address
+
+    // -- event --
+    bytes owner = 10;
+    uint64 expires = 11;
+    optional uint64 base_cost = 12;
+    optional string name = 13;
+    optional bytes label = 14;
+    optional bytes node = 15;
+    optional string token_id = 16;
 }
 
 message NameRenewed {

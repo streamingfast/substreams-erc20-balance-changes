@@ -101,27 +101,35 @@ pub struct NewTtl {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct NameRegistered {
+    /// -- transaction --
     #[prost(bytes="vec", tag="1")]
-    pub contract: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="2")]
     pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="3")]
+    /// -- call --
+    #[prost(bytes="vec", tag="2")]
     pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// -- log --
+    ///
     /// log.ordinal
-    #[prost(uint64, tag="4")]
+    #[prost(uint64, tag="3")]
     pub ordinal: u64,
-    #[prost(string, tag="10")]
-    pub name: ::prost::alloc::string::String,
-    #[prost(bytes="vec", tag="11")]
-    pub label: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="12")]
+    /// log.address
+    #[prost(bytes="vec", tag="4")]
+    pub contract: ::prost::alloc::vec::Vec<u8>,
+    /// -- event --
+    #[prost(bytes="vec", tag="10")]
     pub owner: ::prost::alloc::vec::Vec<u8>,
-    #[prost(uint64, tag="13")]
-    pub base_cost: u64,
-    #[prost(uint64, tag="14")]
+    #[prost(uint64, tag="11")]
     pub expires: u64,
-    #[prost(bytes="vec", tag="15")]
-    pub node: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint64, optional, tag="12")]
+    pub base_cost: ::core::option::Option<u64>,
+    #[prost(string, optional, tag="13")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(bytes="vec", optional, tag="14")]
+    pub label: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
+    #[prost(bytes="vec", optional, tag="15")]
+    pub node: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
+    #[prost(string, optional, tag="16")]
+    pub token_id: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
