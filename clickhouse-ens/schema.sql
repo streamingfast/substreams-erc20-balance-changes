@@ -185,6 +185,35 @@ ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)
 ORDER BY (timestamp, block_num, `index`);
 
+CREATE TABLE IF NOT EXISTS new_owner (
+    -- block --
+    block_num            UInt32,
+    block_hash           FixedString(66),
+    timestamp            DateTime(0, 'UTC'),
+
+    -- ordering --
+    ordinal              UInt64, -- log.ordinal
+    `index`              UInt64, -- relative index
+    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+    -- transaction --
+    tx_hash              FixedString(66),
+
+    -- call --
+    caller               FixedString(42) COMMENT 'caller address', -- call.caller
+
+    -- log --
+    contract             FixedString(42) COMMENT 'contract address',
+
+    -- event --
+    node                 FixedString(66),
+    label                FixedString(66),
+    owner                FixedString(42)
+)
+ENGINE = ReplacingMergeTree
+PRIMARY KEY (timestamp, block_num, `index`)
+ORDER BY (timestamp, block_num, `index`);
+
 
 CREATE TABLE IF NOT EXISTS addresses (
     global_sequence         UInt64, -- latest global sequence (block_num << 32 + index)
@@ -196,7 +225,7 @@ CREATE TABLE IF NOT EXISTS addresses (
 ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (address, node);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS address_changed_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_address_changed
 TO addresses AS
 SELECT
     global_sequence,
@@ -217,7 +246,7 @@ CREATE TABLE IF NOT EXISTS names (
 ENGINE = AggregatingMergeTree
 ORDER BY (node, name);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS name_registered_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_name_registered
 TO names AS
 SELECT
     node,
@@ -242,7 +271,7 @@ CREATE TABLE IF NOT EXISTS records (
 ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (node, key);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS records_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_text_changed
 TO records AS
 SELECT
     global_sequence,
@@ -252,19 +281,59 @@ SELECT
 FROM text_changed
 WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'); -- ENS: Public Resolver
 
-CREATE TABLE IF NOT EXISTS agg_records (
-    node                FixedString(66),
-    kv_pairs_state      AggregateFunction(groupArray, Tuple(String, String))
-)
-ENGINE = AggregatingMergeTree
-ORDER BY (node);
+-- TO-DO: Tuple(String, String) is not supported in Substreams SQL Sink
+-- CREATE TABLE IF NOT EXISTS agg_records (
+--     node                FixedString(66),
+--     kv_pairs_state      AggregateFunction(groupArray, Tuple(String, String))
+-- )
+-- ENGINE = AggregatingMergeTree
+-- ORDER BY (node);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS agg_records_mv
-TO agg_records AS
+-- CREATE MATERIALIZED VIEW IF NOT EXISTS agg_records_mv
+-- TO agg_records AS
+-- SELECT
+--     node,
+--     groupArrayState( (key, value) )  AS kv_pairs_state
+-- FROM records
+-- GROUP BY node;
+
+
+
+CREATE TABLE ens (
+    global_sequence     UInt64,
+
+    -- addresses --
+    address             FixedString(42),
+    node                FixedString(66),
+
+    -- names --
+    name                String,
+    registered          DateTime('UTC'),
+    expires             DateTime('UTC'),
+
+    -- records --
+    records_json        String          -- {"k1":"v1", ...}
+)
+ENGINE = ReplacingMergeTree(global_sequence)
+ORDER BY (address, name);
+
+CREATE MATERIALIZED VIEW mv_from_addresses
+TO ens
+AS
 SELECT
-    node,
-    groupArrayState( (key, value) )  AS kv_pairs_state
-FROM records
-GROUP BY node;
+    a.global_sequence AS global_sequence,
+    a.address,
+    a.node,
+
+    n.name,
+    n.registered,
+    n.expires
+
+    -- toJSONString(
+    --     mapFromEntries( groupArrayMerge(r.kv_state) )
+    -- ) AS records_json,
+
+FROM addresses AS a
+LEFT JOIN names AS n FINAL USING (node);
 
 

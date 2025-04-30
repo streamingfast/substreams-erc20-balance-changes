@@ -8,7 +8,7 @@ use substreams_ethereum::{
 
 use crate::utils::label_to_node;
 
-pub fn insert_eth_registrar_controller<'a>(events: &mut ens::Events, transaction: &'a TransactionTrace, call: &'a Call, log: &'a Log) {
+pub fn insert_v1_eth_registrar_controller<'a>(events: &mut ens::Events, transaction: &'a TransactionTrace, call: &'a Call, log: &'a Log) {
     // NameRegistered event
     if let Some(event) = events::NameRegistered::match_and_decode(log) {
         let node = label_to_node(&event.label);

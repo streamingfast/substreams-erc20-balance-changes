@@ -105,5 +105,21 @@ pub fn db_out(clock: Clock, events: Events) -> Result<DatabaseChanges, substream
         index += 1;
     }
 
+    for event in events.new_owner {
+        let key = common_key(&clock, index);
+        let row = tables
+            .create_row("new_owner", key)
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("node", bytes_to_hex(&event.node))
+            .set("label", bytes_to_hex(&event.label))
+            .set("owner", bytes_to_hex(&event.owner));
+
+        set_caller(Some(event.caller), row);
+        set_ordering(index, Some(event.ordinal), &clock, row);
+        set_tx_hash(Some(event.transaction_hash), row);
+        set_clock(&clock, row);
+        index += 1;
+    }
+
     Ok(tables.to_database_changes())
 }

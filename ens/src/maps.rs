@@ -3,8 +3,8 @@ pub use substreams_abis::evm::ens::v1 as ens;
 use substreams_ethereum::pb::eth::v2::Block;
 
 use crate::events::{
-    ens_registry::insert_ens_registry, eth_registrar_controller::insert_eth_registrar_controller, public_resolver::insert_public_resolver,
-    reverse_registrar::insert_reverse_registrar,
+    ens_registry::insert_ens_registry, public_resolver::insert_public_resolver, reverse_registrar::insert_reverse_registrar,
+    v0_eth_registrar_controller::insert_v0_eth_registrar_controller, v1_eth_registrar_controller::insert_v1_eth_registrar_controller,
 };
 
 #[substreams::handlers::map]
@@ -16,7 +16,8 @@ fn map_events(block: Block) -> Result<Events, substreams::errors::Error> {
             let call = call_view.call;
             insert_public_resolver(&mut events, trx, call, log);
             insert_ens_registry(&mut events, trx, call, log);
-            insert_eth_registrar_controller(&mut events, trx, call, log);
+            insert_v0_eth_registrar_controller(&mut events, trx, call, log);
+            insert_v1_eth_registrar_controller(&mut events, trx, call, log);
             insert_reverse_registrar(&mut events, trx, call, log);
         }
     }

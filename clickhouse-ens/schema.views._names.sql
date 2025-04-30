@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS names (
 ENGINE = AggregatingMergeTree
 ORDER BY (node, name);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS name_registered_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_name_registered
 TO names AS
 SELECT
     node,

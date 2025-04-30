@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS addresses (
 ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (address, node);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS address_changed_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_address_changed
 TO addresses AS
 SELECT
     global_sequence,
