@@ -203,10 +203,8 @@ SELECT
     node,
     address
 FROM address_changed
-WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41') -- ENS: Public Resolver
+WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'); -- ENS: Public Resolver
 
--- INSERT INTO address_changed SELECT * FROM address_changed;
--- SELECT node, address FROM addresses;
 
 CREATE TABLE IF NOT EXISTS names (
     node                    FixedString(66),
@@ -230,8 +228,6 @@ FROM name_registered
 WHERE contract IN ('0x253553366da8546fc250f225fe3d25d0c782303b') -- ENS: ETH Registrar Controller
 GROUP BY node, name;
 
--- INSERT INTO name_registered SELECT * FROM name_registered;
--- SELECT node, name, expires FROM names WHERE expires > now();
 
 CREATE TABLE IF NOT EXISTS records (
     global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
@@ -271,7 +267,4 @@ SELECT
 FROM records
 GROUP BY node;
 
--- INSERT INTO text_changed SELECT * FROM text_changed;
--- SELECT node, groupArrayMerge(kv_pairs_state) FROM agg_records GROUP BY node;
--- SELECT node, groupArray( (key, value) ) FROM records GROUP BY node;
 

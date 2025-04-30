@@ -19,6 +19,3 @@ SELECT
 FROM name_registered
 WHERE contract IN ('0x253553366da8546fc250f225fe3d25d0c782303b') -- ENS: ETH Registrar Controller
 GROUP BY node, name;
-
--- INSERT INTO name_registered SELECT * FROM name_registered;
--- SELECT node, name, expires FROM names WHERE expires > now();

@@ -35,7 +35,3 @@ SELECT
     groupArrayState( (key, value) )  AS kv_pairs_state
 FROM records
 GROUP BY node;
-
--- INSERT INTO text_changed SELECT * FROM text_changed;
--- SELECT node, groupArrayMerge(kv_pairs_state) FROM agg_records GROUP BY node;
--- SELECT node, groupArray( (key, value) ) FROM records GROUP BY node;

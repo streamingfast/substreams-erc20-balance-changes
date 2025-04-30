@@ -15,7 +15,4 @@ SELECT
     node,
     address
 FROM address_changed
-WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41') -- ENS: Public Resolver
-
--- INSERT INTO address_changed SELECT * FROM address_changed;
--- SELECT node, address FROM addresses;
+WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'); -- ENS: Public Resolver
