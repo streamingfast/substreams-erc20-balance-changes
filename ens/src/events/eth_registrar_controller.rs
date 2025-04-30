@@ -1,3 +1,4 @@
+use common::bigint_to_uint64;
 use proto::pb::evm::tokens::ens::v1 as ens;
 use substreams_abis::evm::ens::v1::ethregistrarcontroller::events;
 use substreams_ethereum::{
@@ -11,6 +12,11 @@ pub fn insert_eth_registrar_controller<'a>(events: &mut ens::Events, transaction
     // NameRegistered event
     if let Some(event) = events::NameRegistered::match_and_decode(log) {
         let node = label_to_node(&event.label);
+        let expires = if bigint_to_uint64(&event.expires).is_some() {
+            event.expires.to_u64()
+        } else {
+            return;
+        };
         events.name_registered.push(ens::NameRegistered {
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
@@ -20,7 +26,7 @@ pub fn insert_eth_registrar_controller<'a>(events: &mut ens::Events, transaction
             label: event.label.to_vec(),
             owner: event.owner.to_vec(),
             base_cost: event.base_cost.to_u64(),
-            expires: event.expires.to_u64(),
+            expires,
             node: node.to_vec(),
         });
     }
@@ -28,6 +34,12 @@ pub fn insert_eth_registrar_controller<'a>(events: &mut ens::Events, transaction
     // NameRenewed event
     if let Some(event) = events::NameRenewed::match_and_decode(log) {
         let node = label_to_node(&event.label);
+        let expires = if bigint_to_uint64(&event.expires).is_some() {
+            event.expires.to_u64()
+        } else {
+            return;
+        };
+
         events.name_renewed.push(ens::NameRenewed {
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
@@ -36,7 +48,7 @@ pub fn insert_eth_registrar_controller<'a>(events: &mut ens::Events, transaction
             name: event.name,
             label: event.label.to_vec(),
             cost: event.cost.to_u64(),
-            expires: event.expires.to_u64(),
+            expires,
             node: node.to_vec(),
         });
     }

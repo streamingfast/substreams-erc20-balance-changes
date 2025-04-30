@@ -76,16 +76,28 @@ pub fn bytes32_to_string(bytes: &[u8]) -> String {
 }
 
 // Used to enforce ERC-20 decimals to be between 0 and 255
-pub fn bigint_to_int32(bigint: &substreams::scalar::BigInt) -> Option<i32> {
+pub fn bigint_to_uint8(bigint: &substreams::scalar::BigInt) -> Option<i32> {
     if bigint.lt(&BigInt::zero()) {
-        log::info!("bigint_to_int32: value is negative");
+        log::info!("bigint_to_uint8: value is negative");
         return None;
     }
     if bigint.gt(&BigInt::from(255)) {
-        log::info!("bigint_to_int32: value is greater than 255");
+        log::info!("bigint_to_uint8: value is greater than 255");
         return None;
     }
     Some(bigint.to_i32())
+}
+
+pub fn bigint_to_uint64(bigint: &substreams::scalar::BigInt) -> Option<u64> {
+    if bigint.lt(&BigInt::zero()) {
+        log::info!("bigint_to_uint64: value is negative");
+        return None;
+    }
+    if bigint.gt(&BigInt::from(u64::MAX)) {
+        log::info!("bigint_to_uint64: value is greater than u64::MAX");
+        return None;
+    }
+    Some(bigint.to_u64())
 }
 
 // Timestamp to date conversion

@@ -1,3 +1,4 @@
+use common::bigint_to_uint64;
 use proto::pb::evm::tokens::ens::v1 as ens;
 use substreams_abis::evm::ens::v1::ensregistry::events;
 use substreams_ethereum::{
@@ -45,13 +46,18 @@ pub fn insert_ens_registry<'a>(events: &mut ens::Events, transaction: &'a Transa
 
     // NewTTL event
     if let Some(event) = events::NewTtl::match_and_decode(log) {
+        let ttl = if bigint_to_uint64(&event.ttl).is_some() {
+            event.ttl.to_u64()
+        } else {
+            return;
+        };
         events.new_ttl.push(ens::NewTtl {
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
             ordinal: log.ordinal,
             node: event.node.to_vec(),
-            ttl: event.ttl.to_u64(),
+            ttl,
         });
     }
 }

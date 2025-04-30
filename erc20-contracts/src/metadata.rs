@@ -1,7 +1,7 @@
-use common::{bigint_to_int32, bytes32_to_string};
-use substreams_ethereum::{pb::eth::v2::Call, Function};
 use crate::abi::functions;
+use common::{bigint_to_uint8, bytes32_to_string};
 use substreams_abis::evm::tokens;
+use substreams_ethereum::{pb::eth::v2::Call, Function};
 
 pub struct SetNameSymbol {
     pub name: Option<String>,
@@ -16,7 +16,7 @@ pub fn get_metadata<'a>(call: &'a Call) -> Option<SetNameSymbol> {
             name: Some(name),
             symbol: Some(symbol),
             decimals: None,
-        })
+        });
     }
 
     // extracted only name from the call
@@ -25,7 +25,7 @@ pub fn get_metadata<'a>(call: &'a Call) -> Option<SetNameSymbol> {
             name: Some(name),
             symbol: None,
             decimals: None,
-        })
+        });
     }
 
     // extracted only symbol from the call
@@ -34,7 +34,7 @@ pub fn get_metadata<'a>(call: &'a Call) -> Option<SetNameSymbol> {
             name: None,
             symbol: Some(symbol),
             decimals: None,
-        })
+        });
     }
     None
 }
@@ -113,7 +113,7 @@ pub fn get_name_symbol<'a>(call: &'a Call) -> Option<(String, String)> {
 pub fn get_name_symbol_precision<'a>(call: &'a Call) -> Option<(String, String, i32)> {
     // USDC Circle
     if let Some(result) = tokens::usdc::functions::Initialize::match_and_decode(call) {
-        if let Some(decimals) = bigint_to_int32(&result.token_decimals) {
+        if let Some(decimals) = bigint_to_uint8(&result.token_decimals) {
             return Some((result.token_name, result.token_symbol, decimals));
         }
     }
@@ -123,7 +123,7 @@ pub fn get_name_symbol_precision<'a>(call: &'a Call) -> Option<(String, String, 
     // https://github.com/pinax-network/substreams-evm-tokens/issues/28
     // https://github.com/wormhole-foundation/wormhole/blob/9b9c07b4b1474a1526c9a7346dab640e627630bc/ethereum/contracts/bridge/token/TokenImplementation.sol#L17-L25
     if let Some(result) = functions::Initialize::match_and_decode(call) {
-        if let Some(decimals) = bigint_to_int32(&result.decimals) {
+        if let Some(decimals) = bigint_to_uint8(&result.decimals) {
             return Some((result.name, result.symbol, decimals));
         }
     }
