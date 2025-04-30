@@ -5,7 +5,6 @@ package evm.erc1155.events.v1;
 message Events {
   repeated Transfer transfers = 2;
   repeated Uri uris = 3;
-  repeated Transaction transactions = 4;
 }
 
 message Transfer {
@@ -50,26 +49,3 @@ message Uri {
   string uri = 6;
 }
 
-message Transaction {
-  uint64 block_number = 1;
-  uint64 block_timestamp = 2;
-  bytes block_hash = 3;
-  uint32 position = 4;
-  bytes tx_hash = 5;
-  uint64 nonce = 6;
-  bytes from_address = 7;
-  bytes to_address = 8;
-  string value = 9;
-  string tx_fee = 10;
-  string gas_price = 11;
-  uint64 gas_limit = 12;
-  uint64 gas_used = 13;
-  uint64 cumulative_gas_used = 14;
-  string max_fee_per_gas = 15;
-  string max_priority_fee_per_gas = 16;
-  bytes input = 17;
-  int32 type = 18;
-  bytes v = 19;
-  bytes r = 20;
-  bytes s = 21;
-}

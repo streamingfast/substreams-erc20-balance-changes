@@ -1,5 +1,4 @@
 mod events;
-mod transactions;
 
 use common::is_zero_address;
 use proto::pb::evm::erc721::events::v1::{Events, Mints, Token, Transfer};
@@ -14,12 +13,7 @@ fn map_events(blk: eth::Block, mints: Mints) -> Result<Events, substreams::error
     // Merge metadata from mints into transfers
     merge_metadata(&mut transfers, &mints.tokens);
 
-    // Collect all transaction hashes involved in any ERC721 event
-    let event_tx_hashes: std::collections::HashSet<Vec<u8>> = transfers.iter().map(|t| t.tx_hash.to_vec()).collect();
-
-    let transactions = transactions::get_transactions(&blk, &event_tx_hashes);
-
-    Ok(Events { transfers, transactions })
+    Ok(Events { transfers })
 }
 
 fn merge_metadata(transfers: &mut [Transfer], tokens: &[Token]) {
