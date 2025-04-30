@@ -207,30 +207,56 @@ SELECT
     key,
     value
 FROM text_changed
-WHERE contract = '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63'; -- ENS: Public Resolver
+WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'); -- ENS: Public Resolver
 
 CREATE TABLE IF NOT EXISTS names (
-    global_sequence         UInt64, -- latest global sequence (block_num << 32 + index)
     node                    FixedString(66),
-    address                 FixedString(42),
     name                    String,
-    registered              DateTime(0, 'UTC'),
-    expires                 DateTime(0, 'UTC'),
+    registered              SimpleAggregateFunction(min, DateTime(0, 'UTC')),
+    expires                 SimpleAggregateFunction(max, DateTime(0, 'UTC')),
 
-   -- indexes --
-   INDEX idx_address        (address)     TYPE bloom_filter GRANULARITY 4,
+    INDEX idx_name       (name)       TYPE bloom_filter GRANULARITY 4
+)
+ENGINE = AggregatingMergeTree
+ORDER BY (node, name);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS name_registered_mv
+TO names AS
+SELECT
+    node,
+    name,
+    min(timestamp) as registered,
+    max(expires) as expires
+FROM name_registered
+WHERE contract IN ('0x253553366da8546fc250f225fe3d25d0c782303b') -- ENS: ETH Registrar Controller
+GROUP BY name, node;
+
+CREATE TABLE IF NOT EXISTS addresses (
+    global_sequence         UInt64, -- latest global sequence (block_num << 32 + index)
+    address                 FixedString(42),
+    node                    FixedString(66),
+
+    INDEX idx_node       (node)       TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree(global_sequence)
-ORDER BY (node);
+ORDER BY (address, node);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS names_mv
-TO names AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS address_changed_mv
+TO addresses AS
 SELECT
     global_sequence,
     node,
-    name,
-    timestamp as registered,
-    expires
-FROM name_registered
-WHERE contract = '0x253553366da8546fc250f225fe3d25d0c782303b'; -- ENS: ETH Registrar Controller
+    address
+FROM address_changed
+WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41') -- ENS: Public Resolver
+
+-- -- INSERTS --
+-- INSERT INTO name_registered SELECT * FROM name_registered;
+-- INSERT INTO address_changed SELECT * FROM address_changed;
+
+-- SELECT address, name, expires FROM addresses
+-- JOIN names FINAL USING (node)
+-- WHERE expires > now()
+-- ORDER BY expires ASC
+-- LIMIT 10;
 
