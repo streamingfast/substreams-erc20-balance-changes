@@ -23,3 +23,19 @@ WHERE contract IN (
     '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', -- ENS: Public Resolver
     '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'  -- ENS: Public Resolver 2
 );
+
+CREATE TABLE IF NOT EXISTS agg_records (
+    global_sequence         UInt64, -- latest global sequence (block_num << 32 + index)
+    node                    FixedString(66),
+    kv_state                AggregateFunction(groupArray, Tuple(String, String))
+) ENGINE = AggregatingMergeTree
+ORDER BY node;
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS agg_records_mv
+TO agg_records AS
+SELECT
+    max(global_sequence) AS global_sequence,
+    node,
+    groupArrayState((key, value)) AS kv_state
+FROM records
+GROUP BY node;

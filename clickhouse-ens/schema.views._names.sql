@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS names (
+    global_sequence         SimpleAggregateFunction(max, UInt64), -- latest global sequence (block_num << 32 + index)
     node                    FixedString(66),
     name                    String,
     registered              SimpleAggregateFunction(min, DateTime(0, 'UTC')),
@@ -12,6 +13,7 @@ ORDER BY (node, name);
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_name_registered
 TO names AS
 SELECT
+    max(global_sequence) as global_sequence,
     node,
     name,
     min(timestamp) as registered,
