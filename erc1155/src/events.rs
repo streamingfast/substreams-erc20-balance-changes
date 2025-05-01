@@ -1,4 +1,4 @@
-use proto::pb::evm::erc1155::events::v1::{Transfer, Uri};
+use proto::pb::evm::erc1155::events::v1::{Token, Transfer};
 use substreams_abis::evm::token::erc1155::events::{TransferBatch, TransferSingle, Uri as UriEvent};
 use substreams_ethereum::{pb::eth::v2 as eth, Event as _};
 
@@ -52,11 +52,11 @@ pub fn get_transfers<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Transfer> 
 }
 
 // Extracts ERC1155 Uri events
-pub fn get_uris<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Uri> + 'a {
+pub fn get_tokens<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Token> + 'a {
     blk.receipts().flat_map(move |receipt| {
         receipt.receipt.logs.iter().filter_map(move |log| {
             if let Some(event) = UriEvent::match_and_decode(log) {
-                Some(Uri {
+                Some(Token {
                     block_num: blk.number,
                     tx_hash: receipt.transaction.hash.to_vec().into(),
                     log_index: log.block_index as u64,

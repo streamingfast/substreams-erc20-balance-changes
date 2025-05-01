@@ -97,8 +97,12 @@ FROM erc1155_transfers;
 CREATE TABLE IF NOT EXISTS nft_tokens (
     contract        FixedString(42),
     token_id        String,
-    token_standard  Enum8('ERC721' = 1, 'ERC1155' = 2),
+    block_num       UInt64,
+    tx_hash         FixedString(66),
+    evt_index       UInt64,
     global_sequence UInt64,
+    timestamp       DateTime(0, 'UTC'),
+    token_standard  Enum8('ERC721' = 1, 'ERC1155' = 2),
     uri             String DEFAULT '',
     symbol          String DEFAULT '',
     name            String DEFAULT '',
@@ -110,6 +114,7 @@ CREATE TABLE IF NOT EXISTS nft_tokens (
     INDEX idx_token_standard        (token_standard)        TYPE set(8) GRANULARITY 4,
 ) ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (contract, token_id);
+
 
 -- CREATE TABLE IF NOT EXISTS nft_offchain (
 --     contract        FixedString(42),
@@ -132,28 +137,3 @@ ORDER BY (contract, token_id);
 -- ORDER BY (contract, token_id);
 
 
-CREATE TABLE IF NOT EXISTS nft_transactions (
-    block_num                UInt64,
-    block_hash               FixedString(66),
-    timestamp                DateTime(0, 'UTC'),
-    tx_hash                  FixedString(66),
-    nonce                    UInt64,
-    position                 UInt32,
-    from_address             FixedString(42),
-    to_address               FixedString(42),
-    value                    String,
-    tx_fee                   String,
-    gas_price                String,
-    gas_limit                UInt64,
-    gas_used                 UInt64,
-    cumulative_gas_used      UInt64,
-    max_fee_per_gas          String,
-    max_priority_fee_per_gas String,
-    input                    String,
-    type                     Int32,
-    v                        String,
-    r                        String,
-    s                        String
-
-) ENGINE = ReplacingMergeTree
-ORDER BY tx_hash;

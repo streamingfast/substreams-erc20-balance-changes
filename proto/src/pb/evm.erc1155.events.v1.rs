@@ -6,7 +6,7 @@ pub struct Events {
     #[prost(message, repeated, tag="2")]
     pub transfers: ::prost::alloc::vec::Vec<Transfer>,
     #[prost(message, repeated, tag="3")]
-    pub uris: ::prost::alloc::vec::Vec<Uri>,
+    pub tokens: ::prost::alloc::vec::Vec<Token>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -44,7 +44,7 @@ pub struct Transfer {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Uri {
+pub struct Token {
     #[prost(uint64, tag="1")]
     pub block_num: u64,
     #[prost(bytes="vec", tag="2")]

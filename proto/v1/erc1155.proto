@@ -4,7 +4,7 @@ package evm.erc1155.events.v1;
 
 message Events {
   repeated Transfer transfers = 2;
-  repeated Uri uris = 3;
+  repeated Token tokens = 3;
 }
 
 message Transfer {
@@ -40,7 +40,7 @@ message Transfer {
 
 }
 
-message Uri {
+message Token {
   uint64 block_num = 1;
   bytes tx_hash = 2;
   uint64 log_index = 3;

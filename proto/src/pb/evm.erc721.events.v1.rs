@@ -5,26 +5,14 @@
 pub struct Events {
     #[prost(message, repeated, tag="2")]
     pub transfers: ::prost::alloc::vec::Vec<Transfer>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Mints {
-    #[prost(message, repeated, tag="1")]
+    #[prost(message, repeated, tag="3")]
     pub tokens: ::prost::alloc::vec::Vec<Token>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Token {
-    #[prost(bytes="vec", tag="1")]
-    pub contract: ::prost::alloc::vec::Vec<u8>,
-    #[prost(string, tag="2")]
-    pub token_id: ::prost::alloc::string::String,
-    #[prost(string, optional, tag="3")]
-    pub uri: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag="4")]
-    pub symbol: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag="5")]
-    pub name: ::core::option::Option<::prost::alloc::string::String>,
+pub struct Tokens {
+    #[prost(message, repeated, tag="1")]
+    pub tokens: ::prost::alloc::vec::Vec<Token>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -58,6 +46,26 @@ pub struct Transfer {
     pub symbol: ::core::option::Option<::prost::alloc::string::String>,
     /// Name of the token.
     #[prost(string, optional, tag="11")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Token {
+    #[prost(uint64, tag="1")]
+    pub block_num: u64,
+    #[prost(bytes="vec", tag="2")]
+    pub tx_hash: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint64, tag="3")]
+    pub log_index: u64,
+    #[prost(bytes="vec", tag="4")]
+    pub contract: ::prost::alloc::vec::Vec<u8>,
+    #[prost(string, tag="5")]
+    pub token_id: ::prost::alloc::string::String,
+    #[prost(string, optional, tag="6")]
+    pub uri: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag="7")]
+    pub symbol: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag="8")]
     pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
 // @@protoc_insertion_point(module)
