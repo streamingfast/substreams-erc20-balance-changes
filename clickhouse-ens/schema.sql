@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS name_registered (
     owner                FixedString(42),
     base_cost            UInt64,
     expires              DateTime(0, 'UTC'),
-    token_id             UInt256
+    premium              UInt64, -- only in V1
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -259,10 +259,9 @@ SELECT
     max(expires) as expires
 FROM name_registered
 WHERE contract IN (
-    '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85', -- ENS: Base Registrar Implementation
     '0x283af0b28c62c092c9727f1ee09c02ca627eb7f5', -- ENS: Old ETH Registrar Controller
     '0x253553366da8546fc250f225fe3d25d0c782303b', -- ENS: ETH Registrar Controller
-) AND name != '' AND node != ''
+)
 GROUP BY node, name;
 
 

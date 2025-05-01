@@ -1,5 +1,5 @@
 use common::bytes_to_hex;
-use common::clickhouse::{common_key, set_bytes, set_caller, set_clock, set_ordering, set_tx_hash};
+use common::clickhouse::{common_key, set_caller, set_clock, set_ordering, set_tx_hash};
 use proto::pb::evm::tokens::ens::v1::Events;
 use substreams::pb::substreams::Clock;
 use substreams_database_change::pb::database::DatabaseChanges;
@@ -16,15 +16,12 @@ pub fn db_out(clock: Clock, events: Events) -> Result<DatabaseChanges, substream
             .create_row("name_registered", key)
             .set("contract", bytes_to_hex(&event.contract))
             .set("expires", event.expires)
-            // Optional values
-            .set("name", &event.name.unwrap_or("".to_string()))
+            .set("name", &event.name.to_string())
             .set("owner", &event.owner)
-            .set("base_cost", event.base_cost.unwrap_or(0))
-            .set("token_id", event.token_id.unwrap_or("".to_string()));
-
-        // Optional Hex values
-        set_bytes(event.label, "label", row);
-        set_bytes(event.node, "node", row);
+            .set("base_cost", event.base_cost)
+            .set("label", bytes_to_hex(&event.label))
+            .set("node", bytes_to_hex(&event.node))
+            .set("premium", event.premium.unwrap_or(0)); // only V1 has premium
 
         // Default values
         set_caller(Some(event.caller), row);

@@ -36,13 +36,11 @@ pub fn insert_v0_eth_registrar_controller<'a>(events: &mut ens::Events, transact
             // -- event --
             owner: event.owner.to_vec(),
             expires,
-
-            // -- event (optional) --
-            name: Some(event.name),
-            label: Some(event.label.to_vec()),
-            node: Some(node.to_vec()),
-            base_cost: Some(base_cost),
-            token_id: None,
+            name: event.name,
+            label: event.label.to_vec(),
+            node: node.to_vec(),
+            base_cost: base_cost,
+            premium: None,
         });
     }
 
