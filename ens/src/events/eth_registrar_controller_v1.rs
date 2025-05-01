@@ -22,11 +22,6 @@ pub fn insert_v1_eth_registrar_controller<'a>(events: &mut ens::Events, transact
         } else {
             return;
         };
-        let premium = if bigint_to_uint64(&event.premium).is_some() {
-            event.premium.to_u64()
-        } else {
-            return;
-        };
         events.name_registered.push(ens::NameRegistered {
             // -- transaction --
             contract: log.address.to_vec(),
@@ -41,11 +36,13 @@ pub fn insert_v1_eth_registrar_controller<'a>(events: &mut ens::Events, transact
             // -- event --
             owner: event.owner.to_vec(),
             expires,
-            label: event.label.to_vec(),
-            name: event.name,
-            node: node.to_vec(),
-            base_cost: base_cost,
-            premium: Some(premium),
+
+            // -- event (optional) --
+            label: Some(event.label.to_vec()),
+            name: Some(event.name),
+            node: Some(node.to_vec()),
+            base_cost: Some(base_cost),
+            token_id: None,
         });
     }
 

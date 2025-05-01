@@ -120,16 +120,16 @@ pub struct NameRegistered {
     pub owner: ::prost::alloc::vec::Vec<u8>,
     #[prost(uint64, tag="11")]
     pub expires: u64,
-    #[prost(uint64, tag="12")]
-    pub base_cost: u64,
-    #[prost(string, tag="13")]
-    pub name: ::prost::alloc::string::String,
-    #[prost(bytes="vec", tag="14")]
-    pub label: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="15")]
-    pub node: ::prost::alloc::vec::Vec<u8>,
-    #[prost(uint64, optional, tag="16")]
-    pub premium: ::core::option::Option<u64>,
+    #[prost(uint64, optional, tag="12")]
+    pub base_cost: ::core::option::Option<u64>,
+    #[prost(string, optional, tag="13")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(bytes="vec", optional, tag="14")]
+    pub label: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
+    #[prost(bytes="vec", optional, tag="15")]
+    pub node: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
+    #[prost(string, optional, tag="16")]
+    pub token_id: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
