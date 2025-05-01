@@ -12,6 +12,9 @@ pub fn get_mints<'a>(blk: &'a eth::Block) -> impl Iterator<Item = Token> + 'a {
                     Some(Token {
                         contract: log.address.to_vec().into(),
                         token_id: event.token_id.into(),
+                        block_num: blk.number,
+                        tx_hash: receipt.transaction.hash.to_vec().into(),
+                        log_index: log.block_index as u64,
                         ..Default::default()
                     })
                 } else {

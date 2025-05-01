@@ -5,28 +5,14 @@
 pub struct Events {
     #[prost(message, repeated, tag="2")]
     pub transfers: ::prost::alloc::vec::Vec<Transfer>,
-    #[prost(message, repeated, tag="4")]
-    pub transactions: ::prost::alloc::vec::Vec<Transaction>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Mints {
-    #[prost(message, repeated, tag="1")]
+    #[prost(message, repeated, tag="3")]
     pub tokens: ::prost::alloc::vec::Vec<Token>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Token {
-    #[prost(bytes="vec", tag="1")]
-    pub contract: ::prost::alloc::vec::Vec<u8>,
-    #[prost(string, tag="2")]
-    pub token_id: ::prost::alloc::string::String,
-    #[prost(string, optional, tag="3")]
-    pub uri: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag="4")]
-    pub symbol: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag="5")]
-    pub name: ::core::option::Option<::prost::alloc::string::String>,
+pub struct Tokens {
+    #[prost(message, repeated, tag="1")]
+    pub tokens: ::prost::alloc::vec::Vec<Token>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -64,48 +50,22 @@ pub struct Transfer {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Transaction {
+pub struct Token {
     #[prost(uint64, tag="1")]
-    pub block_number: u64,
-    #[prost(uint64, tag="2")]
-    pub block_timestamp: u64,
-    #[prost(bytes="vec", tag="3")]
-    pub block_hash: ::prost::alloc::vec::Vec<u8>,
-    #[prost(uint32, tag="4")]
-    pub position: u32,
-    #[prost(bytes="vec", tag="5")]
+    pub block_num: u64,
+    #[prost(bytes="vec", tag="2")]
     pub tx_hash: ::prost::alloc::vec::Vec<u8>,
-    #[prost(uint64, tag="6")]
-    pub nonce: u64,
-    #[prost(bytes="vec", tag="7")]
-    pub from_address: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="8")]
-    pub to_address: ::prost::alloc::vec::Vec<u8>,
-    #[prost(string, tag="9")]
-    pub value: ::prost::alloc::string::String,
-    #[prost(string, tag="10")]
-    pub tx_fee: ::prost::alloc::string::String,
-    #[prost(string, tag="11")]
-    pub gas_price: ::prost::alloc::string::String,
-    #[prost(uint64, tag="12")]
-    pub gas_limit: u64,
-    #[prost(uint64, tag="13")]
-    pub gas_used: u64,
-    #[prost(uint64, tag="14")]
-    pub cumulative_gas_used: u64,
-    #[prost(string, tag="15")]
-    pub max_fee_per_gas: ::prost::alloc::string::String,
-    #[prost(string, tag="16")]
-    pub max_priority_fee_per_gas: ::prost::alloc::string::String,
-    #[prost(bytes="vec", tag="17")]
-    pub input: ::prost::alloc::vec::Vec<u8>,
-    #[prost(int32, tag="18")]
-    pub r#type: i32,
-    #[prost(bytes="vec", tag="19")]
-    pub v: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="20")]
-    pub r: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="21")]
-    pub s: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint64, tag="3")]
+    pub log_index: u64,
+    #[prost(bytes="vec", tag="4")]
+    pub contract: ::prost::alloc::vec::Vec<u8>,
+    #[prost(string, tag="5")]
+    pub token_id: ::prost::alloc::string::String,
+    #[prost(string, optional, tag="6")]
+    pub uri: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag="7")]
+    pub symbol: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag="8")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
 // @@protoc_insertion_point(module)

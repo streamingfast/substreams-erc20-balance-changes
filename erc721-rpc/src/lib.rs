@@ -1,5 +1,5 @@
 mod events;
-use proto::pb::evm::erc721::events::v1::{Mints, Token};
+use proto::pb::evm::erc721::events::v1::{Token, Tokens};
 use std::collections::{HashMap, HashSet};
 use substreams::scalar::BigInt;
 use substreams_abis::evm::token::erc721::functions;
@@ -7,10 +7,10 @@ use substreams_ethereum::{pb::eth::v2 as eth, rpc::RpcBatch};
 
 /// Extracts mints with uri, symbol and name from the logs
 #[substreams::handlers::map]
-fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
+fn map_mints(blk: eth::Block) -> Result<Tokens, substreams::errors::Error> {
     let mints: Vec<Token> = events::get_mints(&blk).collect();
     if mints.is_empty() {
-        return Ok(Mints { tokens: vec![] });
+        return Ok(Tokens { tokens: vec![] });
     }
 
     let contracts = mints.iter().map(|m| &m.contract).collect::<HashSet<_>>().into_iter().collect::<Vec<_>>();
@@ -38,6 +38,9 @@ fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
             let uri = RpcBatch::decode::<String, functions::TokenUri>(&responses[i]);
             let (symbol, name) = symbols.get(&mint.contract.as_ref()).cloned().unwrap_or((None, None));
             tokens.push(Token {
+                block_num: mint.block_num,
+                tx_hash: mint.tx_hash.clone(),
+                log_index: mint.log_index,
                 uri,
                 symbol,
                 name,
@@ -49,5 +52,5 @@ fn map_mints(blk: eth::Block) -> Result<Mints, substreams::errors::Error> {
 
     substreams::log::info!("{} contracts, {} mints", contracts.len(), tokens.len());
 
-    Ok(Mints { tokens })
+    Ok(Tokens { tokens })
 }

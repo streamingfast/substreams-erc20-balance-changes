@@ -37,12 +37,6 @@ impl fmt::Display for TransferType {
 
 #[substreams::handlers::map]
 pub fn db_out(mut clock: Clock, erc721_events: ERC721Events, erc1155_events: ERC1155Events) -> Result<DatabaseChanges, substreams::errors::Error> {
-    substreams::log::info!(
-        "block_num: {}, seconds: {}, nanos: {}",
-        clock.number,
-        clock.timestamp.unwrap().seconds,
-        clock.timestamp.unwrap().nanos
-    );
     let mut tables = Tables::new();
     clock = update_genesis_clock(clock);
     let mut i = 0;
@@ -51,26 +45,19 @@ pub fn db_out(mut clock: Clock, erc721_events: ERC721Events, erc1155_events: ERC
     for transfer in erc721_events.transfers {
         i += 1;
         let row = tables.create_row(
-            "nft_transfers",
+            "erc721_transfers",
             [
                 ("block_num", clock.number.to_string()),
                 ("tx_hash", bytes_to_hex(&transfer.tx_hash)),
                 ("evt_index", transfer.log_index.to_string()),
             ],
         );
-        row.set("contract", bytes_to_hex(&transfer.contract))
+        row.set("global_sequence", to_global_sequence(&clock, i))
             .set("timestamp", clock.timestamp.unwrap().seconds)
-            .set("global_sequence", to_global_sequence(&clock, i))
-            .set("operator", "")
-            .set("from", bytes_to_hex(&transfer.from))
-            .set("to", bytes_to_hex(&transfer.to))
+            .set("contract", bytes_to_hex(&transfer.contract))
             .set("token_id", &transfer.token_id)
-            .set("amount", 1)
-            .set("transfer_type", TransferType::Single.to_string())
-            .set("token_standard", TokenStandard::ERC721.to_string())
-            .set("uri", transfer.uri.as_deref().unwrap_or(""))
-            .set("symbol", transfer.symbol.as_deref().unwrap_or(""))
-            .set("name", transfer.name.as_deref().unwrap_or(""));
+            .set("from", bytes_to_hex(&transfer.from))
+            .set("to", bytes_to_hex(&transfer.to));
     }
 
     // Transfers
@@ -80,21 +67,15 @@ pub fn db_out(mut clock: Clock, erc721_events: ERC721Events, erc1155_events: ERC
         };
         i += 1;
         let row = tables.create_row(
-            "nft_transfers",
+            "erc1155_transfers",
             [
                 ("block_num", clock.number.to_string()),
                 ("tx_hash", bytes_to_hex(&transfer.tx_hash)),
                 ("evt_index", transfer.log_index.to_string()),
             ],
         );
-        row.set("contract", bytes_to_hex(&transfer.contract))
+        row.set("global_sequence", to_global_sequence(&clock, i))
             .set("timestamp", clock.timestamp.unwrap().seconds)
-            .set("global_sequence", to_global_sequence(&clock, i))
-            .set("from", bytes_to_hex(&transfer.from))
-            .set("to", bytes_to_hex(&transfer.to))
-            .set("token_id", &transfer.token_id)
-            .set("operator", bytes_to_hex(&transfer.operator))
-            .set("amount", amount)
             .set(
                 "transfer_type",
                 if amount == 1 {
@@ -103,58 +84,40 @@ pub fn db_out(mut clock: Clock, erc721_events: ERC721Events, erc1155_events: ERC
                     TransferType::Batch.to_string()
                 },
             )
-            .set("token_standard", TokenStandard::ERC1155.to_string())
-            .set("uri", transfer.uri.as_deref().unwrap_or(""))
-            .set("symbol", "")
-            .set("name", "");
+            .set("contract", bytes_to_hex(&transfer.contract))
+            .set("token_id", &transfer.token_id)
+            .set("amount", amount)
+            .set("from", bytes_to_hex(&transfer.from))
+            .set("to", bytes_to_hex(&transfer.to))
+            .set("operator", bytes_to_hex(&transfer.operator));
     }
 
-    // Transactions
-    for tx in erc721_events.transactions {
-        let row = tables.create_row("nft_transactions", [("tx_hash", bytes_to_hex(&tx.tx_hash))]);
-        row.set("block_num", tx.block_number.to_string())
-            .set("timestamp", tx.block_timestamp.to_string())
-            .set("block_hash", bytes_to_hex(&tx.block_hash))
-            .set("nonce", tx.nonce.to_string())
-            .set("position", tx.position.to_string())
-            .set("from_address", bytes_to_hex(&tx.from_address))
-            .set("to_address", bytes_to_hex(&tx.to_address))
-            .set("value", &tx.value)
-            .set("tx_fee", &tx.tx_fee)
-            .set("gas_price", &tx.gas_price)
-            .set("gas_limit", tx.gas_limit.to_string())
-            .set("gas_used", tx.gas_used.to_string())
-            .set("cumulative_gas_used", tx.cumulative_gas_used.to_string())
-            .set("max_fee_per_gas", &tx.max_fee_per_gas)
-            .set("max_priority_fee_per_gas", &tx.max_priority_fee_per_gas)
-            .set("input", bytes_to_hex(&tx.input))
-            .set("type", tx.r#type.to_string())
-            .set("v", bytes_to_hex(&tx.v))
-            .set("r", bytes_to_hex(&tx.r))
-            .set("s", bytes_to_hex(&tx.s));
+    for token in erc721_events.tokens {
+        i += 1;
+        let row = tables.create_row("nft_tokens", [("contract", bytes_to_hex(&token.contract)), ("token_id", token.token_id)]);
+        row.set("global_sequence", to_global_sequence(&clock, i))
+            .set("block_num", clock.number.to_string())
+            .set("tx_hash", bytes_to_hex(&token.tx_hash))
+            .set("evt_index", token.log_index.to_string())
+            .set("timestamp", clock.timestamp.unwrap().seconds)
+            .set("token_standard", TokenStandard::ERC721.to_string())
+            .set("uri", token.uri.as_deref().unwrap_or(""))
+            .set("symbol", token.symbol.as_deref().unwrap_or(""))
+            .set("name", token.name.as_deref().unwrap_or(""));
     }
-    for tx in erc1155_events.transactions {
-        let row = tables.create_row("nft_transactions", [("tx_hash", bytes_to_hex(&tx.tx_hash))]);
-        row.set("block_num", tx.block_number.to_string())
-            .set("timestamp", tx.block_timestamp.to_string())
-            .set("block_hash", bytes_to_hex(&tx.block_hash))
-            .set("nonce", tx.nonce.to_string())
-            .set("position", tx.position.to_string())
-            .set("from_address", bytes_to_hex(&tx.from_address))
-            .set("to_address", bytes_to_hex(&tx.to_address))
-            .set("value", &tx.value)
-            .set("tx_fee", &tx.tx_fee)
-            .set("gas_price", &tx.gas_price)
-            .set("gas_limit", tx.gas_limit.to_string())
-            .set("gas_used", tx.gas_used.to_string())
-            .set("cumulative_gas_used", tx.cumulative_gas_used.to_string())
-            .set("max_fee_per_gas", &tx.max_fee_per_gas)
-            .set("max_priority_fee_per_gas", &tx.max_priority_fee_per_gas)
-            .set("input", bytes_to_hex(&tx.input))
-            .set("type", tx.r#type.to_string())
-            .set("v", bytes_to_hex(&tx.v))
-            .set("r", bytes_to_hex(&tx.r))
-            .set("s", bytes_to_hex(&tx.s));
+
+    for token in erc1155_events.tokens {
+        i += 1;
+        let row = tables.create_row("nft_tokens", [("contract", bytes_to_hex(&token.contract)), ("token_id", token.token_id)]);
+        row.set("global_sequence", to_global_sequence(&clock, i))
+            .set("block_num", clock.number.to_string())
+            .set("tx_hash", bytes_to_hex(&token.tx_hash))
+            .set("evt_index", token.log_index.to_string())
+            .set("timestamp", clock.timestamp.unwrap().seconds)
+            .set("token_standard", TokenStandard::ERC1155.to_string())
+            .set("uri", token.uri)
+            .set("symbol", "")
+            .set("name", "");
     }
 
     Ok(tables.to_database_changes())
