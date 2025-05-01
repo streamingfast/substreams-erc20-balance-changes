@@ -17,5 +17,8 @@ SELECT
     min(timestamp) as registered,
     max(expires) as expires
 FROM name_registered
-WHERE contract IN ('0x253553366da8546fc250f225fe3d25d0c782303b') -- ENS: ETH Registrar Controller
+WHERE contract IN (
+    '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85', -- ENS: Base Registrar Implementation
+    '0x253553366da8546fc250f225fe3d25d0c782303b'  -- ENS: ETH Registrar Controller
+) AND name != '' AND node != ''
 GROUP BY node, name;

@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS name_registered (
     owner                FixedString(42),
     base_cost            UInt64,
     expires              DateTime(0, 'UTC'),
+    token_id             UInt256
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)

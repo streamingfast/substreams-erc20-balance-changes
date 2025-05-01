@@ -19,21 +19,7 @@ SELECT
     key,
     value
 FROM text_changed
-WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'); -- ENS: Public Resolver
-
--- TO-DO: Tuple(String, String) is not supported in Substreams SQL Sink
--- CREATE TABLE IF NOT EXISTS agg_records (
---     node                FixedString(66),
---     kv_pairs_state      AggregateFunction(groupArray, Tuple(String, String))
--- )
--- ENGINE = AggregatingMergeTree
--- ORDER BY (node);
-
--- CREATE MATERIALIZED VIEW IF NOT EXISTS agg_records_mv
--- TO agg_records AS
--- SELECT
---     node,
---     groupArrayState( (key, value) )  AS kv_pairs_state
--- FROM records
--- GROUP BY node;
-
+WHERE contract IN (
+    '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', -- ENS: Public Resolver
+    '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'  -- ENS: Public Resolver 2
+);

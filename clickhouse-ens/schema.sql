@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS name_registered (
     owner                FixedString(42),
     base_cost            UInt64,
     expires              DateTime(0, 'UTC'),
+    token_id             UInt256
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -232,7 +233,10 @@ SELECT
     node,
     address
 FROM address_changed
-WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'); -- ENS: Public Resolver
+WHERE contract IN (
+    '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', -- ENS: Public Resolver
+    '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'  -- ENS: Public Resolver 2
+);
 
 
 CREATE TABLE IF NOT EXISTS names (
@@ -254,7 +258,10 @@ SELECT
     min(timestamp) as registered,
     max(expires) as expires
 FROM name_registered
-WHERE contract IN ('0x253553366da8546fc250f225fe3d25d0c782303b') -- ENS: ETH Registrar Controller
+WHERE contract IN (
+    '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85', -- ENS: Base Registrar Implementation
+    '0x253553366da8546fc250f225fe3d25d0c782303b'  -- ENS: ETH Registrar Controller
+) AND name != '' AND node != ''
 GROUP BY node, name;
 
 
@@ -279,24 +286,10 @@ SELECT
     key,
     value
 FROM text_changed
-WHERE contract IN ('0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'); -- ENS: Public Resolver
-
--- TO-DO: Tuple(String, String) is not supported in Substreams SQL Sink
--- CREATE TABLE IF NOT EXISTS agg_records (
---     node                FixedString(66),
---     kv_pairs_state      AggregateFunction(groupArray, Tuple(String, String))
--- )
--- ENGINE = AggregatingMergeTree
--- ORDER BY (node);
-
--- CREATE MATERIALIZED VIEW IF NOT EXISTS agg_records_mv
--- TO agg_records AS
--- SELECT
---     node,
---     groupArrayState( (key, value) )  AS kv_pairs_state
--- FROM records
--- GROUP BY node;
-
+WHERE contract IN (
+    '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', -- ENS: Public Resolver
+    '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'  -- ENS: Public Resolver 2
+);
 
 
 CREATE TABLE ens (
