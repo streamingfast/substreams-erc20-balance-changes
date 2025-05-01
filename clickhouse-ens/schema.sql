@@ -236,7 +236,7 @@ FROM address_changed
 WHERE contract IN (
     '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', -- ENS: Public Resolver
     '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'  -- ENS: Public Resolver 2
-);
+) AND address != '0x0000000000000000000000000000000000000000';
 
 
 CREATE TABLE IF NOT EXISTS names (
@@ -260,7 +260,8 @@ SELECT
 FROM name_registered
 WHERE contract IN (
     '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85', -- ENS: Base Registrar Implementation
-    '0x253553366da8546fc250f225fe3d25d0c782303b'  -- ENS: ETH Registrar Controller
+    '0x283af0b28c62c092c9727f1ee09c02ca627eb7f5', -- ENS: Old ETH Registrar Controller
+    '0x253553366da8546fc250f225fe3d25d0c782303b', -- ENS: ETH Registrar Controller
 ) AND name != '' AND node != ''
 GROUP BY node, name;
 

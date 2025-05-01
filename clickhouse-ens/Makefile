@@ -9,15 +9,15 @@ build:
 
 .PHONY: gui
 gui: build
-	substreams gui substreams.yaml db_out -e eth.substreams.pinax.network:443 -s 9430706 --network eth
+	substreams gui substreams.yaml db_out -e eth.substreams.pinax.network:443 -s 9478157 --network eth
 
 .PHONY: noop
 noop: build
-	substreams run substreams.yaml db_out -e eth.substreams.pinax.network:443 -s 9430706 -t 0 --limit-processed-blocks 0 --network eth --production-mode --noop-mode
+	substreams run substreams.yaml db_out -e eth.substreams.pinax.network:443 -s 9478157 -t 0 --limit-processed-blocks 0 --network eth --production-mode --noop-mode
 
 .PHONY: dev
 dev: build
-	substreams-sink-sql run clickhouse://default:default@localhost:9000/default substreams.yaml -e eth.substreams.pinax.network:443 9430706: --final-blocks-only --undo-buffer-size 1 --on-module-hash-mistmatch=warn --batch-block-flush-interval 1 --development-mode
+	substreams-sink-sql run clickhouse://default:default@localhost:9000/default substreams.yaml -e eth.substreams.pinax.network:443 9478157: --final-blocks-only --undo-buffer-size 1 --on-module-hash-mistmatch=warn --batch-block-flush-interval 1 --development-mode
 
 .PHONY: setup
 setup: build

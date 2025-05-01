@@ -17,6 +17,11 @@ pub fn insert_v0_eth_registrar_controller<'a>(events: &mut ens::Events, transact
         } else {
             return;
         };
+        let base_cost = if bigint_to_uint64(&event.cost).is_some() {
+            event.cost.to_u64()
+        } else {
+            return;
+        };
         events.name_registered.push(ens::NameRegistered {
             // -- transaction --
             transaction_hash: transaction.hash.to_vec(),
@@ -36,7 +41,7 @@ pub fn insert_v0_eth_registrar_controller<'a>(events: &mut ens::Events, transact
             name: Some(event.name),
             label: Some(event.label.to_vec()),
             node: Some(node.to_vec()),
-            base_cost: None,
+            base_cost: Some(base_cost),
             token_id: None,
         });
     }
