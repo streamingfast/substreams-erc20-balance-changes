@@ -18,13 +18,18 @@ CREATE TABLE IF NOT EXISTS name_registered (
     -- log --
     contract             FixedString(42) COMMENT 'contract address',
 
-    -- event --
+    -- event (v1 & v0) --
     name                 String,
     label                FixedString(66),
     node                 FixedString(66),
     owner                FixedString(42),
     base_cost            UInt64,
     expires              DateTime(0, 'UTC'),
+
+    -- event (v1) --
+    premium              UInt64,
+
+    -- event (base) --
     token_id             UInt256
 )
 ENGINE = ReplacingMergeTree
@@ -54,7 +59,8 @@ CREATE TABLE IF NOT EXISTS text_changed (
     -- event --
     node                 FixedString(66),
     key                  String,
-    value                String
+    value                String,
+    indexed_key          FixedString(66)
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -137,8 +143,9 @@ CREATE TABLE IF NOT EXISTS address_changed (
     contract             FixedString(42) COMMENT 'contract address',
 
     -- event --
-    node                 FixedString(66),
-    address              FixedString(42)
+    node                 String,
+    address              FixedString(42),
+    coin_type            UInt64 COMMENT 'coin type (e.g. 60 for ETH)'
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)

@@ -1,20 +1,28 @@
+use common::{bigint_to_uint64, bytes_to_address};
 use proto::pb::evm::tokens::ens::v1 as ens;
+use substreams::log;
 use substreams_abis::evm::ens::v1::publicresolver::events;
 use substreams_ethereum::{
     pb::eth::v2::{Call, Log, TransactionTrace},
     Event,
 };
 
-pub fn insert_public_resolver<'a>(events: &mut ens::Events, transaction: &'a TransactionTrace, call: &'a Call, log: &'a Log) {
+pub fn insert_public_resolver_v1<'a>(events: &mut ens::Events, transaction: &'a TransactionTrace, call: &'a Call, log: &'a Log) {
     // AddrChanged event
-    if let Some(event) = events::AddrChanged::match_and_decode(log) {
-        events.address_changed.push(ens::AddrChanged {
+    if let Some(event) = events::AddressChanged::match_and_decode(log) {
+        let coin_type = if bigint_to_uint64(&event.coin_type).is_some() {
+            event.coin_type.to_u64()
+        } else {
+            return;
+        };
+        events.address_changed.push(ens::AddressChanged {
             contract: log.address.to_vec(),
             transaction_hash: transaction.hash.to_vec(),
             caller: call.caller.to_vec(),
             ordinal: log.ordinal,
             node: event.node.to_vec(),
-            address: event.a.to_vec(),
+            address: bytes_to_address(&event.new_address),
+            coin_type: Some(coin_type),
         });
     }
 
@@ -52,6 +60,7 @@ pub fn insert_public_resolver<'a>(events: &mut ens::Events, transaction: &'a Tra
             caller: call.caller.to_vec(),
             ordinal: log.ordinal,
             node: event.node.to_vec(),
+            indexed_key: event.indexed_key.hash.to_vec(),
             key: event.key,
             value: event.value,
         });

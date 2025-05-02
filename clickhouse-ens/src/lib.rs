@@ -10,38 +10,15 @@ pub fn db_out(clock: Clock, events: Events) -> Result<DatabaseChanges, substream
     let mut tables = Tables::new();
     let mut index = 0; // incremental index for each event
 
-    for event in events.name_registered {
-        let key = common_key(&clock, index);
-        let row = tables
-            .create_row("name_registered", key)
-            .set("contract", bytes_to_hex(&event.contract))
-            .set("expires", event.expires)
-            // Optional values
-            .set("name", &event.name.unwrap_or("".to_string()))
-            .set("owner", &event.owner)
-            .set("base_cost", event.base_cost.unwrap_or(0))
-            .set("token_id", event.token_id.unwrap_or("".to_string()));
-
-        // Optional Hex values
-        set_bytes(event.label, "label", row);
-        set_bytes(event.node, "node", row);
-
-        // Default values
-        set_caller(Some(event.caller), row);
-        set_tx_hash(Some(event.transaction_hash), row);
-        set_ordering(index, Some(event.ordinal), &clock, row);
-        set_clock(&clock, row);
-        index += 1;
-    }
-
     for event in events.text_changed {
         let key = common_key(&clock, index);
         let row = tables
             .create_row("text_changed", key)
             .set("contract", bytes_to_hex(&event.contract))
-            .set("node", &event.node)
+            .set("node", bytes_to_hex(&event.node))
             .set("key", &event.key)
-            .set("value", &event.value);
+            .set("value", &event.value)
+            .set("indexed_key", bytes_to_hex(&event.indexed_key));
 
         set_caller(Some(event.caller), row);
         set_ordering(index, Some(event.ordinal), &clock, row);
@@ -80,21 +57,6 @@ pub fn db_out(clock: Clock, events: Events) -> Result<DatabaseChanges, substream
         index += 1;
     }
 
-    for event in events.address_changed {
-        let key = common_key(&clock, index);
-        let row = tables
-            .create_row("address_changed", key)
-            .set("contract", bytes_to_hex(&event.contract))
-            .set("address", bytes_to_hex(&event.address))
-            .set("node", bytes_to_hex(&event.node));
-
-        set_caller(Some(event.caller), row);
-        set_ordering(index, Some(event.ordinal), &clock, row);
-        set_tx_hash(Some(event.transaction_hash), row);
-        set_clock(&clock, row);
-        index += 1;
-    }
-
     for event in events.content_hash_changed {
         let key = common_key(&clock, index);
         let row = tables
@@ -122,6 +84,46 @@ pub fn db_out(clock: Clock, events: Events) -> Result<DatabaseChanges, substream
         set_caller(Some(event.caller), row);
         set_ordering(index, Some(event.ordinal), &clock, row);
         set_tx_hash(Some(event.transaction_hash), row);
+        set_clock(&clock, row);
+        index += 1;
+    }
+
+    for event in events.address_changed {
+        let key = common_key(&clock, index);
+        let row = tables
+            .create_row("address_changed", key)
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("address", bytes_to_hex(&event.address))
+            .set("node", bytes_to_hex(&event.node))
+            .set("coin_type", event.coin_type());
+
+        set_caller(Some(event.caller), row);
+        set_ordering(index, Some(event.ordinal), &clock, row);
+        set_tx_hash(Some(event.transaction_hash), row);
+        set_clock(&clock, row);
+        index += 1;
+    }
+
+    for event in events.name_registered {
+        let key = common_key(&clock, index);
+        let row = tables
+            .create_row("name_registered", key)
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("expires", event.expires)
+            .set("name", &event.name.unwrap_or("".to_string()))
+            .set("owner", &bytes_to_hex(&event.owner))
+            .set("base_cost", event.base_cost.unwrap_or(0))
+            .set("premium", event.premium.unwrap_or(0))
+            .set("token_id", event.token_id.unwrap_or("".to_string()));
+
+        // Optional Hex values
+        set_bytes(event.label, "label", row);
+        set_bytes(event.node, "node", row);
+
+        // Default values
+        set_caller(Some(event.caller), row);
+        set_tx_hash(Some(event.transaction_hash), row);
+        set_ordering(index, Some(event.ordinal), &clock, row);
         set_clock(&clock, row);
         index += 1;
     }

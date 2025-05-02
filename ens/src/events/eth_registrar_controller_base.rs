@@ -29,12 +29,17 @@ pub fn insert_base_eth_registrar_controller<'a>(events: &mut ens::Events, transa
             owner: event.owner.to_vec(),
             expires,
 
-            // -- event (optional) --
-            token_id: Some(event.id.to_string()),
+            // -- event (v0 & v1) --
             name: None,
             label: None,
             node: None,
             base_cost: None,
+
+            // -- event (v1) --
+            premium: None,
+
+            // -- event (base) --
+            token_id: Some(event.id.to_string()),
         });
     }
 

@@ -8,7 +8,7 @@ use substreams_ethereum::{
 
 use crate::utils::label_to_node;
 
-pub fn insert_v0_eth_registrar_controller<'a>(events: &mut ens::Events, transaction: &'a TransactionTrace, call: &'a Call, log: &'a Log) {
+pub fn insert_eth_registrar_controller_v0<'a>(events: &mut ens::Events, transaction: &'a TransactionTrace, call: &'a Call, log: &'a Log) {
     // NameRegistered event
     if let Some(event) = events::NameRegistered::match_and_decode(log) {
         let node = label_to_node(&event.label);
@@ -37,11 +37,16 @@ pub fn insert_v0_eth_registrar_controller<'a>(events: &mut ens::Events, transact
             owner: event.owner.to_vec(),
             expires,
 
-            // -- event (optional) --
+            // -- event (v0 & v1) --
             name: Some(event.name),
             label: Some(event.label.to_vec()),
             node: Some(node.to_vec()),
             base_cost: Some(base_cost),
+
+            // -- event (v1) --
+            premium: None,
+
+            // -- event (base) --
             token_id: None,
         });
     }

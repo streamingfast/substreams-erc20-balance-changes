@@ -100,6 +100,13 @@ pub fn bigint_to_uint64(bigint: &substreams::scalar::BigInt) -> Option<u64> {
     Some(bigint.to_u64())
 }
 
+// Convert a 32-byte hash to a 20-byte address
+// Edge case transaction: 0x083752500764e30f9f6b13c8a6d7d80214b907bd897937b35de78371ca85009e
+pub fn bytes_to_address(bytes: &[u8]) -> Vec<u8> {
+    let start = bytes.len().saturating_sub(20);
+    bytes[start..].to_vec()
+}
+
 // Timestamp to date conversion
 // ex: 2015-07-30T16:02:18Z => 2015-07-30
 pub fn clock_to_date(clock: &Clock) -> String {

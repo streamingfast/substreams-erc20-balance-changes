@@ -31,13 +31,18 @@ CREATE TABLE IF NOT EXISTS name_registered (
     -- log --
     contract             FixedString(42) COMMENT 'contract address',
 
-    -- event --
+    -- event (v1 & v0) --
     name                 String,
     label                FixedString(66),
     node                 FixedString(66),
     owner                FixedString(42),
     base_cost            UInt64,
     expires              DateTime(0, 'UTC'),
+
+    -- event (v1) --
+    premium              UInt64,
+
+    -- event (base) --
     token_id             UInt256
 )
 ENGINE = ReplacingMergeTree
@@ -67,7 +72,8 @@ CREATE TABLE IF NOT EXISTS text_changed (
     -- event --
     node                 FixedString(66),
     key                  String,
-    value                String
+    value                String,
+    indexed_key          FixedString(66)
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -150,8 +156,9 @@ CREATE TABLE IF NOT EXISTS address_changed (
     contract             FixedString(42) COMMENT 'contract address',
 
     -- event --
-    node                 FixedString(66),
-    address              FixedString(42)
+    node                 String,
+    address              FixedString(42),
+    coin_type            UInt64 COMMENT 'coin type (e.g. 60 for ETH)'
 )
 ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)
@@ -275,11 +282,11 @@ CREATE TABLE IF NOT EXISTS records (
     value                String,
 
    -- indexes --
-   INDEX idx_key                  (key)               TYPE bloom_filter GRANULARITY 4,
+   INDEX idx_node                 (node)              TYPE bloom_filter GRANULARITY 4,
    INDEX idx_value                (value)             TYPE bloom_filter GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree(global_sequence)
-ORDER BY (node, key);
+ORDER BY (key, node);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_text_changed
 TO records AS
@@ -294,15 +301,15 @@ WHERE contract IN (
     '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'  -- ENS: Public Resolver 2
 );
 
-CREATE TABLE IF NOT EXISTS agg_records (
+CREATE TABLE IF NOT EXISTS records_by_node (
     global_sequence         UInt64, -- latest global sequence (block_num << 32 + index)
     node                    FixedString(66),
     kv_state                AggregateFunction(groupArray, Tuple(String, String))
 ) ENGINE = AggregatingMergeTree
 ORDER BY node;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS agg_records_mv
-TO agg_records AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS records_by_node_mv
+TO records_by_node AS
 SELECT
     max(global_sequence) AS global_sequence,
     node,
@@ -330,65 +337,13 @@ ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (address, name);
 
 -- FROM addresses --
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_from_addresses
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ens_from_addresses
 TO ens
 AS
 SELECT
     -- ordering --
     a.node as node,
     max(a.global_sequence) AS global_sequence,
-
-    -- addresses --
-    a.address as address,
-
-    -- names --
-    any(n.name) as name,
-    min(n.registered) as registered,
-    max(n.expires) as expires,
-
-    -- records --
-    groupArrayMerge(r.kv_state) AS records_kv
-
-FROM addresses AS a
-LEFT JOIN names AS n USING (node)
-LEFT JOIN agg_records AS r USING (node)
-GROUP BY
-    a.address,
-    a.node;
-
--- FROM names --
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_from_names
-TO ens
-AS
-SELECT
-    -- ordering --
-    n.node as node,
-    max(n.global_sequence) AS global_sequence,
-
-    -- addresses --
-    any(a.address)    AS address,   -- a node can map to many
-
-    -- names --
-    any(n.name) as name,
-    min(n.registered) as registered,
-    max(n.expires) as expires,
-
-    -- records --
-    groupArrayMerge(r.kv_state) AS records_kv
-
-FROM names AS n
-LEFT JOIN addresses AS a USING (node)         -- gives you ≥1 address per node
-LEFT JOIN agg_records AS r USING (node)
-GROUP BY n.node;
-
--- FROM records --
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_from_agg_records
-TO ens
-AS
-SELECT
-    -- ordering --
-    r.node as node,
-    max(r.global_sequence) AS global_sequence,
 
     -- addresses --
     any(a.address) as address,
@@ -401,9 +356,9 @@ SELECT
     -- records --
     groupArrayMerge(r.kv_state) AS records_kv
 
-FROM agg_records AS r
-LEFT JOIN addresses AS a USING (node)
+FROM addresses AS a
 LEFT JOIN names AS n USING (node)
-GROUP BY r.node;
-
+LEFT JOIN records_by_node AS r USING (node)
+GROUP BY
+    a.node;
 
