@@ -10,3 +10,6 @@ SELECT node, name, expires FROM names WHERE expires > now();
 INSERT INTO text_changed SELECT * FROM text_changed;
 SELECT node, groupArrayMerge(kv_pairs_state) FROM agg_records GROUP BY node;
 SELECT node, groupArray( (key, value) ) FROM records GROUP BY node;
+
+SYSTEM REFRESH VIEW mv_ens_from_addresses;
+SET allow_experimental_refreshable_materialized_view = 1;

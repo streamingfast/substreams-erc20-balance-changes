@@ -128,5 +128,24 @@ pub fn db_out(clock: Clock, events: Events) -> Result<DatabaseChanges, substream
         index += 1;
     }
 
+    for event in events.name_renewed {
+        let key = common_key(&clock, index);
+        let row = tables
+            .create_row("name_renewed", key)
+            .set("contract", bytes_to_hex(&event.contract))
+            .set("label", bytes_to_hex(&event.label))
+            .set("node", bytes_to_hex(&event.node))
+            .set("expires", event.expires)
+            .set("name", &event.name)
+            .set("cost", event.cost);
+
+        // Default values
+        set_caller(Some(event.caller), row);
+        set_tx_hash(Some(event.transaction_hash), row);
+        set_ordering(index, Some(event.ordinal), &clock, row);
+        set_clock(&clock, row);
+        index += 1;
+    }
+
     Ok(tables.to_database_changes())
 }

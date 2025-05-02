@@ -19,6 +19,7 @@ ORDER BY (address, name);
 
 -- FROM addresses --
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ens_from_addresses
+REFRESH EVERY 10 SECOND
 TO ens
 AS
 SELECT
@@ -31,14 +32,15 @@ SELECT
 
     -- names --
     any(n.name) as name,
-    min(n.registered) as registered,
-    max(n.expires) as expires,
+    min(e.registered) as registered,
+    max(e.expires) as expires,
 
     -- records --
     groupArrayMerge(r.kv_state) AS records
 
 FROM addresses AS a
 LEFT JOIN names AS n USING (node)
+LEFT JOIN expires AS e USING (node)
 LEFT JOIN records_by_node AS r USING (node)
 GROUP BY
     a.node;

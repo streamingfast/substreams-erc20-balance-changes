@@ -36,6 +36,37 @@ ENGINE = ReplacingMergeTree
 PRIMARY KEY (timestamp, block_num, `index`)
 ORDER BY (timestamp, block_num, `index`);
 
+CREATE TABLE IF NOT EXISTS name_renewed (
+    -- block --
+    block_num            UInt32,
+    block_hash           FixedString(66),
+    timestamp            DateTime(0, 'UTC'),
+
+    -- ordering --
+    ordinal              UInt64, -- log.ordinal
+    `index`              UInt64, -- relative index
+    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
+
+    -- transaction --
+    tx_hash              FixedString(66),
+
+    -- call --
+    caller               FixedString(42) COMMENT 'caller address', -- call.caller
+
+    -- log --
+    contract             FixedString(42) COMMENT 'contract address',
+
+    -- event --
+    name                 String,
+    label                FixedString(66),
+    node                 FixedString(66),
+    cost                 UInt64,
+    expires              DateTime(0, 'UTC')
+)
+ENGINE = ReplacingMergeTree
+PRIMARY KEY (timestamp, block_num, `index`)
+ORDER BY (timestamp, block_num, `index`);
+
 CREATE TABLE IF NOT EXISTS text_changed (
     -- block --
     block_num            UInt32,
