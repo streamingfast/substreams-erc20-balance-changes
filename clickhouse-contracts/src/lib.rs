@@ -13,10 +13,8 @@ pub fn db_out(events: Events) -> Result<DatabaseChanges, substreams::errors::Err
             .set("block_hash", contract.block_hash)
             .set("tx_hash", contract.transaction_hash)
             .set("tx_index", contract.transaction_index)
-            .set("from", contract.from)
-            .set("to", contract.to)
+            .set("creator", contract.from)
             .set("factory", contract.factory.unwrap_or_default())
-            .set("deployer", contract.deployer)
             .set("code", contract.code.unwrap_or_default())
             .set("code_hash", contract.code_hash.unwrap_or_default())
             .set("input", contract.input.unwrap_or_default());
