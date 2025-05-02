@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS contracts (
     timestamp                   DateTime(0, 'UTC'),      -- The timestamp of the block that deployed the contract
     tx_hash                     FixedString(66),         -- The hash of the transaction that deployed the contract
     tx_index                    UInt32,                  -- The index of the transaction in the block
-    deployer                    FixedString(42),         -- The address of the account that sent the creation transaction
-    creator                     FixedString(42),         -- The address of the factory contract that deployed the contract
+    creator                     FixedString(42),         -- The address of the account that sent the creation transaction
+    factory                     FixedString(42),         -- The address of the factory contract that deployed the contract
     code                        String,                  -- The code of the contract
     code_hash                   FixedString(66),         -- The hash of the code of the contract
     input                       String,                  -- The input data of the transaction that deployed the contract
