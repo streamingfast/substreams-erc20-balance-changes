@@ -8,13 +8,14 @@ CREATE TABLE IF NOT EXISTS addresses (
 ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (address);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_reverse_claimed
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_address_changed
 TO addresses AS
 SELECT
     global_sequence,
     node,
     address
-FROM reverse_claimed
+FROM address_changed
 WHERE contract IN (
-    '0xa58e81fe9b61b5c3fe2afd33cf304c454abfc7cb' -- ENS: Reverse Registrar
+    '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', -- ENS: Public Resolver
+    '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'  -- ENS: Public Resolver 2
 );

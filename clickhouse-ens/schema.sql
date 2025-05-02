@@ -264,24 +264,27 @@ CREATE TABLE IF NOT EXISTS addresses (
 ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (address);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_reverse_claimed
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_address_changed
 TO addresses AS
 SELECT
     global_sequence,
     node,
     address
-FROM reverse_claimed
+FROM address_changed
 WHERE contract IN (
-    '0xa58e81fe9b61b5c3fe2afd33cf304c454abfc7cb' -- ENS: Reverse Registrar
+    '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63', -- ENS: Public Resolver
+    '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'  -- ENS: Public Resolver 2
 );
 
 
 CREATE TABLE IF NOT EXISTS expires (
-    global_sequence         SimpleAggregateFunction(max, UInt64), -- latest global sequence (block_num << 32 + index)
     node                    FixedString(66),
     name                    String,
     registered              SimpleAggregateFunction(min, DateTime(0, 'UTC')),
+    registered_tx_hash      AggregateFunction(argMin, FixedString(66), UInt64),
+    renewed_tx_hash         AggregateFunction(argMax, FixedString(66), UInt64),
     expires                 SimpleAggregateFunction(max, DateTime(0, 'UTC')),
+    close                   AggregateFunction(argMax, UInt256, UInt64),
 
     INDEX idx_name          (name)          TYPE bloom_filter GRANULARITY 4,
     INDEX idx_registered    (registered)    TYPE minmax       GRANULARITY 4,
@@ -293,7 +296,7 @@ ORDER BY (node);
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_name_registered
 TO expires AS
 SELECT
-    max(global_sequence) as global_sequence,
+    argMinState(tx_hash, global_sequence) AS registered_tx_hash,
     node,
     name,
     min(timestamp) as registered,
@@ -303,13 +306,13 @@ WHERE contract IN (
     '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85', -- ENS: Base Registrar Implementation
     '0x283af0b28c62c092c9727f1ee09c02ca627eb7f5', -- ENS: Old ETH Registrar Controller
     '0x253553366da8546fc250f225fe3d25d0c782303b', -- ENS: ETH Registrar Controller
-) AND name != '' AND node != ''
+)
 GROUP BY node, name;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_name_renewed
 TO expires AS
 SELECT
-    max(global_sequence) as global_sequence,
+    argMaxState(tx_hash, global_sequence) AS renewed_tx_hash,
     node,
     name,
     min(timestamp) as registered,
@@ -319,7 +322,7 @@ WHERE contract IN (
     '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85', -- ENS: Base Registrar Implementation
     '0x283af0b28c62c092c9727f1ee09c02ca627eb7f5', -- ENS: Old ETH Registrar Controller
     '0x253553366da8546fc250f225fe3d25d0c782303b', -- ENS: ETH Registrar Controller
-) AND name != '' AND node != ''
+)
 GROUP BY node, name;
 
 
@@ -333,7 +336,7 @@ CREATE TABLE IF NOT EXISTS names (
 ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (node);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_name_changed
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_names_by_name_changed
 TO names AS
 SELECT
     global_sequence,
@@ -345,6 +348,31 @@ WHERE contract IN (
     '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'  -- ENS: Public Resolver 2
 );
 
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_names_by_name_registered
+TO names AS
+SELECT
+    global_sequence,
+    node,
+    name,
+FROM name_registered
+WHERE contract IN (
+    '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85', -- ENS: Base Registrar Implementation
+    '0x283af0b28c62c092c9727f1ee09c02ca627eb7f5', -- ENS: Old ETH Registrar Controller
+    '0x253553366da8546fc250f225fe3d25d0c782303b', -- ENS: ETH Registrar Controller
+);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_names_by_name_renewed
+TO names AS
+SELECT
+    global_sequence,
+    node,
+    name,
+FROM name_renewed
+WHERE contract IN (
+    '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85', -- ENS: Base Registrar Implementation
+    '0x283af0b28c62c092c9727f1ee09c02ca627eb7f5', -- ENS: Old ETH Registrar Controller
+    '0x253553366da8546fc250f225fe3d25d0c782303b', -- ENS: ETH Registrar Controller
+);
 
 CREATE TABLE IF NOT EXISTS records (
     global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
