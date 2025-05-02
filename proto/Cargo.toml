@@ -8,5 +8,5 @@ version = { workspace = true }
 crate-type = ["rlib"]
 
 [dependencies]
-prost = "0.13"
-prost-types = "0.13"
+prost = { workspace = true }
+prost-types = { workspace = true }

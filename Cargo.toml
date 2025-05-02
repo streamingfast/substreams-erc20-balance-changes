@@ -18,6 +18,7 @@ members = [
   "clickhouse-nfts",
   "clickhouse-ens",
   "clickhouse-transactions",
+  "clickhouse-contracts",
 ]
 resolver = "2"
 
@@ -31,6 +32,8 @@ license = "Apache-2.0"
 substreams = "0.6.1"
 substreams-abis = "0.3.2"
 substreams-ethereum = "0.10.4"
+prost = "0.13"
+prost-types = "0.13"
 
 [profile.release]
 lto = true
