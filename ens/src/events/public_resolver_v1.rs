@@ -1,6 +1,5 @@
 use common::{bigint_to_uint64, bytes_to_address};
-use proto::pb::evm::tokens::ens::v1 as ens;
-use substreams::log;
+use proto::pb::evm::ens::v1 as ens;
 use substreams_abis::evm::ens::v1::publicresolver::events;
 use substreams_ethereum::{
     pb::eth::v2::{Call, Log, TransactionTrace},

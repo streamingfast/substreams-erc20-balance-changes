@@ -1,6 +1,6 @@
 use common::bytes_to_hex;
 use common::clickhouse::{common_key, set_bytes, set_caller, set_clock, set_ordering, set_tx_hash};
-use proto::pb::evm::tokens::ens::v1::Events;
+use proto::pb::evm::ens::v1::Events;
 use substreams::pb::substreams::Clock;
 use substreams_database_change::pb::database::DatabaseChanges;
 use substreams_database_change::tables::Tables;

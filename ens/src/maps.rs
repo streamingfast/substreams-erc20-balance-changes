@@ -1,4 +1,4 @@
-use proto::pb::evm::tokens::ens::v1::Events;
+use proto::pb::evm::ens::v1::Events;
 pub use substreams_abis::evm::ens::v1 as ens;
 use substreams_ethereum::pb::eth::v2::Block;
 
