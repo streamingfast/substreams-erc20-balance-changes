@@ -7,6 +7,8 @@ pub struct Events {
     pub order_fulfilled: ::prost::alloc::vec::Vec<OrderFulfilled>,
     #[prost(message, repeated, tag="2")]
     pub orders_matched: ::prost::alloc::vec::Vec<OrdersMatched>,
+    #[prost(message, repeated, tag="3")]
+    pub order_cancelled: ::prost::alloc::vec::Vec<OrderCancelled>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -103,5 +105,34 @@ pub struct Consideration {
     /// address
     #[prost(bytes="vec", tag="5")]
     pub recipient: ::prost::alloc::vec::Vec<u8>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OrderCancelled {
+    /// -- transaction --
+    #[prost(bytes="vec", tag="1")]
+    pub transaction_hash: ::prost::alloc::vec::Vec<u8>,
+    /// -- call --
+    #[prost(bytes="vec", tag="2")]
+    pub caller: ::prost::alloc::vec::Vec<u8>,
+    /// -- log --
+    ///
+    /// log.ordinal
+    #[prost(uint64, tag="3")]
+    pub ordinal: u64,
+    /// log.address
+    #[prost(bytes="vec", tag="4")]
+    pub contract: ::prost::alloc::vec::Vec<u8>,
+    /// -- event --
+    ///
+    /// hash
+    #[prost(bytes="vec", tag="10")]
+    pub order_hash: ::prost::alloc::vec::Vec<u8>,
+    /// address
+    #[prost(bytes="vec", tag="11")]
+    pub offerer: ::prost::alloc::vec::Vec<u8>,
+    /// address
+    #[prost(bytes="vec", tag="12")]
+    pub zone: ::prost::alloc::vec::Vec<u8>,
 }
 // @@protoc_insertion_point(module)

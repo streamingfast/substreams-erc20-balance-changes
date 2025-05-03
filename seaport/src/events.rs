@@ -57,4 +57,24 @@ pub fn insert_events<'a>(events: &mut seaport::Events, transaction: &'a Transact
             order_hashes: event.order_hashes.iter().map(|order_hash| order_hash.to_vec()).collect(),
         });
     }
+
+    // OrderCancelled event
+    if let Some(event) = events::OrderCancelled::match_and_decode(log) {
+        events.order_cancelled.push(seaport::OrderCancelled {
+            // -- transaction --
+            transaction_hash: transaction.hash.to_vec(),
+
+            // -- call --
+            caller: call.caller.to_vec(),
+
+            // -- log --
+            contract: log.address.to_vec(),
+            ordinal: log.ordinal,
+
+            // -- event --
+            order_hash: event.order_hash.to_vec(),
+            offerer: event.offerer.to_vec(),
+            zone: event.zone.to_vec(),
+        });
+    }
 }

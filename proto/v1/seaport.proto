@@ -5,6 +5,7 @@ package evm.seaport.v1;
 message Events {
     repeated OrderFulfilled order_fulfilled = 1;
     repeated OrdersMatched orders_matched = 2;
+    repeated OrderCancelled order_cancelled = 3;
 }
 
 message OrderFulfilled {
@@ -55,4 +56,21 @@ message Consideration {
     string identifier = 3; // uint256
     string amount = 4; // uint256
     bytes recipient = 5; // address
+}
+
+message OrderCancelled {
+    // -- transaction --
+    bytes transaction_hash = 1;
+
+    // -- call --
+    bytes caller = 2;
+
+    // -- log --
+    uint64 ordinal = 3; // log.ordinal
+    bytes contract = 4; // log.address
+
+    // -- event --
+    bytes order_hash = 10; // hash
+    bytes offerer = 11; // address
+    bytes zone = 12; // address
 }
