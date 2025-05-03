@@ -1161,6 +1161,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "seaport"
+version = "0.0.0"
+dependencies = [
+ "common",
+ "proto",
+ "substreams",
+ "substreams-abis",
+ "substreams-ethereum",
+ "tiny-keccak",
+]
+
+[[package]]
 name = "serde"
 version = "1.0.219"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1244,9 +1256,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-abis"
-version = "0.3.2"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "658a9d7a501e620c918a2e4d379d444eddbfaf8c01520df90e47f166423f6f4e"
+checksum = "17eef6c5d346e50f4cf43b4ee16fb9aeed828cfc8c917d231eb77551f3aa0d84"
 dependencies = [
  "anyhow",
  "ethabi 18.0.0",

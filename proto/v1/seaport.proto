@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package evm.seaport.v1;
+
+message Events {
+    repeated OrderFulfilled order_fulfilled = 1;
+    repeated OrdersMatched orders_matched = 2;
+}
+
+message OrderFulfilled {
+    // -- transaction --
+    bytes transaction_hash = 1;
+
+    // -- call --
+    bytes caller = 2;
+
+    // -- log --
+    uint64 ordinal = 3; // log.ordinal
+    bytes contract = 4; // log.address
+
+    // -- event --
+    bytes order_hash = 10; // hash
+    bytes offerer = 11; // address
+    bytes zone = 12; // address
+    bytes recipient = 13; // address
+    repeated Offer offer = 14; // NFT offer
+    repeated Consideration consideration = 15; // offerer, fee, collection fee
+}
+
+message OrdersMatched {
+    // -- transaction --
+    bytes transaction_hash = 1;
+
+    // -- call --
+    bytes caller = 2;
+
+    // -- log --
+    uint64 ordinal = 3; // log.ordinal
+    bytes contract = 4; // log.address
+
+    // -- event --
+    repeated bytes order_hashes = 10; // hash[]
+}
+
+message Offer {
+    uint32 item_type = 1; // uint8
+    bytes token = 2; // address (NFT token contract)
+    string identifier = 3; // uint256
+    string amount = 4; // uint256
+}
+
+message Consideration {
+    uint32 item_type = 1; // uint8
+    bytes token = 2; // address (ETH=0x0000000000000000000000000000000000000000)
+    string identifier = 3; // uint256
+    string amount = 4; // uint256
+    bytes recipient = 5; // address
+}
