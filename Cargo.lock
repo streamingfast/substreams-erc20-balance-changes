@@ -1169,7 +1169,6 @@ dependencies = [
  "substreams",
  "substreams-abis",
  "substreams-ethereum",
- "tiny-keccak",
 ]
 
 [[package]]

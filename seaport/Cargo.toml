@@ -12,7 +12,6 @@ crate-type = ["cdylib", "rlib"]
 substreams = { workspace = true }
 substreams-ethereum = { workspace = true }
 substreams-abis = { workspace = true }
-tiny-keccak = { version = "2.0", features = ["default"] }
 
 proto = { path = "../proto" }
 common = { path = "../common" }
