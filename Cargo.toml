@@ -19,6 +19,7 @@ members = [
   "clickhouse-ens",
   "clickhouse-transactions",
   "clickhouse-contracts",
+  "clickhouse-eas",
   "seaport"
 ]
 resolver = "2"
