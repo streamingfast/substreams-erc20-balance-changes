@@ -1,5 +1,5 @@
 mod pb;
-use crate::pb::eas::v1::Events;
+use crate::pb::contract::v1::Events;
 use common::bytes_to_hex;
 use substreams_database_change::pb::database::DatabaseChanges;
 use substreams_database_change::tables::Tables;
@@ -8,7 +8,8 @@ use substreams_database_change::tables::Tables;
 pub fn db_out(events: Events) -> Result<DatabaseChanges, substreams::errors::Error> {
     let tables = events.eas_attesteds.into_iter().fold(Tables::new(), |mut tables, attestation| {
         tables
-            .create_row("attestations", [("tx_hash", attestation.evt_tx_hash)])
+            .create_row("attestations", [("tx_hash", bytes_to_hex(&attestation.evt_tx_hash))])
+            .set("tx_hash", bytes_to_hex(&attestation.evt_tx_hash))
             .set("evt_index", attestation.evt_index)
             .set("block_num", attestation.evt_block_number)
             .set("timestamp", attestation.evt_block_time.as_ref().map_or(0, |t| t.seconds))

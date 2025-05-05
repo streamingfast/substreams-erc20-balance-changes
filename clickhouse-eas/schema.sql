@@ -18,4 +18,4 @@ CREATE TABLE IF NOT EXISTS attestations (
     INDEX idx_recipient         (recipient)        TYPE bloom_filter GRANULARITY 4,
     INDEX idx_attester          (attester)         TYPE bloom_filter GRANULARITY 4
 ) ENGINE = ReplacingMergeTree(block_num)
-ORDER BY uid;
+ORDER BY (uid);

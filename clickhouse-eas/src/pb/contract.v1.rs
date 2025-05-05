@@ -15,8 +15,8 @@ pub struct Events {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EasAttested {
-    #[prost(string, tag="1")]
-    pub evt_tx_hash: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="1")]
+    pub evt_tx_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(uint32, tag="2")]
     pub evt_index: u32,
     #[prost(message, optional, tag="3")]
@@ -41,8 +41,8 @@ pub struct EasAttested {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EasRevoked {
-    #[prost(string, tag="1")]
-    pub evt_tx_hash: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="1")]
+    pub evt_tx_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(uint32, tag="2")]
     pub evt_index: u32,
     #[prost(message, optional, tag="3")]
@@ -61,8 +61,8 @@ pub struct EasRevoked {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EasRevokedOffchain {
-    #[prost(string, tag="1")]
-    pub evt_tx_hash: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="1")]
+    pub evt_tx_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(uint32, tag="2")]
     pub evt_index: u32,
     #[prost(message, optional, tag="3")]
@@ -79,8 +79,8 @@ pub struct EasRevokedOffchain {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EasTimestamped {
-    #[prost(string, tag="1")]
-    pub evt_tx_hash: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="1")]
+    pub evt_tx_hash: ::prost::alloc::vec::Vec<u8>,
     #[prost(uint32, tag="2")]
     pub evt_index: u32,
     #[prost(message, optional, tag="3")]
