@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: eas_attestations
-  version: v0.1.0
+  version: v0.2.5
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: EAS attestations
   image: ../image.png
