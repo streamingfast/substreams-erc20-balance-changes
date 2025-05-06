@@ -12,15 +12,15 @@ members = [
   "common",
   "ens",
   "erc721",
-  "erc721-rpc",
+  "erc721-metadata",
   "erc1155",
+  "seaport",
   "clickhouse",
   "clickhouse-nfts",
   "clickhouse-ens",
   "clickhouse-transactions",
   "clickhouse-contracts",
-  "clickhouse-eas",
-  "seaport"
+  "clickhouse-eas"
 ]
 resolver = "2"
 
@@ -32,7 +32,7 @@ license = "Apache-2.0"
 
 [workspace.dependencies]
 substreams = "0.6.1"
-substreams-abis = "0.4.0"
+substreams-abis = "0.4.1"
 substreams-ethereum = "0.10.4"
 prost = "0.13"
 prost-types = "0.13"

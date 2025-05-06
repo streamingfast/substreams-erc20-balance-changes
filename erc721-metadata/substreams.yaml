@@ -1,28 +1,29 @@
 specVersion: v0.1.0
 package:
-  name: erc1155
+  name: erc721_metadata
   version: v0.4.0
   url: https://github.com/pinax-network/substreams-evm-tokens
-  description: ERC1155 events substreams package
+  description: ERC721 token metadata
   image: ../image.png
+
+imports:
+  erc721: ../erc721/substreams.yaml
 
 protobuf:
   files:
-    - erc1155.proto
+    - erc721-metadata.proto
   importPaths:
     - ../proto/v1
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ../target/wasm32-unknown-unknown/release/erc1155.wasm
+    file: ../target/wasm32-unknown-unknown/release/erc721_metadata.wasm
 
 modules:
   - name: map_events
     kind: map
     inputs:
-      - source: sf.ethereum.type.v2.Block
+      - map: erc721:map_events
     output:
-      type: proto:evm.erc1155.v1.Events
-
-network: mainnet
+      type: proto:evm.erc721.metadata.v1.Events
