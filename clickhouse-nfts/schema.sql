@@ -373,46 +373,39 @@ ORDER BY (order_hash); -- contains duplicates --
 
 
 -- Offchain Metadata
-CREATE TABLE IF NOT EXISTS metadata (
+CREATE TABLE IF NOT EXISTS nft_metadata (
     contract            FixedString(42),
     token_id            UInt256,
-    timestamp           DateTime(0, 'UTC') DEFAULT now(),
-    metadata_json       String DEFAULT '',                  -- metadata JSON response
-    image_uri           String DEFAULT '',                  -- image URI
-    description         String DEFAULT '',                  -- description from metadata
-    rarity              LowCardinality(String) DEFAULT '',  -- rarity from metadata
-    image_saved         Boolean DEFAULT false,              -- whether the image has been saved to S3
-    image_mime_type     LowCardinality(String) DEFAULT '',  -- image MIME type
-    image_size_bytes    UInt64 DEFAULT 0,                   -- image size in bytes
-
-    INDEX idx_timestamp             (timestamp)            TYPE minmax GRANULARITY 4,
-    INDEX idx_image_saved           (image_saved)          TYPE set(2) GRANULARITY 4,
-    INDEX idx_description           (description)          TYPE bloom_filter GRANULARITY 4,
-    INDEX idx_rarity                (rarity)               TYPE set(32) GRANULARITY 4
-) ENGINE = ReplacingMergeTree(timestamp)
-PRIMARY KEY (contract, token_id)
+    type                LowCardinality(String),
+    metadata_json       String,
+    name                String,
+    description         String,
+    attributes          String,
+    media_uri           String,
+    created_at          DateTime(0, 'UTC') DEFAULT now(),
+    INDEX idx_type (type) TYPE set(8) GRANULARITY 4,
+    INDEX idx_name (name) TYPE bloom_filter GRANULARITY 4,
+) ENGINE = ReplacingMergeTree(created_at)
 ORDER BY (contract, token_id);
 
 -- Metadata requests and query results
-CREATE TABLE IF NOT EXISTS metadata_requests (
-    contract        FixedString(42),
-    token_id        UInt256,
-    timestamp       DateTime(0, 'UTC') DEFAULT now(),
-    uri             String,                         -- metadata URI being requested
-    url             String,                         -- actual URL being requested (can be different from uri, i.e. ipfs://xxx vs https://ipfs.com/xxx)
-    status          Enum8('ok' = 0, 'timeout' = 1, 'host_not_found' = 2, 'connection_refused' = 3, 'connection_reset' = 4, 'http_error' = 5, 'other_error' = 6),
-    http_code       UInt16 DEFAULT 0,               -- HTTP status code
-    success         Boolean DEFAULT false,          -- whether the request was successful
-    metadata_json   String DEFAULT '',              -- metadata JSON response
-    duration_ms     UInt64 DEFAULT 0,               -- duration of the request in milliseconds
-
-    INDEX idx_success       (success) TYPE set(2) GRANULARITY 4,
-    INDEX idx_http_code     (http_code) TYPE set(32) GRANULARITY 4,
-    INDEX idx_status        (status)  TYPE set(16) GRANULARITY 4,
-    INDEX idx_duration_ms   (duration_ms) TYPE minmax GRANULARITY 4
-) ENGINE = MergeTree
-PRIMARY KEY (contract, token_id, timestamp)
-ORDER BY (contract, token_id, timestamp);
+CREATE TABLE IF NOT EXISTS scrape_attempts (
+    contract            FixedString(42),
+    token_id            UInt256,
+    uri                 String,
+    attempt_num         UInt32,
+    timestamp           DateTime(0, 'UTC') DEFAULT now(),
+    result              LowCardinality(String),
+    reason              LowCardinality(String),
+    error_msg           String,
+    duration            UInt32,
+    INDEX idx_attempt_num (attempt_num) TYPE minmax GRANULARITY 4,
+    INDEX idx_timestamp (timestamp) TYPE minmax GRANULARITY 4,
+    INDEX idx_result (result) TYPE set(8) GRANULARITY 4,
+    INDEX idx_reason (reason) TYPE set(32) GRANULARITY 4,
+    INDEX idx_duration (duration) TYPE minmax GRANULARITY 4,
+) ENGINE = MergeTree()
+ORDER BY (contract, token_id, attempt_num)
 
 -- Spam Scoring
 CREATE TABLE IF NOT EXISTS spam_scoring (
