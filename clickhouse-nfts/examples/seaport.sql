@@ -55,7 +55,7 @@ SELECT
     count() AS total_sales,
     any(m.name) AS name,
     floor(sum(consideration_amount) / pow(10, 18), 2) AS sales_in_ETH
-FROM seaport_sales as s
+FROM seaport_orders as s
 JOIN erc721_metadata_by_contract AS m ON s.offer_token = m.contract
 WHERE
     offer_item_type = 2 AND -- ERC-721
