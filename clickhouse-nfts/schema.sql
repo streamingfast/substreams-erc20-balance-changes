@@ -405,7 +405,7 @@ CREATE TABLE IF NOT EXISTS scrape_attempts (
     INDEX idx_reason (reason) TYPE set(32) GRANULARITY 4,
     INDEX idx_duration (duration) TYPE minmax GRANULARITY 4,
 ) ENGINE = MergeTree()
-ORDER BY (contract, token_id, attempt_num)
+ORDER BY (contract, token_id, attempt_num);
 
 -- Spam Scoring
 CREATE TABLE IF NOT EXISTS spam_scoring (
