@@ -641,12 +641,15 @@ TO balances AS
 SELECT * FROM native_balance_changes;
 
 -- latest balances by contract/address --
-CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_contract
+CREATE TABLE IF NOT EXISTS balances_by_contract AS balances
 ENGINE = ReplacingMergeTree(global_sequence)
 PRIMARY KEY (contract, address)
-ORDER BY (contract, address)
-AS
+ORDER BY (contract, address);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS balances_by_contract_mv
+TO balances_by_contract AS
 SELECT * FROM balances;
+
 
 -- Historical ERC-20 balances by address/contract --
 CREATE TABLE IF NOT EXISTS historical_balances (
