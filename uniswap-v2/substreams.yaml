@@ -3,7 +3,7 @@ package:
   name: evm_uniswap_v2
   version: v0.1.0
   url: https://githubcom/pinax-network/substreams-evm-tokens
-  description: EVM Token prices Uniswap V2
+  description: Uniswap V2 for EVM
   image: ../image.png
 
 binaries:
@@ -23,6 +23,6 @@ modules:
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:evm.tokens.uniswap.v2.Events
+      type: proto:evm.uniswap.v2.Events
 
 network: mainnet
