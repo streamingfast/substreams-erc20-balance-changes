@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package evm.erc20.stores.v1;
+
+message Events {
+  repeated FirstTransferByContract first_transfer_by_contract = 1;
+}
+
+message FirstTransferByContract {
+  bytes contract = 1;
+}

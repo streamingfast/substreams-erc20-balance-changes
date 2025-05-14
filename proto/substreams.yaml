@@ -5,13 +5,18 @@ package:
 
 protobuf:
   files:
-    - v1/balances.proto
-    - v1/contracts.proto
     - v1/uniswap-v2.proto
     - v1/uniswap-v3.proto
     - v1/ethereum.proto
     - v1/ens.proto
     - v1/seaport.proto
+    - v1/native-transfers.proto
+    - v1/native-balances.proto
+    - v1/erc20-transfers.proto
+    - v1/erc20-balances.proto
+    - v1/erc20-metadata.proto
+    - v1/erc20-supply.proto
+    - v1/erc20-stores.proto
     - v1/erc721.proto
     - v1/erc721-metadata.proto
     - v1/erc1155.proto

@@ -92,16 +92,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "clickhouse"
-version = "0.0.0"
-dependencies = [
- "common",
- "proto",
- "substreams",
- "substreams-database-change",
-]
-
-[[package]]
 name = "clickhouse-contracts"
 version = "0.0.0"
 dependencies = [
@@ -259,17 +249,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "erc20-balances"
-version = "0.0.0"
-dependencies = [
- "common",
- "proto",
- "substreams",
- "substreams-abis",
- "substreams-ethereum",
-]
-
-[[package]]
 name = "erc20-balances-rpc"
 version = "0.0.0"
 dependencies = [
@@ -281,7 +260,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "erc20-contracts"
+name = "erc20-metadata"
+version = "0.0.0"
+dependencies = [
+ "common",
+ "proto",
+ "substreams",
+ "substreams-abis",
+ "substreams-ethereum",
+]
+
+[[package]]
+name = "erc20-metadata-functions"
 version = "0.0.0"
 dependencies = [
  "anyhow",
@@ -298,11 +288,30 @@ dependencies = [
 ]
 
 [[package]]
-name = "erc20-contracts-rpc"
+name = "erc20-stores"
 version = "0.0.0"
 dependencies = [
  "common",
- "erc20-balances",
+ "proto",
+ "substreams",
+]
+
+[[package]]
+name = "erc20-supply"
+version = "0.0.0"
+dependencies = [
+ "common",
+ "proto",
+ "substreams",
+ "substreams-abis",
+ "substreams-ethereum",
+]
+
+[[package]]
+name = "erc20-transfers"
+version = "0.0.0"
+dependencies = [
+ "common",
  "proto",
  "substreams",
  "substreams-abis",
@@ -688,18 +697,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "defc4c55412d89136f966bbb339008b474350e5e6e78d2714439c386b3137a03"
 
 [[package]]
-name = "native-contracts"
+name = "native_balances"
 version = "0.0.0"
 dependencies = [
  "common",
  "proto",
  "substreams",
- "substreams-abis",
  "substreams-ethereum",
 ]
 
 [[package]]
-name = "native_balances"
+name = "native_transfers"
 version = "0.0.0"
 dependencies = [
  "common",
