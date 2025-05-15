@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 > [!IMPORTANT]
-> The [substreams-evm-tokens](https://github.com/pinax-network/substreams-evm-tokens?tab=readme-ov-file#evm-tokens-substreams) is a forked and improved version of this repository, users should check it out first.
+> Repository [substreams-evm-tokens](https://github.com/pinax-network/substreams-evm-tokens?tab=readme-ov-file#evm-tokens-substreams) is a forked and improved version of this repository, users should check it out first.
 > 
 > This repository is in maintenance mode.
 
