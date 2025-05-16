@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS ohlc_prices (
    timestamp            DateTime(0, 'UTC') COMMENT 'beginning of the bar',
 
    -- pool --
-   pool                 LowCardinality(FixedString(42)) COMMENT 'pool address',
+   pool                 LowCardinality(String) COMMENT 'pool address',
 
    -- swaps --
    open0                AggregateFunction(argMin, Float64, UInt64),
@@ -21,11 +21,10 @@ CREATE TABLE IF NOT EXISTS ohlc_prices (
    transactions         SimpleAggregateFunction(sum, UInt64) COMMENT 'number of transactions in the window'
 )
 ENGINE = AggregatingMergeTree
-PRIMARY KEY (pool, timestamp)
 ORDER BY (pool, timestamp);
 
 -- Swaps --
-CREATE MATERIALIZED VIEW IF NOT EXISTS ohlc_prices_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices
 TO ohlc_prices
 AS
 SELECT
@@ -46,7 +45,7 @@ SELECT
    sum(toInt256(amount1))     AS net_flow1,
 
    -- universal --
-   uniqState(sender) AS uaw,
+   uniqState(sender) + uniqState(tx_from) AS uaw,
    sum(1) AS transactions
 FROM swaps AS s
 GROUP BY pool, timestamp;
@@ -59,7 +58,7 @@ CREATE TABLE IF NOT EXISTS ohlc_prices_by_contract (
    token                LowCardinality(FixedString(42)) COMMENT 'token address',
 
    -- pool --
-   pool                 LowCardinality(FixedString(42)) COMMENT 'pool address',
+   pool                 LowCardinality(String) COMMENT 'pool address',
 
    -- swaps --
    open                Float64,
@@ -75,11 +74,10 @@ CREATE TABLE IF NOT EXISTS ohlc_prices_by_contract (
    transactions         UInt64
 )
 ENGINE = AggregatingMergeTree
-PRIMARY KEY (token, pool, timestamp)
 ORDER BY (token, pool, timestamp);
 
 -- Swaps --
-CREATE MATERIALIZED VIEW IF NOT EXISTS ohlc_prices_by_contract_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices_by_contract
 TO ohlc_prices_by_contract
 AS
 -- Get pools for token contract
@@ -110,7 +108,7 @@ ranked_pools AS (
         uniqMerge(o.uaw) AS uaw,
         sum(o.transactions) AS transactions,
         row_number() OVER (PARTITION BY token, timestamp ORDER BY uniqMerge(o.uaw) + sum(o.transactions) DESC) AS rank
-    FROM ohlc_prices_mv AS o
+    FROM mv_ohlc_prices AS o
     JOIN tokens ON o.pool = tokens.pool
     GROUP BY token, is_first_token, pool, timestamp
 )

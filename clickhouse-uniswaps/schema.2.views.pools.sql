@@ -11,9 +11,11 @@ CREATE TABLE IF NOT EXISTS pools (
    -- transaction --
    tx_hash              FixedString(66),
 
-   -- swaps --
+   -- log --
    factory              FixedString(42) COMMENT 'factory address', -- log.address
-   pool                 FixedString(42) COMMENT 'pool address',
+
+   -- event --
+   pool                 String COMMENT 'pool address',
    token0               FixedString(42) COMMENT 'token0 address',
    token1               FixedString(42) COMMENT 'token1 address',
    fee                  UInt32 COMMENT 'pool fee (e.g., 3000 represents 0.30%)',
@@ -31,7 +33,7 @@ ENGINE = ReplacingMergeTree(global_sequence)
 ORDER BY (pool, factory);
 
 -- Uniswap::V2::Factory:PairCreated --
-CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v2_pairs_created_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_uniswap_v2_pair_created
 TO pools AS
 SELECT
    block_num,
@@ -45,10 +47,10 @@ SELECT
    token1,
    3000 AS fee, -- default Uniswap V2 fee
    'uniswap_v2' AS protocol
-FROM uniswap_v2_pairs_created;
+FROM uniswap_v2_pair_created;
 
 -- Uniswap::V3::Factory:PoolCreated --
-CREATE MATERIALIZED VIEW IF NOT EXISTS uniswap_v3_pools_created_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_uniswap_v3_pool_created
 TO pools AS
 SELECT
    block_num,
@@ -62,4 +64,30 @@ SELECT
    token1,
    fee,
    'uniswap_v3' AS protocol
-FROM uniswap_v3_pools_created;
+FROM uniswap_v3_pool_created;
+
+-- Uniswap::V4::IPoolManager:Initialize --
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_uniswap_v4_initialize
+TO pools AS
+SELECT
+   -- block --
+   block_num,
+   block_hash,
+   timestamp,
+
+   -- ordering --
+   global_sequence,
+
+   -- transaction --
+   tx_hash,
+
+   -- log --
+   address AS factory,
+
+   -- event --
+   id as pool,
+   currency0 as token0,
+   currency1 as token1,
+   fee,
+   'uniswap_v4' AS protocol
+FROM uniswap_v4_initialize;
