@@ -83,6 +83,7 @@ ORDER BY id;
 
 - `docker-compose.yaml` - Docker Compose configuration for the cluster
 - `clickhouse-configs/` - Configuration files for ClickHouse nodes
+- `data1/` and `data2/` - Directories used to persist data for ClickHouse nodes; mounted as volumes in the Docker Compose setup
 - `up.sh` - Script to start containers (with optional data cleanup)
 - `run_substreams_sql.sh` - Script to run the Substreams SQL sink
 - `delete_db.sh` - Script to delete the database
