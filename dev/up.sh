@@ -31,12 +31,13 @@ docker-compose down
 if [ "$CLEAN" = true ]; then
   echo "🧹 Cleaning data directories..."
   rm -rf data1 data2 data
+  mkdir data1 data2
   echo "✅ Data directories cleaned"
 fi
 
 # Start the containers
 echo "🚀 Starting ClickHouse cluster..."
-docker-compose up -d
+docker-compose -p clickhouse-cluster up -d
 
 # Wait for ClickHouse to be ready
 echo "⏳ Waiting for ClickHouse to be ready..."

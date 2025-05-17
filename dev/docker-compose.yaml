@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   zookeeper:
     image: zookeeper:3.7
@@ -7,7 +6,7 @@ services:
       - "2181:2181"
 
   clickhouse01:
-    image: clickhouse/clickhouse-server:22.8.5.29
+    image: clickhouse/clickhouse-server:25.4
     container_name: clickhouse01
     depends_on:
       - zookeeper
@@ -24,7 +23,7 @@ services:
       - ./clickhouse-configs/config1.xml:/etc/clickhouse-server/config.xml:ro
 
   clickhouse02:
-    image: clickhouse/clickhouse-server:latest
+    image: clickhouse/clickhouse-server:25.4
     container_name: clickhouse02
     depends_on:
       - zookeeper
