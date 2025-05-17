@@ -21,7 +21,7 @@ services:
     volumes:
       - ./data1:/var/lib/clickhouse
       - ./clickhouse-configs/config.xml:/etc/clickhouse-server/config.xml:ro
-      - ./clickhouse-configs/clusters.xml:/etc/clickhouse-server/config.d/clusters.xml:ro
+      - ./clickhouse-configs/config.d:/etc/clickhouse-server/config.d:ro
 
   clickhouse02:
     image: clickhouse/clickhouse-server:latest
@@ -38,4 +38,4 @@ services:
     volumes:
       - ./data2:/var/lib/clickhouse
       - ./clickhouse-configs/config.xml:/etc/clickhouse-server/config.xml:ro
-      - ./clickhouse-configs/clusters.xml:/etc/clickhouse-server/config.d/clusters.xml:ro
+      - ./clickhouse-configs/config.d:/etc/clickhouse-server/config.d:ro

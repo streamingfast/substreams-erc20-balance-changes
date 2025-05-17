@@ -10,7 +10,7 @@ build
 buf.gen.yaml
 substreams-sink-sql
 cluster*
-!dev/clickhouse-configs/clusters.xml
+!dev/clickhouse-configs/config.d/clusters.xml
 data
 data1
 data2
