@@ -33,17 +33,17 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS mv_erc20_metadata_changes
 TO erc20_metadata AS
 SELECT
     -- block --
-    block_num,
-    timestamp,
+    c.block_num as block_num,
+    c.timestamp as timestamp,
 
     -- event--
-    address,
+    c.address AS address,
 
     -- replace empty strings with NULLs --
-    IF (name = '', Null, name) AS name,
-    IF (symbol = '', Null, symbol) AS symbol
-FROM erc20_metadata_changes
-WHERE address IN erc20_metadata_initialize.address; -- address must already be initialized
+    IF (c.name = '', Null, c.name) AS name,
+    IF (c.symbol = '', Null, c.symbol) AS symbol
+FROM erc20_metadata_changes AS c
+JOIN erc20_metadata_initialize USING (address); -- address must already be initialized
 
 -- one time INSERT to populate Native contract --
 INSERT INTO erc20_metadata (
