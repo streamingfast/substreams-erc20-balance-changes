@@ -7,7 +7,7 @@ services:
       - "2181:2181"
 
   clickhouse01:
-    image: clickhouse/clickhouse-server:latest
+    image: clickhouse/clickhouse-server:22.8.5.29
     container_name: clickhouse01
     depends_on:
       - zookeeper
