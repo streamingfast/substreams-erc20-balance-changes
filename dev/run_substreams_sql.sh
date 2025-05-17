@@ -17,7 +17,7 @@ until docker exec clickhouse01 clickhouse-client --user $CH_USERNAME --password 
 done
 
 echo "⛏️ ClickHouse is ready. Creating database if not exists..."
-docker exec clickhouse01 clickhouse-client --user $CH_USERNAME --password $CH_PASSWORD --query "CREATE DATABASE IF NOT EXISTS $CH_DATABASE;"
+docker exec clickhouse01 clickhouse-client --user $CH_USERNAME --password $CH_PASSWORD --query "CREATE DATABASE IF NOT EXISTS $CH_DATABASE ${CH_CLUSTER:+ON CLUSTER $CH_CLUSTER};"
 
 echo "🏗️ Running substreams-sink-sql setup..."
 # Determine if SPKG is a local file or a URL

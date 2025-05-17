@@ -8,7 +8,7 @@
     <http_port>8123</http_port>
     <listen_host>0.0.0.0</listen_host>
 
-    <!-- Cluster configuration (moved from clusters.xml) -->
+    <!-- Cluster configuration -->
     <remote_servers>
         <dev1>
             <shard>
@@ -40,6 +40,11 @@
         <replicas_path>/clickhouse/task_queue/replicas</replicas_path>
     </distributed_ddl>
 
+    <!-- Macros for substitutions -->
+    <macros>
+        <shard>02</shard>
+        <replica>01</replica>
+    </macros>
 
     <!-- Standard settings for production -->
     <max_connections>4096</max_connections>

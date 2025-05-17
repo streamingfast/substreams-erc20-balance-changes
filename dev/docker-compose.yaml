@@ -20,7 +20,7 @@ services:
       - "9000:9000"
     volumes:
       - ./data1:/var/lib/clickhouse
-      - ./clickhouse-configs/config.xml:/etc/clickhouse-server/config.xml:ro
+      - ./clickhouse-configs/config1.xml:/etc/clickhouse-server/config.xml:ro
 
   clickhouse02:
     image: clickhouse/clickhouse-server:latest
@@ -36,4 +36,4 @@ services:
       - "9001:9000"
     volumes:
       - ./data2:/var/lib/clickhouse
-      - ./clickhouse-configs/config.xml:/etc/clickhouse-server/config.xml:ro
+      - ./clickhouse-configs/config2.xml:/etc/clickhouse-server/config.xml:ro
