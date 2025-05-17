@@ -16,10 +16,10 @@ until docker exec clickhouse clickhouse-client --user $CH_USERNAME --password $C
   sleep 2
 done
 
-echo "ClickHouse is ready. Creating database if not exists..."
+echo "⛏️ ClickHouse is ready. Creating database if not exists..."
 docker exec clickhouse clickhouse-client --user $CH_USERNAME --password $CH_PASSWORD --query "CREATE DATABASE IF NOT EXISTS $CH_DATABASE;"
 
-echo "Running substreams-sink-sql setup..."
+echo "🏗️ Running substreams-sink-sql setup..."
 # Determine if SPKG is a local file or a URL
 if [[ "$SPKG" =~ ^https?:// ]]; then
   # Remote SPKG - no mount needed
@@ -44,7 +44,7 @@ docker run --rm \
 
 # Run the substreams sink
 
-echo "Running substreams-sink-sql run..."
+echo "🏃‍♂️ Running substreams-sink-sql run..."
 # Determine if SPKG is a local file or a URL
 if [[ "$SPKG" =~ ^https?:// ]]; then
   # Remote SPKG - no mount needed
