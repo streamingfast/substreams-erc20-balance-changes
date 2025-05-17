@@ -14,7 +14,7 @@ services:
     environment:
       - CLICKHOUSE_DB=default
       - CLICKHOUSE_USER=default
-      - CLICKHOUSE_PASSWORD=
+      - CLICKHOUSE_PASSWORD=default
     ports:
       - "8123:8123"
       - "9000:9000"
@@ -31,7 +31,7 @@ services:
     environment:
       - CLICKHOUSE_DB=default
       - CLICKHOUSE_USER=default
-      - CLICKHOUSE_PASSWORD=
+      - CLICKHOUSE_PASSWORD=default
     ports:
       - "8124:8123"
       - "9001:9000"

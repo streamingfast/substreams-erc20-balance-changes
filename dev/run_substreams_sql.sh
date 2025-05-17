@@ -11,13 +11,13 @@ fi
 
 
 # Wait for ClickHouse to be ready
-until docker exec clickhouse clickhouse-client --user $CH_USERNAME --password $CH_PASSWORD --query "SELECT 1" &>/dev/null; do
+until docker exec clickhouse01 clickhouse-client --user $CH_USERNAME --password $CH_PASSWORD --query "SELECT 1" &>/dev/null; do
   echo "Waiting for ClickHouse to be ready..."
   sleep 2
 done
 
 echo "⛏️ ClickHouse is ready. Creating database if not exists..."
-docker exec clickhouse clickhouse-client --user $CH_USERNAME --password $CH_PASSWORD --query "CREATE DATABASE IF NOT EXISTS $CH_DATABASE;"
+docker exec clickhouse01 clickhouse-client --user $CH_USERNAME --password $CH_PASSWORD --query "CREATE DATABASE IF NOT EXISTS $CH_DATABASE;"
 
 echo "🏗️ Running substreams-sink-sql setup..."
 # Determine if SPKG is a local file or a URL
