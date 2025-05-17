@@ -7,10 +7,10 @@
     <tcp_port>9000</tcp_port>
     <http_port>8123</http_port>
     <listen_host>0.0.0.0</listen_host>
-    
+
     <!-- Cluster configuration (moved from clusters.xml) -->
     <remote_servers>
-        <my_cluster>
+        <dev1>
             <shard>
                 <replica>
                     <host>clickhouse01</host>
@@ -23,9 +23,9 @@
                     <port>9000</port>
                 </replica>
             </shard>
-        </my_cluster>
+        </dev1>
     </remote_servers>
-    
+
     <!-- ZooKeeper configuration -->
     <zookeeper>
         <node index="1">
@@ -33,7 +33,14 @@
             <port>2181</port>
         </node>
     </zookeeper>
-    
+
+    <!-- Distributed DDL configuration -->
+    <distributed_ddl>
+        <path>/clickhouse/task_queue/ddl</path>
+        <replicas_path>/clickhouse/task_queue/replicas</replicas_path>
+    </distributed_ddl>
+
+
     <!-- Standard settings for production -->
     <max_connections>4096</max_connections>
     <keep_alive_timeout>10</keep_alive_timeout>
