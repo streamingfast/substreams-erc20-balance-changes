@@ -2,22 +2,12 @@
 
 set -e
 
-# Configurable variables
-CH_USERNAME="default"
-CH_PASSWORD="default"
-CH_DATABASE="testdb"
-CH_HOSTNAME="localhost"
-# CH_CLUSTER="dev1"
-SQL_SINK_IMAGE="ghcr.io/yaroshkvorets/substreams-sink-sql:v4.6.2-patched-ch-go"
-# can be local spkg/yaml file or URL
-SPKG="https://github.com/pinax-network/substreams-evm-tokens/releases/download/uniswaps-v0.1.2/evm-uniswaps-v0.1.2.spkg"
-CURSOR_TABLE_PREFIX="backfill"
-START_BLOCK="20000000"
-STOP_BLOCK="20100000"
-ENDPOINT="eth.substreams.pinax.network:443"
-SUBSTREAMS_WORKERS="10"
-OTHER_ARGS=""
-SUBSTREAMS_API_TOKEN="${SUBSTREAMS_API_TOKEN:-}"
+# Load config from .env if present
+if [ -f "$(dirname "$0")/.env" ]; then
+  set -o allexport
+  source "$(dirname "$0")/.env"
+  set +o allexport
+fi
 
 
 # Wait for ClickHouse to be ready
