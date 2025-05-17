@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<yandex>
+    <logger>
+        <level>information</level>
+        <console>true</console>
+    </logger>
+    <tcp_port>9000</tcp_port>
+    <http_port>8123</http_port>
+    <listen_host>0.0.0.0</listen_host>
+    <include_from>/etc/clickhouse-server/config.d/*.xml</include_from>
+    <zookeeper>
+        <node index="1">
+            <host>zookeeper</host>
+            <port>2181</port>
+        </node>
+    </zookeeper>
+</yandex>

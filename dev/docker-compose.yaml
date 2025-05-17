@@ -1,15 +1,41 @@
 version: '3.8'
 services:
-  clickhouse:
+  zookeeper:
+    image: zookeeper:3.7
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+
+  clickhouse01:
     image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse
-    init: true
+    container_name: clickhouse01
+    depends_on:
+      - zookeeper
     environment:
       - CLICKHOUSE_DB=default
       - CLICKHOUSE_USER=default
-      - CLICKHOUSE_PASSWORD=default
+      - CLICKHOUSE_PASSWORD=
     ports:
       - "8123:8123"
       - "9000:9000"
     volumes:
-      - ./data:/var/lib/clickhouse
+      - ./data1:/var/lib/clickhouse
+      - ./clickhouse-configs/config.xml:/etc/clickhouse-server/config.xml:ro
+      - ./clickhouse-configs/clusters.xml:/etc/clickhouse-server/config.d/clusters.xml:ro
+
+  clickhouse02:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse02
+    depends_on:
+      - zookeeper
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+    ports:
+      - "8124:8123"
+      - "9001:9000"
+    volumes:
+      - ./data2:/var/lib/clickhouse
+      - ./clickhouse-configs/config.xml:/etc/clickhouse-server/config.xml:ro
+      - ./clickhouse-configs/clusters.xml:/etc/clickhouse-server/config.d/clusters.xml:ro
