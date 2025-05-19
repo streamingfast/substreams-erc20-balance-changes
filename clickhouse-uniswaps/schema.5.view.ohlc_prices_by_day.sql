@@ -1,9 +1,9 @@
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices_since_initialize
--- REFRESH EVERY 1 HOUR OFFSET 10 MINUTE
-TO ohlc_prices_since_initialize
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices_by_day
+REFRESH EVERY 1 DAY OFFSET 10 MINUTE APPEND
+TO ohlc_prices_by_day
 AS
 SELECT
-    min(timestamp) AS timestamp,
+    toStartOfDay(timestamp) AS timestamp,
 
     -- pool --
     pool,
@@ -41,4 +41,4 @@ SELECT
     uniqMerge(uaw) AS uaw,
     sum(transactions) AS transactions
 FROM ohlc_prices
-GROUP BY pool;
+GROUP BY pool, timestamp;

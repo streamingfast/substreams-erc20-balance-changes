@@ -1428,6 +1428,149 @@ ENGINE = ReplacingMergeTree
 ORDER BY (pool);
 
 
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices
+REFRESH EVERY 1 HOUR OFFSET 5 MINUTE APPEND
+TO ohlc_prices
+AS
+WITH
+    any(p.token0) AS t0,
+    any(p.token1) AS t1,
+    pow(10, m0.decimals) AS scale0,
+    pow(10, m1.decimals) AS scale1
+SELECT
+    toStartOfHour(s.timestamp)  AS timestamp,
+    s.pool                      AS pool,
+    any(s.protocol)             AS protocol,
+
+    -- token0 erc20 metadata --
+    t0                      AS token0,
+    any(m0.decimals)        AS decimals0,
+    any(m0.symbol)          AS symbol0,
+    any(m0.name)            AS name0,
+
+    -- token1 erc20 metadata --
+    t1                      AS token1,
+    any(m1.decimals)        AS decimals1,
+    any(m1.symbol)          AS symbol1,
+    any(m1.name)            AS name1,
+
+    -- canonical pair --
+    if(t0 < t1, t0, t1) AS canonical0,
+    if(t0 < t1, t1, t0) AS canonical1,
+
+    -- swaps --
+    argMinState(s.price * scale0 / scale1, s.global_sequence)                AS open0,
+    quantileDeterministicState(s.price * scale0 / scale1, s.global_sequence) AS quantile0,
+    argMaxState(s.price * scale0 / scale1, s.global_sequence)                AS close0,
+
+    -- volume --
+    sum(abs(s.amount0) / scale0)        AS gross_volume0,
+    sum(abs(s.amount1) / scale1)        AS gross_volume1,
+    sum(s.amount0 / scale0)             AS net_flow0,
+    sum(s.amount1 / scale1)             AS net_flow1,
+
+    -- universal --
+    uniqState(s.tx_from)                AS uaw,
+    count()                             AS transactions
+FROM swaps AS s
+JOIN pools AS p USING (pool)
+JOIN erc20_metadata AS m0 ON m0.address = p.token0
+JOIN erc20_metadata AS m1 ON m1.address = p.token1
+GROUP BY pool, timestamp;
+
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices_by_day
+REFRESH EVERY 1 DAY OFFSET 10 MINUTE APPEND
+TO ohlc_prices_by_day
+AS
+SELECT
+    toStartOfDay(timestamp) AS timestamp,
+
+    -- pool --
+    pool,
+    any(protocol) as protocol,
+
+    -- tokens0 erc20 metadata --
+    any(token0) as token0,
+    any(decimals0) as decimals0,
+    any(symbol0) as symbol0,
+    any(name0) as name0,
+
+    -- tokens1 erc20 metadata --
+    any(token1) as token1,
+    any(decimals1) as decimals1,
+    any(symbol1) as symbol1,
+    any(name1) as name1,
+
+    -- canonical pair (token0, token1) lexicographic order --
+    any(canonical0) as canonical0,
+    any(canonical1) as canonical1,
+
+    -- token0 swaps --
+    argMinMerge(open0) AS open0,
+    quantileDeterministicMerge(0.95)(quantile0) AS high0,
+    quantileDeterministicMerge(0.05)(quantile0) AS low0,
+    argMaxMerge(close0) AS close0,
+
+    -- volume --
+    sum(gross_volume0) AS gross_volume0,
+    sum(gross_volume1) AS gross_volume1,
+    sum(net_flow0) AS net_flow0,
+    sum(net_flow1) AS net_flow1,
+
+    -- universal --
+    uniqMerge(uaw) AS uaw,
+    sum(transactions) AS transactions
+FROM ohlc_prices
+GROUP BY pool, timestamp;
+
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices_since_initialize
+REFRESH EVERY 1 HOUR OFFSET 10 MINUTE APPEND
+TO ohlc_prices_since_initialize
+AS
+SELECT
+    min(timestamp) AS timestamp,
+
+    -- pool --
+    pool,
+    any(protocol) as protocol,
+
+    -- tokens0 erc20 metadata --
+    any(token0) as token0,
+    any(decimals0) as decimals0,
+    any(symbol0) as symbol0,
+    any(name0) as name0,
+
+    -- tokens1 erc20 metadata --
+    any(token1) as token1,
+    any(decimals1) as decimals1,
+    any(symbol1) as symbol1,
+    any(name1) as name1,
+
+    -- canonical pair (token0, token1) lexicographic order --
+    any(canonical0) as canonical0,
+    any(canonical1) as canonical1,
+
+    -- token0 swaps --
+    argMinMerge(open0) AS open0,
+    quantileDeterministicMerge(0.95)(quantile0) AS high0,
+    quantileDeterministicMerge(0.05)(quantile0) AS low0,
+    argMaxMerge(close0) AS close0,
+
+    -- volume --
+    sum(gross_volume0) AS gross_volume0,
+    sum(gross_volume1) AS gross_volume1,
+    sum(net_flow0) AS net_flow0,
+    sum(net_flow1) AS net_flow1,
+
+    -- universal --
+    uniqMerge(uaw) AS uaw,
+    sum(transactions) AS transactions
+FROM ohlc_prices
+GROUP BY pool;
+
+
 CREATE TABLE IF NOT EXISTS cursors
 (
     id        String,
