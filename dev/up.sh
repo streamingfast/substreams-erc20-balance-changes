@@ -25,7 +25,7 @@ done
 
 # Stop any running containers
 echo "📥 Stopping any running containers..."
-docker-compose down
+docker-compose -p clickhouse-cluster down
 
 # Clean data directories if -c flag is used
 if [ "$CLEAN" = true ]; then
