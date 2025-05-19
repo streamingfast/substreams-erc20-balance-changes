@@ -58,6 +58,7 @@ ENGINE = AggregatingMergeTree
 ORDER BY (pool, timestamp);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices
+REFRESH EVERY 1 HOUR OFFSET 5 MINUTE
 TO ohlc_prices
 AS
 WITH

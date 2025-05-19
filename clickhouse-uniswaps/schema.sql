@@ -1353,6 +1353,7 @@ ENGINE = AggregatingMergeTree
 ORDER BY (pool, timestamp);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices
+REFRESH EVERY 1 HOUR OFFSET 5 MINUTE
 TO ohlc_prices
 AS
 WITH
@@ -1472,6 +1473,7 @@ ENGINE = ReplacingMergeTree
 ORDER BY (pool, timestamp);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices_by_day
+REFRESH EVERY 1 DAY OFFSET 10 MINUTE
 TO ohlc_prices_by_day
 AS
 SELECT
@@ -1522,6 +1524,7 @@ ENGINE = ReplacingMergeTree
 ORDER BY (pool);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_ohlc_prices_since_initialize
+REFRESH EVERY 1 HOUR OFFSET 10 MINUTE
 TO ohlc_prices_since_initialize
 AS
 SELECT
