@@ -7,7 +7,7 @@ package:
   image: ../image.png
 
 imports:
-  erc20: ../erc20/evm-erc20-v0.1.0.spkg
+  erc20_transfers: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.1.0/evm-erc20-transfers-v0.1.0.spkg
 
 protobuf:
   files:
@@ -24,7 +24,7 @@ modules:
   - name: map_events
     kind: map
     inputs:
-      - map: erc20:map_events
+      - map: erc20_transfers:map_events
     output:
       type: proto:evm.erc20.balances.v1.Events
 

@@ -1,5 +1,5 @@
 [package]
-name = "clickhouse"
+name = "tokens"
 description = { workspace = true }
 edition = { workspace = true }
 version = { workspace = true }

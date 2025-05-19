@@ -5,7 +5,7 @@ use substreams::{log, scalar::BigInt, Hex};
 use substreams_abis::evm::token::erc20;
 use substreams_ethereum::rpc::RpcBatch;
 
-static CHUNK_SIZE: usize = 100;
+static CHUNK_SIZE: usize = 25;
 
 // Returns the token URI.
 pub fn batch_balance_of(contract_owners: Vec<(Address, Address)>) -> HashMap<(Address, Address), BigInt> {
