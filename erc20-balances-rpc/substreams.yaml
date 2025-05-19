@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_erc20_balances_rpc
-  version: v0.1.0
+  version: v0.1.1
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: ERC20 balance changes via RPC
   image: ../image.png
@@ -24,8 +24,12 @@ modules:
   - name: map_events
     kind: map
     inputs:
+      - params: string
       - map: erc20_transfers:map_events
     output:
       type: proto:evm.erc20.balances.v1.Events
 
 network: mainnet
+
+params:
+  map_events: 25 # CHUNK_SIZE (Batch RPC Calls)
