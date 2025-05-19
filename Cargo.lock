@@ -1479,16 +1479,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tokens"
-version = "0.0.0"
-dependencies = [
- "common",
- "proto",
- "substreams",
- "substreams-database-change",
-]
-
-[[package]]
 name = "toml_datetime"
 version = "0.6.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
