@@ -183,6 +183,11 @@ CREATE TABLE IF NOT EXISTS native_balance_changes  (
 ENGINE = ReplacingMergeTree
 ORDER BY (address, block_num);
 
+-- Exclude gas fees from primary Clickhouse DB --
+CREATE TABLE IF NOT EXISTS native_balance_changes_from_gas AS native_balance_changes
+ENGINE = ReplacingMergeTree
+ORDER BY (address, block_num);
+
 
 -- Native transfers --
 CREATE TABLE IF NOT EXISTS native_transfers  (
@@ -214,17 +219,11 @@ CREATE TABLE IF NOT EXISTS native_transfers  (
 ENGINE = ReplacingMergeTree
 ORDER BY (timestamp, block_num, `index`);
 
+-- Exclude gas fees from primary Clickhouse DB --
 CREATE TABLE IF NOT EXISTS native_transfers_from_fees AS native_transfers
 ENGINE = ReplacingMergeTree
 ORDER BY (timestamp, block_num, `index`);
 
-CREATE TABLE IF NOT EXISTS native_transfers_from_block_rewards AS native_transfers
-ENGINE = ReplacingMergeTree
-ORDER BY (timestamp, block_num, `index`);
-
-CREATE TABLE IF NOT EXISTS native_transfers_from_calls AS native_transfers
-ENGINE = ReplacingMergeTree
-ORDER BY (timestamp, block_num, `index`);
 
 -- latest ERC-20 Metadata --
 CREATE TABLE IF NOT EXISTS erc20_metadata  (
@@ -294,19 +293,84 @@ VALUES (
 );
 
 -- latest balances by owner/contract --
-CREATE TABLE IF NOT EXISTS balances AS erc20_balance_changes
+CREATE TABLE IF NOT EXISTS balances  (
+    -- block --
+    block_num            UInt32,
+    block_hash           FixedString(66),
+    timestamp            DateTime(0, 'UTC'),
+
+    -- event --
+    contract             FixedString(42),
+    address              FixedString(42),
+    balance              Float64,
+    balance_raw          UInt256,
+
+    -- erc20 metadata --
+    decimals             UInt8,
+    symbol               Nullable(String),
+    name                 Nullable(String),
+
+    -- indexes --
+    INDEX idx_block_num          (block_num)           TYPE minmax GRANULARITY 4,
+    INDEX idx_timestamp          (timestamp)           TYPE minmax GRANULARITY 4,
+
+    -- indexes (event) --
+    INDEX idx_contract           (contract)            TYPE set(64) GRANULARITY 4,
+    INDEX idx_address            (address)             TYPE bloom_filter GRANULARITY 4,
+    INDEX idx_balance            (balance)             TYPE minmax GRANULARITY 4,
+
+    -- indexes (erc20 metadata) --
+    INDEX idx_decimals           (decimals)            TYPE set(32) GRANULARITY 4,
+    INDEX idx_symbol             (symbol)              TYPE set(64) GRANULARITY 4,
+    INDEX idx_name               (name)                TYPE set(64) GRANULARITY 4
+)
 ENGINE = ReplacingMergeTree(block_num)
 ORDER BY (address, contract);
 
 -- insert ERC20 balance changes --
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_erc20_balances
 TO balances AS
-SELECT * FROM erc20_balance_changes;
+SELECT
+    -- block --
+    b.block_num AS block_num,
+    b.block_hash AS block_hash,
+    b.timestamp AS timestamp,
+
+    -- event --
+    b.contract AS contract,
+    b.address AS address,
+    b.balance / pow(10, m.decimals) AS balance,
+    b.balance AS balance_raw,
+
+    -- erc20 metadata --
+    m.decimals AS decimals,
+    m.symbol AS symbol,
+    m.name AS name
+
+FROM erc20_balance_changes AS b
+JOIN erc20_metadata AS m ON m.address = b.contract;
 
 -- insert Native balance changes --
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_native_balances
 TO balances AS
-SELECT * FROM native_balance_changes;
+SELECT
+    -- block --
+    block_num,
+    block_hash,
+    timestamp,
+
+    -- event --
+    '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' AS contract,
+    address,
+    b.balance / pow(10, 18) AS balance,
+    b.balance AS balance_raw,
+
+    -- erc20 metadata --
+    18 AS decimals,
+    'Native' AS symbol,
+    'Native' AS name
+
+FROM native_balance_changes as b;
 
 -- latest balances by contract/address --
 CREATE TABLE IF NOT EXISTS balances_by_contract AS balances
@@ -348,9 +412,6 @@ ORDER BY (address, contract, timestamp);
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_historical_erc20_balances
 TO historical_balances
 AS
-WITH (
-    pow(10, m.decimals) AS scale
-)
 SELECT
     -- block --
     toStartOfHour(timestamp) AS timestamp,
@@ -366,10 +427,10 @@ SELECT
     anyLast(m.name) AS name,
 
     -- ohlc --
-    argMinState(balance, b.block_num) AS open,
-    max(balance) AS high,
-    min(balance) AS low,
-    argMaxState(balance, b.block_num) AS close,
+    argMinState(b.balance, b.block_num) AS open,
+    max(b.balance) AS high,
+    min(b.balance) AS low,
+    argMaxState(b.balance, b.block_num) AS close,
     uniqState(address) AS uaw,
     count() AS transactions
 FROM erc20_balance_changes AS b
@@ -526,78 +587,6 @@ SELECT
     symbol,
     name
 FROM native_transfers;
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_native_transfers_from_block_rewards
-TO transfers AS
-WITH (
-    '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' AS contract,
-    18 AS decimals,
-    'Native' AS symbol,
-    'Native' AS name
-)
-SELECT
-    -- block --
-    timestamp,
-    block_hash,
-    block_num,
-
-    -- ordering --
-    `index`,
-    global_sequence,
-
-    -- transaction --
-    tx_hash,
-
-    -- log --
-    contract,
-
-    -- event --
-    `from`,
-    `to`,
-    value AS amount,
-    value / pow(10, decimals) AS value,
-
-    -- ERC20 metadata --
-    decimals,
-    symbol,
-    name
-FROM native_transfers_from_block_rewards;
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_native_transfers_from_calls
-TO transfers AS
-WITH (
-    '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' AS contract,
-    18 AS decimals,
-    'Native' AS symbol,
-    'Native' AS name
-)
-SELECT
-    -- block --
-    timestamp,
-    block_hash,
-    block_num,
-
-    -- ordering --
-    `index`,
-    global_sequence,
-
-    -- transaction --
-    tx_hash,
-
-    -- log --
-    contract,
-
-    -- event --
-    `from`,
-    `to`,
-    value AS amount,
-    value / pow(10, decimals) AS value,
-
-    -- ERC20 metadata --
-    decimals,
-    symbol,
-    name
-FROM native_transfers_from_calls;
 
 
 CREATE TABLE IF NOT EXISTS cursors

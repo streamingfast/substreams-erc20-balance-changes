@@ -28,14 +28,7 @@ CREATE TABLE IF NOT EXISTS native_transfers  (
 ENGINE = ReplacingMergeTree
 ORDER BY (timestamp, block_num, `index`);
 
+-- Exclude gas fees from primary Clickhouse DB --
 CREATE TABLE IF NOT EXISTS native_transfers_from_fees AS native_transfers
-ENGINE = ReplacingMergeTree
-ORDER BY (timestamp, block_num, `index`);
-
-CREATE TABLE IF NOT EXISTS native_transfers_from_block_rewards AS native_transfers
-ENGINE = ReplacingMergeTree
-ORDER BY (timestamp, block_num, `index`);
-
-CREATE TABLE IF NOT EXISTS native_transfers_from_calls AS native_transfers
 ENGINE = ReplacingMergeTree
 ORDER BY (timestamp, block_num, `index`);

@@ -28,9 +28,6 @@ ORDER BY (address, contract, timestamp);
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_historical_erc20_balances
 TO historical_balances
 AS
-WITH (
-    pow(10, m.decimals) AS scale
-)
 SELECT
     -- block --
     toStartOfHour(timestamp) AS timestamp,
@@ -46,10 +43,10 @@ SELECT
     anyLast(m.name) AS name,
 
     -- ohlc --
-    argMinState(balance, b.block_num) AS open,
-    max(balance) AS high,
-    min(balance) AS low,
-    argMaxState(balance, b.block_num) AS close,
+    argMinState(b.balance, b.block_num) AS open,
+    max(b.balance) AS high,
+    min(b.balance) AS low,
+    argMaxState(b.balance, b.block_num) AS close,
     uniqState(address) AS uaw,
     count() AS transactions
 FROM erc20_balance_changes AS b

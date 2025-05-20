@@ -17,11 +17,11 @@ pub fn process_native_transfers(tables: &mut substreams_database_change::tables:
         index += 1;
     }
     for event in events.extended_transfers_from_block_rewards {
-        process_native_transfer("native_transfers_from_block_rewards", tables, clock, event, index);
+        process_native_transfer("native_transfers", tables, clock, event, index);
         index += 1;
     }
     for event in events.extended_transfers_from_calls {
-        process_native_transfer("native_transfers_from_calls", tables, clock, event, index);
+        process_native_transfer("native_transfers", tables, clock, event, index);
         index += 1;
     }
 }
