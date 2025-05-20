@@ -465,7 +465,7 @@ SELECT
     min(balance) AS low,
     argMaxState(balance, b.block_num) AS close,
     uniqState(address) AS uaw,
-    sumState(1) AS transactions
+    count() AS transactions
 FROM native_balance_changes AS b
 GROUP BY address, timestamp;
 
