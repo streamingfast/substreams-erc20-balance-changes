@@ -79,12 +79,11 @@ JOIN erc20_metadata AS c ON c.address = t.contract;
 -- insert Native transfers --
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_native_transfers
 TO transfers AS
-WITH (
+WITH
     '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' AS contract,
     18 AS decimals,
     'Native' AS symbol,
     'Native' AS name
-)
 SELECT
     -- block --
     timestamp,

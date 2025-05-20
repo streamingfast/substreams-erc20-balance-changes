@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS historical_balances (
     name                SimpleAggregateFunction(anyLast, Nullable(String)),
 
     -- ohlc --
-    open                 AggregateFunction(argMin, UInt256, UInt32),
-    high                 SimpleAggregateFunction(max, UInt256),
-    low                  SimpleAggregateFunction(min, UInt256),
-    close                AggregateFunction(argMax, UInt256, UInt32),
+    open                 AggregateFunction(argMin, Float64, UInt32),
+    high                 SimpleAggregateFunction(max, Float64),
+    low                  SimpleAggregateFunction(min, Float64),
+    close                AggregateFunction(argMax, Float64, UInt32),
     uaw                  AggregateFunction(uniq, FixedString(42)) COMMENT 'unique wallet addresses that changed balance in the window',
     transactions         SimpleAggregateFunction(sum, UInt64) COMMENT 'number of transactions in the window',
 )
@@ -28,6 +28,8 @@ ORDER BY (address, contract, timestamp);
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_historical_erc20_balances
 TO historical_balances
 AS
+WITH
+    b.balance / pow(10, m.decimals) AS balance
 SELECT
     -- block --
     toStartOfHour(timestamp) AS timestamp,
@@ -43,10 +45,10 @@ SELECT
     anyLast(m.name) AS name,
 
     -- ohlc --
-    argMinState(b.balance, b.block_num) AS open,
-    max(b.balance) AS high,
-    min(b.balance) AS low,
-    argMaxState(b.balance, b.block_num) AS close,
+    argMinState(balance, b.block_num) AS open,
+    max(balance) AS high,
+    min(balance) AS low,
+    argMaxState(balance, b.block_num) AS close,
     uniqState(address) AS uaw,
     count() AS transactions
 FROM erc20_balance_changes AS b
@@ -57,6 +59,8 @@ GROUP BY address, contract, timestamp;
 CREATE MATERIALIZED VIEW IF NOT EXISTS mv_historical_native_balances
 TO historical_balances
 AS
+WITH
+    b.balance / pow(10, 18) AS balance
 SELECT
     -- block --
     min(block_num) AS block_num,
