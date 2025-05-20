@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS erc721_approvals_for_all (
 PRIMARY KEY (timestamp, block_num, `index`)
 ORDER BY (timestamp, block_num, `index`);
 
+
 -- ERC721 Token Metadata --
 CREATE TABLE IF NOT EXISTS erc721_metadata_by_contract (
     -- block --
@@ -136,32 +137,15 @@ CREATE TABLE IF NOT EXISTS erc721_metadata_by_contract (
     timestamp            DateTime(0, 'UTC'),
 
     -- log --
-    contract            FixedString(42) COMMENT 'contract address',
+    contract            FixedString(42),
 
     -- metadata --
     symbol              String DEFAULT '',
     name                String DEFAULT '',
-    base_uri            String DEFAULT '',
 
     -- indexes --
     INDEX idx_symbol             (symbol)              TYPE bloom_filter GRANULARITY 4,
-    INDEX idx_name               (name)                TYPE bloom_filter GRANULARITY 4,
-    INDEX idx_base_uri           (base_uri)            TYPE bloom_filter GRANULARITY 4
-
-) ENGINE = ReplacingMergeTree(block_num)
-ORDER BY (contract);
-
-CREATE TABLE IF NOT EXISTS erc721_total_supply (
-    -- block --
-    block_num            UInt32,
-    block_hash           FixedString(66),
-    timestamp            DateTime(0, 'UTC'),
-
-    -- log --
-    contract            FixedString(42) COMMENT 'contract address',
-
-    -- metadata --
-    total_supply        UInt256
+    INDEX idx_name               (name)                TYPE bloom_filter GRANULARITY 4
 
 ) ENGINE = ReplacingMergeTree(block_num)
 ORDER BY (contract);
@@ -173,15 +157,45 @@ CREATE TABLE IF NOT EXISTS erc721_metadata_by_token (
     timestamp            DateTime(0, 'UTC'),
 
     -- log --
-    contract            FixedString(42) COMMENT 'contract address',
-    token_id            UInt256,
+    contract            FixedString(42),
 
     -- metadata --
+    token_id            UInt256,
     uri                 String DEFAULT ''
 ) ENGINE = ReplacingMergeTree(block_num)
 PRIMARY KEY (contract, token_id)
 ORDER BY (contract, token_id);
 
+
+CREATE TABLE IF NOT EXISTS erc721_total_supply (
+    -- block --
+    block_num            UInt32,
+    block_hash           FixedString(66),
+    timestamp            DateTime(0, 'UTC'),
+
+    -- log --
+    contract            FixedString(42),
+
+    -- metadata --
+    total_supply        UInt256
+
+) ENGINE = ReplacingMergeTree(block_num)
+ORDER BY (contract);
+
+CREATE TABLE IF NOT EXISTS erc721_base_uri (
+    -- block --
+    block_num            UInt32,
+    block_hash           FixedString(66),
+    timestamp            DateTime(0, 'UTC'),
+
+    -- log --
+    contract            FixedString(42),
+
+    -- metadata --
+    base_uri            String
+
+) ENGINE = ReplacingMergeTree(block_num)
+ORDER BY (contract);
 
 -- Seaport Order Fulfilled --
 CREATE TABLE IF NOT EXISTS seaport_order_fulfilled (
@@ -414,6 +428,10 @@ ENGINE = ReplacingMergeTree(block_num)
 PRIMARY KEY (contract, token_id)
 ORDER BY (contract, token_id);
 
+CREATE TABLE IF NOT EXISTS erc1155_metadata_by_contract as erc721_metadata_by_contract
+ENGINE = ReplacingMergeTree(block_num)
+PRIMARY KEY (contract)
+ORDER BY (contract);
 
 CREATE TABLE IF NOT EXISTS erc721_owners (
     -- block --
@@ -570,9 +588,7 @@ SELECT
     tupleElement(o, 3) AS token_id,
     tupleElement(o, 4) AS amount
 FROM seaport_order_fulfilled
-LEFT ARRAY JOIN offer AS o
--- ERC721 and ERC1155 --
-WHERE item_type IN (2, 3);
+LEFT ARRAY JOIN offer AS o;
 
 
 CREATE TABLE IF NOT EXISTS seaport_orders (
@@ -665,9 +681,7 @@ SELECT
 
 FROM seaport_order_fulfilled AS f
 LEFT ARRAY JOIN f.offer AS o
-LEFT ARRAY JOIN f.consideration AS c
--- ERC721 and ERC1155 --
-WHERE offer_item_type IN (2, 3);
+LEFT ARRAY JOIN f.consideration AS c;
 
 
 CREATE TABLE IF NOT EXISTS erc1155_balances (
