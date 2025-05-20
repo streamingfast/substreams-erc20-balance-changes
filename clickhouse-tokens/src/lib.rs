@@ -4,6 +4,7 @@ mod erc20_supply;
 mod erc20_transfers;
 mod native_balances;
 mod native_transfers;
+use common::update_genesis_clock;
 use proto::pb::evm::erc20;
 use proto::pb::evm::native;
 use substreams::{errors::Error, pb::substreams::Clock};
@@ -24,6 +25,7 @@ pub fn db_out(
     erc20_metadata_functions: erc20::metadata::v1::Events,
 ) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
+    clock = update_genesis_clock(clock);
 
     // -- ERC20 Metadata --
     erc20_metadata::process_erc20_metadata(&mut tables, &clock, erc20_metadata);

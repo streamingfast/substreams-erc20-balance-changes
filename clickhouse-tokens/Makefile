@@ -12,7 +12,7 @@ pack: build
 
 .PHONY: noop
 noop: build
-	substreams-sink-noop $(ENDPOINT) substreams.yaml db_out -H "X-Sf-Substreams-Parallel-Jobs: 500"
+	substreams-sink-noop $(ENDPOINT) https://github.com/pinax-network/substreams-evm-tokens/releases/download/clickhouse-tokens-v1.13.0/evm-clickhouse-tokens-v1.13.0.spkg db_out -H "X-Sf-Substreams-Parallel-Jobs: 500"
 
 .PHONY: gui
 gui: build
