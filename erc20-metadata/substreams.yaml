@@ -30,3 +30,6 @@ modules:
       type: proto:evm.erc20.metadata.v1.Events
 
 network: mainnet
+
+params:
+  map_events: 25 # CHUNK_SIZE (Batch RPC Calls)
