@@ -8,11 +8,9 @@ use substreams::log;
 
 use crate::calls::{batch_name, batch_symbol, batch_uri};
 
-static DEFAULT_CHUNK_SIZE: usize = 25;
-
 #[substreams::handlers::map]
 fn map_events(params: String, erc1155_transfers: events::Events) -> Result<erc1155::Events, substreams::errors::Error> {
-    let chunk_size = params.parse::<usize>().unwrap_or(DEFAULT_CHUNK_SIZE);
+    let chunk_size = params.parse::<usize>().expect("Failed to parse chunk size");
     let mut events = erc1155::Events::default();
 
     // Collect unique contracts and token IDs

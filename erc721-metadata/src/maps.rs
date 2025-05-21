@@ -8,11 +8,9 @@ use substreams::scalar::BigInt;
 
 use crate::calls::{batch_base_uri, batch_name, batch_symbol, batch_token_uri, batch_total_supply};
 
-static DEFAULT_CHUNK_SIZE: usize = 25;
-
 #[substreams::handlers::map]
 fn map_events(params: String, erc721_transfers: ERC721Transfers) -> Result<Events, substreams::errors::Error> {
-    let chunk_size = params.parse::<usize>().unwrap_or(DEFAULT_CHUNK_SIZE);
+    let chunk_size = params.parse::<usize>().expect("Failed to parse chunk size");
     let mut events = Events::default();
     let mints: Vec<Transfer> = get_mints(erc721_transfers.transfers).collect();
 
