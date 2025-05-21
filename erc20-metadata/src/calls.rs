@@ -6,12 +6,10 @@ use substreams_abis::evm::token::erc20;
 use substreams_abis::evm::tokens::sai;
 use substreams_ethereum::rpc::RpcBatch;
 
-static CHUNK_SIZE: usize = 100;
-
 // Returns the token collection name.
-pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
-    let mut results: HashMap<Address, String> = HashMap::new();
-    for chunks in contracts.chunks(CHUNK_SIZE) {
+pub fn batch_name<'a>(contracts: &'a [&Address], chunk_size: usize) -> HashMap<&'a Address, String> {
+    let mut results: HashMap<&'a Address, String> = HashMap::new();
+    for chunks in contracts.chunks(chunk_size / 2) {
         let batch = chunks.iter().fold(RpcBatch::new(), |batch, address| {
             batch
                 .add(erc20::functions::Name {}, address.to_vec())
@@ -23,7 +21,7 @@ pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
             if let Some(name) = RpcBatch::decode::<String, erc20::functions::Name>(&responses[i * 2]) {
                 // Handle empty
                 if let Some(name) = parse_string(&name) {
-                    results.insert(address.to_vec(), name);
+                    results.insert(address, name);
                     continue;
                 } else {
                     substreams::log::info!("Empty name for address={:?}", Hex::encode(address));
@@ -40,7 +38,7 @@ pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
                 if name.is_empty() {
                     substreams::log::info!("Empty name for address={:?}", Hex::encode(address));
                 } else {
-                    results.insert(address.to_vec(), name);
+                    results.insert(address, name);
                     continue;
                 }
             } else {
@@ -51,9 +49,9 @@ pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
     results
 }
 
-pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
-    let mut results: HashMap<Address, String> = HashMap::new();
-    for chunks in contracts.chunks(CHUNK_SIZE) {
+pub fn batch_symbol<'a>(contracts: &'a [&Address], chunk_size: usize) -> HashMap<&'a Address, String> {
+    let mut results: HashMap<&'a Address, String> = HashMap::new();
+    for chunks in contracts.chunks(chunk_size / 2) {
         let batch = chunks.iter().fold(RpcBatch::new(), |batch, address| {
             batch
                 .add(erc20::functions::Symbol {}, address.to_vec())
@@ -65,7 +63,7 @@ pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
             if let Some(symbol) = RpcBatch::decode::<String, erc20::functions::Symbol>(&responses[i * 2]) {
                 // Handle empty symbol
                 if let Some(symbol) = parse_string(&symbol) {
-                    results.insert(address.to_vec(), symbol);
+                    results.insert(address, symbol);
                     continue;
                 } else {
                     substreams::log::info!("Empty symbol for address={:?}", Hex::encode(address));
@@ -80,7 +78,7 @@ pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
 
                 // Handle empty symbol
                 if let Some(symbol) = parse_string(&symbol) {
-                    results.insert(address.to_vec(), symbol);
+                    results.insert(address, symbol);
                     continue;
                 } else {
                     substreams::log::info!("Empty symbol for address={:?}", Hex::encode(address));
@@ -93,9 +91,9 @@ pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
     results
 }
 
-pub fn batch_decimals(contracts: Vec<Address>) -> HashMap<Address, i32> {
-    let mut results: HashMap<Address, i32> = HashMap::new();
-    for chunks in contracts.chunks(CHUNK_SIZE) {
+pub fn batch_decimals<'a>(contracts: &'a [&Address], chunk_size: usize) -> HashMap<&'a Address, i32> {
+    let mut results: HashMap<&'a Address, i32> = HashMap::new();
+    for chunks in contracts.chunks(chunk_size) {
         let batch = chunks
             .iter()
             .fold(RpcBatch::new(), |batch, address| batch.add(erc20::functions::Decimals {}, address.to_vec()));
@@ -104,7 +102,7 @@ pub fn batch_decimals(contracts: Vec<Address>) -> HashMap<Address, i32> {
             // erc20::Decimals
             if let Some(decimals) = RpcBatch::decode::<BigInt, erc20::functions::Decimals>(&responses[i]) {
                 if let Some(decimals_u8) = bigint_to_uint8(&decimals) {
-                    results.insert(address.to_vec(), decimals_u8);
+                    results.insert(address, decimals_u8);
                 } else {
                     substreams::log::info!("Decimals out of range for address={:?}", Hex::encode(address));
                 }
