@@ -1,13 +1,13 @@
 specVersion: v0.1.0
 package:
   name: evm_erc20_metadata
-  version: v0.1.0
+  version: v0.1.1
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: ERC20 Token Metadata via RPC
   image: ../image.png
 
 imports:
-  erc20: ../erc20-stores/evm-erc20-stores-v0.1.0.spkg
+  erc20_stores: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.1.0/evm-erc20-stores-v0.1.0.spkg
 
 protobuf:
   files:
@@ -25,11 +25,8 @@ modules:
     kind: map
     inputs:
       - params: string
-      - map: erc20:map_events
+      - map: erc20_stores:map_events
     output:
       type: proto:evm.erc20.metadata.v1.Events
-
-params:
-  map_events: 30 # CHUNK_SIZE (Batch RPC Calls)
 
 network: mainnet
