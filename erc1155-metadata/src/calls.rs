@@ -9,8 +9,8 @@ use substreams_ethereum::rpc::RpcBatch;
 static CHUNK_SIZE: usize = 100;
 
 // Returns the token collection name.
-pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
-    let mut results: HashMap<Address, String> = HashMap::new();
+pub fn batch_name<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, String> {
+    let mut results: HashMap<&'a Address, String> = HashMap::new();
     for chunks in contracts.chunks(CHUNK_SIZE) {
         let batch = chunks
             .iter()
@@ -21,7 +21,7 @@ pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
                 if name.is_empty() {
                     continue;
                 }
-                results.insert(address.to_vec(), name);
+                results.insert(address, name);
             } else {
                 substreams::log::info!("Failed to decode erc721::functions::Name for address={:?}", Hex::encode(address));
             }
@@ -30,8 +30,8 @@ pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
     results
 }
 
-pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
-    let mut results: HashMap<Address, String> = HashMap::new();
+pub fn batch_symbol<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, String> {
+    let mut results: HashMap<&'a Address, String> = HashMap::new();
     for chunks in contracts.chunks(CHUNK_SIZE) {
         let batch = chunks
             .iter()
@@ -43,7 +43,7 @@ pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
                     substreams::log::info!("Empty symbol for address={:?}", Hex::encode(address));
                     continue;
                 }
-                results.insert(address.to_vec(), symbol);
+                results.insert(address, symbol);
             } else {
                 substreams::log::info!("Failed to decode erc721::functions::Symbol for address={:?}", Hex::encode(address));
             }
@@ -53,8 +53,8 @@ pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
 }
 
 // Returns the token URI.
-pub fn batch_uri(token_ids: Vec<(Address, String)>) -> HashMap<(Address, String), String> {
-    let mut results: HashMap<(Address, String), String> = HashMap::with_capacity(token_ids.len());
+pub fn batch_uri<'a>(token_ids: &'a [(&'a Address, &'a String)]) -> HashMap<(&'a Address, &'a String), String> {
+    let mut results: HashMap<(&'a Address, &'a String), String> = HashMap::with_capacity(token_ids.len());
 
     for chunk in token_ids.chunks(CHUNK_SIZE) {
         let batch = chunk.iter().fold(RpcBatch::new(), |batch, (address, id)| {
@@ -69,7 +69,7 @@ pub fn batch_uri(token_ids: Vec<(Address, String)>) -> HashMap<(Address, String)
         for (i, (address, token_id)) in chunk.iter().enumerate() {
             if let Some(uri) = RpcBatch::decode::<String, erc1155::functions::Uri>(&responses[i]) {
                 if !uri.is_empty() {
-                    results.insert((address.to_vec(), token_id.to_string()), parse_uri(&uri));
+                    results.insert((address, token_id), parse_uri(&uri));
                     continue;
                 }
             } else {

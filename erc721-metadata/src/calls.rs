@@ -9,8 +9,8 @@ use substreams_ethereum::rpc::RpcBatch;
 static CHUNK_SIZE: usize = 100;
 
 // Returns the token collection name.
-pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
-    let mut results: HashMap<Address, String> = HashMap::new();
+pub fn batch_name<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, String> {
+    let mut results: HashMap<&'a Address, String> = HashMap::new();
     for chunks in contracts.chunks(CHUNK_SIZE) {
         let batch = chunks
             .iter()
@@ -18,7 +18,7 @@ pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
         let responses = batch.execute().expect("failed to execute erc721::functions::Name RpcBatch").responses;
         for (i, address) in chunks.iter().enumerate() {
             if let Some(name) = RpcBatch::decode::<String, erc721::functions::Name>(&responses[i]) {
-                results.insert(address.to_vec(), name);
+                results.insert(address, name);
             } else {
                 substreams::log::info!("Failed to decode erc721::functions::Name for address={:?}", Hex::encode(address));
             }
@@ -27,8 +27,8 @@ pub fn batch_name(contracts: Vec<Address>) -> HashMap<Address, String> {
     results
 }
 
-pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
-    let mut results: HashMap<Address, String> = HashMap::new();
+pub fn batch_symbol<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, String> {
+    let mut results: HashMap<&'a Address, String> = HashMap::new();
     for chunks in contracts.chunks(CHUNK_SIZE) {
         let batch = chunks
             .iter()
@@ -36,7 +36,7 @@ pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
         let responses = batch.execute().expect("failed to execute erc721::functions::Symbol RpcBatch").responses;
         for (i, address) in chunks.iter().enumerate() {
             if let Some(symbol) = RpcBatch::decode::<String, erc721::functions::Symbol>(&responses[i]) {
-                results.insert(address.to_vec(), symbol);
+                results.insert(address, symbol);
             } else {
                 substreams::log::info!("Failed to decode erc721::functions::Symbol for address={:?}", Hex::encode(address));
             }
@@ -46,8 +46,8 @@ pub fn batch_symbol(contracts: Vec<Address>) -> HashMap<Address, String> {
 }
 
 // Returns the token URI.
-pub fn batch_token_uri(token_ids: Vec<(Address, String)>) -> HashMap<(Address, String), String> {
-    let mut results: HashMap<(Address, String), String> = HashMap::with_capacity(token_ids.len());
+pub fn batch_token_uri<'a>(token_ids: &'a [(&Address, &'a String)]) -> HashMap<(&'a Address, &'a String), String> {
+    let mut results: HashMap<(&'a Address, &'a String), String> = HashMap::with_capacity(token_ids.len());
 
     for chunk in token_ids.chunks(CHUNK_SIZE) {
         let batch = chunk.iter().fold(RpcBatch::new(), |batch, (address, id)| {
@@ -62,7 +62,7 @@ pub fn batch_token_uri(token_ids: Vec<(Address, String)>) -> HashMap<(Address, S
         for (i, (address, token_id)) in chunk.iter().enumerate() {
             if let Some(uri) = RpcBatch::decode::<String, erc721::functions::TokenUri>(&responses[i]) {
                 if !uri.is_empty() {
-                    results.insert((address.to_vec(), token_id.to_string()), parse_uri(&uri));
+                    results.insert((address, token_id), parse_uri(&uri));
                 }
             } else {
                 substreams::log::info!("Failed to decode TokenUri for address={:?} token_id={:?}", Hex::encode(address), token_id);
@@ -73,8 +73,8 @@ pub fn batch_token_uri(token_ids: Vec<(Address, String)>) -> HashMap<(Address, S
 }
 
 // Returns the token collection name.
-pub fn batch_base_uri(contracts: Vec<Address>) -> HashMap<Address, String> {
-    let mut results: HashMap<Address, String> = HashMap::new();
+pub fn batch_base_uri<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, String> {
+    let mut results: HashMap<&'a Address, String> = HashMap::new();
     for chunks in contracts.chunks(CHUNK_SIZE / 2) {
         let batch = chunks.iter().fold(RpcBatch::new(), |batch, address| {
             batch
@@ -86,7 +86,7 @@ pub fn batch_base_uri(contracts: Vec<Address>) -> HashMap<Address, String> {
             // baseUri
             if let Some(value) = RpcBatch::decode::<String, nfts::boredapeyachtclub::functions::BaseUri>(&responses[i * 2]) {
                 if !value.is_empty() {
-                    results.insert(address.to_vec(), parse_uri(&value));
+                    results.insert(address, parse_uri(&value));
                 }
             } else {
                 substreams::log::info!("Failed to decode functions::BaseUri for address={:?}", Hex::encode(address));
@@ -94,7 +94,7 @@ pub fn batch_base_uri(contracts: Vec<Address>) -> HashMap<Address, String> {
             // baseTokenUri
             if let Some(value) = RpcBatch::decode::<String, nfts::pudgypenguins::functions::BaseTokenUri>(&responses[i * 2 + 1]) {
                 if !value.is_empty() {
-                    results.insert(address.to_vec(), parse_uri(&value));
+                    results.insert(address, parse_uri(&value));
                 }
             } else {
                 substreams::log::info!("Failed to decode functions::BaseTokenUri for address={:?}", Hex::encode(address));
@@ -104,8 +104,8 @@ pub fn batch_base_uri(contracts: Vec<Address>) -> HashMap<Address, String> {
     results
 }
 
-pub fn batch_total_supply(contracts: Vec<Address>) -> HashMap<Address, BigInt> {
-    let mut results: HashMap<Address, BigInt> = HashMap::new();
+pub fn batch_total_supply<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, BigInt> {
+    let mut results: HashMap<&'a Address, BigInt> = HashMap::new();
     for chunks in contracts.chunks(CHUNK_SIZE) {
         let batch = chunks.iter().fold(RpcBatch::new(), |batch, address| {
             batch.add(nfts::boredapeyachtclub::functions::TotalSupply {}, address.to_vec())
@@ -114,7 +114,7 @@ pub fn batch_total_supply(contracts: Vec<Address>) -> HashMap<Address, BigInt> {
         for (i, address) in chunks.iter().enumerate() {
             // TotalSupply
             if let Some(value) = RpcBatch::decode::<BigInt, nfts::boredapeyachtclub::functions::TotalSupply>(&responses[i]) {
-                results.insert(address.to_vec(), value);
+                results.insert(address, value);
             } else {
                 substreams::log::info!("Failed to decode functions::TotalSupply for address={:?}", Hex::encode(address));
             }
