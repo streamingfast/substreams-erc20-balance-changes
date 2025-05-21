@@ -13,8 +13,8 @@ fn map_events(erc1155_transfers: events::Events) -> Result<erc1155::Events, subs
     let mut events = erc1155::Events::default();
 
     // Collect unique contracts and token IDs
-    let mut contracts: HashSet<Address> = HashSet::new();
-    let mut contracts_by_token_id: HashSet<(Address, String)> = HashSet::new();
+    let mut contracts: HashSet<&Address> = HashSet::new();
+    let mut contracts_by_token_id: HashSet<(&Address, &String)> = HashSet::new();
 
     // TransferSingle
     for transfer in &erc1155_transfers.transfers_single {
@@ -23,66 +23,58 @@ fn map_events(erc1155_transfers: events::Events) -> Result<erc1155::Events, subs
         if !is_zero_address(&transfer.from) {
             continue;
         }
-        contracts.insert(transfer.contract.clone());
-        contracts_by_token_id.insert((transfer.contract.clone(), transfer.id.clone()));
+        contracts.insert(&transfer.contract);
+        contracts_by_token_id.insert((&transfer.contract, &transfer.id));
     }
     // TransferBatch
     for transfer in &erc1155_transfers.transfers_batch {
         if !is_zero_address(&transfer.from) {
             continue;
         }
-        contracts.insert(transfer.contract.clone());
+        contracts.insert(&transfer.contract);
         for id in &transfer.ids {
-            contracts_by_token_id.insert((transfer.contract.clone(), id.to_string()));
+            contracts_by_token_id.insert((&transfer.contract, id));
         }
     }
 
     log::info!("\ncontracts={}\ncontracts_by_token_id={}", contracts.len(), contracts_by_token_id.len());
 
     // Fetch RPC calls for tokens
-    let contract_vec: Vec<Address> = contracts.iter().cloned().collect();
-    let contract_by_token_id_vec: Vec<(Address, String)> = contracts_by_token_id.iter().cloned().collect();
+    let contract_vec: Vec<&Address> = contracts.into_iter().collect();
+    let contract_by_token_id_vec: Vec<(&Address, &String)> = contracts_by_token_id.into_iter().collect();
 
     // ERC-721
-    let symbols: HashMap<Address, String> = batch_symbol(contract_vec.clone());
-    let names: HashMap<Address, String> = batch_name(contract_vec.clone());
+    let mut symbols: HashMap<&Address, String> = batch_symbol(&contract_vec);
+    let mut names: HashMap<&Address, String> = batch_name(&contract_vec);
 
     // ERC-1155
-    let uris: HashMap<(Address, String), String> = batch_uri(contract_by_token_id_vec);
+    let mut uris: HashMap<(&Address, &String), String> = batch_uri(&contract_by_token_id_vec);
 
     // Metadata By Token
-    for (contract, token_id) in contracts_by_token_id {
+    for &(contract, token_id) in &contract_by_token_id_vec {
         // Requires URI to be set
-        if let Some(uri) = uris.get(&(contract.clone(), token_id.clone())) {
+        if let Some(uri) = uris.remove(&(contract, token_id)) {
             events.metadata_by_tokens.push(erc1155::MetadataByToken {
                 contract: contract.to_vec(),
                 token_id: token_id.to_string(),
-                uri: uri.to_string(),
+                uri,
             });
         }
     }
 
     // Metadata By Contract
-    for contract in contract_vec {
-        let symbol = match symbols.get(&contract) {
-            Some(value) => Some(value.to_string()),
-            None => None,
-        };
-        let name = match names.get(&contract) {
-            Some(value) => Some(value.to_string()),
-            None => None,
-        };
+    for &contract in &contract_vec {
         // Skip if both symbol and name are None
         // This can happen if the contract is not an ERC-721 or ERC-1155 contract
         // or if the contract does not implement the symbol() or name() functions
-        if symbol.is_none() && name.is_none() {
+        if symbols.get(contract).is_none() && names.get(contract).is_none() {
             continue;
         }
         // Add metadata to the events
         events.metadata_by_contracts.push(erc1155::MetadataByContract {
             contract: contract.to_vec(),
-            symbol,
-            name,
+            symbol: symbols.remove(contract),
+            name: names.remove(contract),
         });
     }
 
