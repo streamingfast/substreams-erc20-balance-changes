@@ -9,7 +9,8 @@ use substreams::scalar::BigInt;
 use crate::calls::{batch_base_uri, batch_name, batch_symbol, batch_token_uri, batch_total_supply};
 
 #[substreams::handlers::map]
-fn map_events(erc721_transfers: ERC721Transfers) -> Result<Events, substreams::errors::Error> {
+fn map_events(params: String, erc721_transfers: ERC721Transfers) -> Result<Events, substreams::errors::Error> {
+    let chunk_size = params.parse::<usize>().expect("Failed to parse chunk size");
     let mut events = Events::default();
     let mints: Vec<Transfer> = get_mints(erc721_transfers.transfers).collect();
 
@@ -26,11 +27,11 @@ fn map_events(erc721_transfers: ERC721Transfers) -> Result<Events, substreams::e
     // Fetch RPC calls for tokens and contracts
     let contract_vec: Vec<&Address> = contracts.into_iter().collect();
     let contract_by_token_id_vec: Vec<(&Address, &String)> = contracts_by_token_id.into_iter().collect();
-    let mut symbols: HashMap<&Address, String> = batch_symbol(&contract_vec);
-    let mut names: HashMap<&Address, String> = batch_name(&contract_vec);
-    let mut base_uris: HashMap<&Address, String> = batch_base_uri(&contract_vec);
-    let mut total_supplies: HashMap<&Address, BigInt> = batch_total_supply(&contract_vec);
-    let mut uris: HashMap<(&Address, &String), String> = batch_token_uri(&contract_by_token_id_vec);
+    let mut symbols: HashMap<&Address, String> = batch_symbol(&contract_vec, chunk_size);
+    let mut names: HashMap<&Address, String> = batch_name(&contract_vec, chunk_size);
+    let mut base_uris: HashMap<&Address, String> = batch_base_uri(&contract_vec, chunk_size);
+    let mut total_supplies: HashMap<&Address, BigInt> = batch_total_supply(&contract_vec, chunk_size);
+    let mut uris: HashMap<(&Address, &String), String> = batch_token_uri(&contract_by_token_id_vec, chunk_size);
 
     // Metadata By Token events
     for transfer in &mints {

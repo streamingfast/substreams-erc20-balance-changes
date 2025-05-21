@@ -9,7 +9,8 @@ use substreams::log;
 use crate::calls::{batch_name, batch_symbol, batch_uri};
 
 #[substreams::handlers::map]
-fn map_events(erc1155_transfers: events::Events) -> Result<erc1155::Events, substreams::errors::Error> {
+fn map_events(params: String, erc1155_transfers: events::Events) -> Result<erc1155::Events, substreams::errors::Error> {
+    let chunk_size = params.parse::<usize>().expect("Failed to parse chunk size");
     let mut events = erc1155::Events::default();
 
     // Collect unique contracts and token IDs
@@ -44,11 +45,11 @@ fn map_events(erc1155_transfers: events::Events) -> Result<erc1155::Events, subs
     let contract_by_token_id_vec: Vec<(&Address, &String)> = contracts_by_token_id.into_iter().collect();
 
     // ERC-721
-    let mut symbols: HashMap<&Address, String> = batch_symbol(&contract_vec);
-    let mut names: HashMap<&Address, String> = batch_name(&contract_vec);
+    let mut symbols: HashMap<&Address, String> = batch_symbol(&contract_vec, chunk_size);
+    let mut names: HashMap<&Address, String> = batch_name(&contract_vec, chunk_size);
 
     // ERC-1155
-    let mut uris: HashMap<(&Address, &String), String> = batch_uri(&contract_by_token_id_vec);
+    let mut uris: HashMap<(&Address, &String), String> = batch_uri(&contract_by_token_id_vec, chunk_size);
 
     // Metadata By Token
     for &(contract, token_id) in &contract_by_token_id_vec {
