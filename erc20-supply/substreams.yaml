@@ -24,6 +24,10 @@ modules:
   - name: map_events
     kind: map
     inputs:
+      - params: string
       - map: erc20:map_events
     output:
       type: proto:evm.erc20.supply.v1.Events
+
+params:
+  map_events: 30 # CHUNK_SIZE (Batch RPC Calls)
