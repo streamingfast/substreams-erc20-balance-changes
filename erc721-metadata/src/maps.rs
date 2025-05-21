@@ -3,6 +3,7 @@ use std::collections::{HashMap, HashSet};
 use common::{is_zero_address, Address};
 use proto::pb::evm::erc721::metadata::v1::{Events, MetadataByContract, MetadataByToken};
 use proto::pb::evm::erc721::v1::{Events as ERC721Transfers, Transfer};
+use substreams::log;
 use substreams::scalar::BigInt;
 
 use crate::calls::{batch_base_uri, batch_name, batch_symbol, batch_token_uri, batch_total_supply};
@@ -20,7 +21,7 @@ fn map_events(erc721_transfers: ERC721Transfers) -> Result<Events, substreams::e
         contracts_by_token_id.insert((&transfer.contract, &transfer.token_id));
     }
 
-    substreams::log::info!("\ncontracts={}\ncontracts_by_token_id={}", contracts.len(), contracts_by_token_id.len());
+    log::info!("\ncontracts={}\ncontracts_by_token_id={}", contracts.len(), contracts_by_token_id.len());
 
     // Fetch RPC calls for tokens and contracts
     let contract_vec: Vec<&Address> = contracts.into_iter().collect();
@@ -41,7 +42,7 @@ fn map_events(erc721_transfers: ERC721Transfers) -> Result<Events, substreams::e
     }
 
     // Metadata By Contract events
-    for contract in &contract_vec {
+    for &contract in &contract_vec {
         events.metadata_by_contracts.push(MetadataByContract {
             contract: contract.to_vec(),
             symbol: symbols.remove(contract),

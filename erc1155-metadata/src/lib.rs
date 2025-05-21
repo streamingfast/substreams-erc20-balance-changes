@@ -51,7 +51,7 @@ fn map_events(erc1155_transfers: events::Events) -> Result<erc1155::Events, subs
     let mut uris: HashMap<(&Address, &String), String> = batch_uri(&contract_by_token_id_vec);
 
     // Metadata By Token
-    for (contract, token_id) in &contract_by_token_id_vec {
+    for &(contract, token_id) in &contract_by_token_id_vec {
         // Requires URI to be set
         if let Some(uri) = uris.remove(&(contract, token_id)) {
             events.metadata_by_tokens.push(erc1155::MetadataByToken {
@@ -63,7 +63,7 @@ fn map_events(erc1155_transfers: events::Events) -> Result<erc1155::Events, subs
     }
 
     // Metadata By Contract
-    for contract in &contract_vec {
+    for &contract in &contract_vec {
         // Skip if both symbol and name are None
         // This can happen if the contract is not an ERC-721 or ERC-1155 contract
         // or if the contract does not implement the symbol() or name() functions
