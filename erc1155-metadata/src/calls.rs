@@ -6,12 +6,10 @@ use substreams_abis::evm::token::erc1155;
 use substreams_abis::evm::token::erc721;
 use substreams_ethereum::rpc::RpcBatch;
 
-static CHUNK_SIZE: usize = 100;
-
 // Returns the token collection name.
-pub fn batch_name<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, String> {
+pub fn batch_name<'a>(contracts: &'a [&Address], chunk_size: usize) -> HashMap<&'a Address, String> {
     let mut results: HashMap<&'a Address, String> = HashMap::new();
-    for chunks in contracts.chunks(CHUNK_SIZE) {
+    for chunks in contracts.chunks(chunk_size) {
         let batch = chunks
             .iter()
             .fold(RpcBatch::new(), |batch, address| batch.add(erc721::functions::Name {}, address.to_vec()));
@@ -30,9 +28,9 @@ pub fn batch_name<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, String>
     results
 }
 
-pub fn batch_symbol<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, String> {
+pub fn batch_symbol<'a>(contracts: &'a [&Address], chunk_size: usize) -> HashMap<&'a Address, String> {
     let mut results: HashMap<&'a Address, String> = HashMap::new();
-    for chunks in contracts.chunks(CHUNK_SIZE) {
+    for chunks in contracts.chunks(chunk_size) {
         let batch = chunks
             .iter()
             .fold(RpcBatch::new(), |batch, address| batch.add(erc721::functions::Symbol {}, address.to_vec()));
@@ -53,10 +51,10 @@ pub fn batch_symbol<'a>(contracts: &'a [&Address]) -> HashMap<&'a Address, Strin
 }
 
 // Returns the token URI.
-pub fn batch_uri<'a>(token_ids: &'a [(&'a Address, &'a String)]) -> HashMap<(&'a Address, &'a String), String> {
+pub fn batch_uri<'a>(token_ids: &'a [(&'a Address, &'a String)], chunk_size: usize) -> HashMap<(&'a Address, &'a String), String> {
     let mut results: HashMap<(&'a Address, &'a String), String> = HashMap::with_capacity(token_ids.len());
 
-    for chunk in token_ids.chunks(CHUNK_SIZE) {
+    for chunk in token_ids.chunks(chunk_size) {
         let batch = chunk.iter().fold(RpcBatch::new(), |batch, (address, id)| {
             batch.add(
                 erc1155::functions::Uri {
