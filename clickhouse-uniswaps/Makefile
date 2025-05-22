@@ -1,6 +1,7 @@
 ENDPOINT ?= eth.substreams.pinax.network:443
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 SINK_RANGE := ":"
+START_BLOCK := 12205120
 
 .PHONY: build
 build:
@@ -16,7 +17,7 @@ noop: build
 
 .PHONY: gui
 gui: build
-	substreams gui -e $(ENDPOINT) substreams.yaml db_out -s 22423815 -t 0 --limit-processed-blocks 0
+	substreams gui -e $(ENDPOINT) substreams.yaml db_out -s $(START_BLOCK)
 
 .PHONY: prod
 prod: build
