@@ -912,7 +912,7 @@ ORDER BY (timestamp, block_num, `index`);
 
 -- Uniswap::V4::IPoolManager:ProtocolFeeControllerUpdated --
 -- Emitted when the protocol fee controller address is updated in setProtocolFeeController. --
-CREATE TABLE IF NOT EXISTS uniswap_v4_protocol_fee_controller_update (
+CREATE TABLE IF NOT EXISTS uniswap_v4_protocol_fee_controller_updated (
    -- block --
    block_num            UInt32,
    block_hash           FixedString(66),
