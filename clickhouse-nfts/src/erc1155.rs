@@ -29,7 +29,16 @@ pub fn process_erc1155(tables: &mut substreams_database_change::tables::Tables, 
 
     // ERC1155 Transfers Batch
     for event in events.transfers_batch {
-        event.ids.iter().enumerate().for_each(|(i, id)| {
+        if event.ids.len() != event.values.len() {
+            substreams::log::info!(
+                "Mismatch between ids length ({}) and values length ({}) in ERC1155 batch transfer in trx {}",
+                event.ids.len(),
+                event.values.len(),
+                bytes_to_hex(&event.tx_hash)
+            );
+        }
+
+        event.ids.iter().zip(event.values.iter()).for_each(|(id, value)| {
             let key = common_key(&clock, index);
             let row = tables
                 .create_row("erc1155_transfers", key)
@@ -37,7 +46,7 @@ pub fn process_erc1155(tables: &mut substreams_database_change::tables::Tables, 
                 .set("from", bytes_to_hex(&event.from))
                 .set("to", bytes_to_hex(&event.to))
                 .set("token_id", id)
-                .set("amount", &event.values[i])
+                .set("amount", value)
                 .set("transfer_type", TransferType::Batch.to_string()) // Enum8('Single' = 1, 'Batch' = 2)
                 .set("token_standard", TokenStandard::ERC1155.to_string()); // Enum8('ERC721' = 1, 'ERC1155' = 2)
 
