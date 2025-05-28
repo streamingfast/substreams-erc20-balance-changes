@@ -983,6 +983,7 @@ CREATE TABLE IF NOT EXISTS uniswap_v4_protocol_fee_updated (
 ENGINE = ReplacingMergeTree
 ORDER BY (timestamp, block_num, `index`);
 
+
 -- latest ERC-20 Metadata --
 CREATE TABLE IF NOT EXISTS erc20_metadata  (
    -- block --
