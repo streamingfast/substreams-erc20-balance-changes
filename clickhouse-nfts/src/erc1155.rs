@@ -31,11 +31,12 @@ pub fn process_erc1155(tables: &mut substreams_database_change::tables::Tables, 
     for event in events.transfers_batch {
         if event.ids.len() != event.values.len() {
             substreams::log::info!(
-                "Mismatch between ids length ({}) and values length ({}) in ERC1155 batch transfer in trx {}",
+                "Invalid ERC1155 TransferBatch event: mismatch between ids length ({}) and values length ({}) in trx {}",
                 event.ids.len(),
                 event.values.len(),
                 bytes_to_hex(&event.tx_hash)
             );
+            continue;
         }
 
         event.ids.iter().zip(event.values.iter()).for_each(|(id, value)| {
