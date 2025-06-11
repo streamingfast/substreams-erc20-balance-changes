@@ -632,6 +632,46 @@ CREATE TABLE IF NOT EXISTS scrape_attempts (
 ) ENGINE = MergeTree()
 ORDER BY (contract, token_id, attempt_num);
 
+CREATE TABLE IF NOT EXISTS scrape_attempts_by_contract (
+    contract                 FixedString(42),
+    success_count            UInt32,
+    error_count              UInt32,
+    error_parse_count        UInt32,
+    error_uri_count          UInt32,
+    error_timeout_count      UInt32,
+    error_http_count         UInt32,
+    error_empty_count        UInt32,
+    error_host_count         UInt32,
+    error_other_count        UInt32,
+    last_success_timestamp   DateTime,
+    last_error_timestamp     DateTime,
+    last_timestamp           DateTime,
+    INDEX idx_last_timestamp (last_timestamp) TYPE minmax,
+    INDEX idx_error_count (error_count) TYPE minmax,
+    INDEX idx_success_count (success_count) TYPE minmax
+) ENGINE = SummingMergeTree()
+ORDER BY contract;
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS scrape_attempts_by_contract_mv
+    TO scrape_attempts_by_contract
+    AS
+    SELECT
+        contract,
+        sum(if(result = 'success', 1, 0)) AS success_count,
+        sum(if(result = 'error', 1, 0)) AS error_count,
+        sum(if(result = 'error' AND reason = 'parse', 1, 0)) AS error_parse_count,
+        sum(if(result = 'error' AND reason = 'uri', 1, 0)) AS error_uri_count,
+        sum(if(result = 'error' AND reason = 'timeout', 1, 0)) AS error_timeout_count,
+        sum(if(result = 'error' AND reason = 'http', 1, 0)) AS error_http_count,
+        sum(if(result = 'error' AND reason = 'empty', 1, 0)) AS error_empty_count,
+        sum(if(result = 'error' AND reason = 'host', 1, 0)) AS error_host_count,
+        sum(if(result = 'error' AND (reason = '' OR reason NOT IN ('parse', 'uri', 'timeout', 'http', 'empty', 'host')), 1, 0)) AS error_other_count,
+        max(if(result = 'success', timestamp, toDateTime('1970-01-01 00:00:00'))) AS last_success_timestamp,
+        max(if(result = 'error', timestamp, toDateTime('1970-01-01 00:00:00'))) AS last_error_timestamp,
+        max(timestamp) AS last_timestamp
+    FROM scrape_attempts
+GROUP BY contract;
+
 -- Spam Scoring
 CREATE TABLE IF NOT EXISTS spam_scoring (
     contract        FixedString(42),
