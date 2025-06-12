@@ -47,9 +47,9 @@ CREATE TABLE IF NOT EXISTS scrape_attempts_by_contract (
     last_success_timestamp   DateTime,
     last_error_timestamp     DateTime,
     last_timestamp           DateTime,
-    INDEX idx_last_timestamp (last_timestamp) TYPE minmax,
-    INDEX idx_error_count (error_count) TYPE minmax,
-    INDEX idx_success_count (success_count) TYPE minmax
+    INDEX idx_last_timestamp (last_timestamp) TYPE minmax GRANULARITY 4,
+    INDEX idx_error_count (error_count) TYPE minmax GRANULARITY 4,
+    INDEX idx_success_count (success_count) TYPE minmax GRANULARITY 4
 ) ENGINE = SummingMergeTree()
 ORDER BY contract;
 
