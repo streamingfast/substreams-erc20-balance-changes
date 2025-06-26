@@ -18,7 +18,6 @@ imports:
   # ERC-20
   erc20_balances_rpc: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.2.0/evm-erc20-balances-rpc-v0.2.0.spkg
   erc20_transfers: https://github.com/pinax-network/substreams-evm-tokens/releases/download/erc20-transfers-v0.2.1/evm-erc20-transfers-v0.2.1.spkg
-  erc20_metadata_functions: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.1.0/evm-erc20-metadata-functions-v0.1.0.spkg
   erc20_metadata: https://github.com/pinax-network/substreams-evm-tokens/releases/download/erc20-metadata-v0.1.2/evm-erc20-metadata-v0.1.2.spkg
   erc20_supply: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.2.0/evm-erc20-supply-v0.2.0.spkg
 
@@ -42,7 +41,6 @@ modules:
       - map: erc20_transfers:map_events
       - map: erc20_supply:map_events
       - map: erc20_metadata:map_events
-      - map: erc20_metadata_functions:map_events
 
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges

@@ -22,14 +22,12 @@ pub fn db_out(
     erc20_transfers: erc20::transfers::v1::Events,
     erc20_supply: erc20::supply::v1::Events,
     erc20_metadata: erc20::metadata::v1::Events,
-    erc20_metadata_functions: erc20::metadata::v1::Events,
 ) -> Result<DatabaseChanges, Error> {
     let mut tables = substreams_database_change::tables::Tables::new();
     clock = update_genesis_clock(clock);
 
     // -- ERC20 Metadata --
     erc20_metadata::process_erc20_metadata(&mut tables, &clock, erc20_metadata);
-    erc20_metadata::process_erc20_metadata(&mut tables, &clock, erc20_metadata_functions);
 
     // -- ERC20 Balances --
     erc20_balances::process_erc20_balances(&mut tables, &clock, erc20_balances_rpc);
