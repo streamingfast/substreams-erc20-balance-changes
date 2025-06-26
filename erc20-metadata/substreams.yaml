@@ -1,13 +1,13 @@
 specVersion: v0.1.0
 package:
   name: evm_erc20_metadata
-  version: v0.1.2
+  version: v0.2.1
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: ERC20 Token Metadata via RPC
   image: ../image.png
 
 imports:
-  erc20_stores: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.1.0/evm-erc20-stores-v0.1.0.spkg
+  erc20_stores: https://github.com/pinax-network/substreams-evm-tokens/releases/download/erc20-transfers-v0.2.1/evm-erc20-stores-v0.2.1.spkg
 
 binaries:
   default:

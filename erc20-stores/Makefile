@@ -1,6 +1,6 @@
 ENDPOINT ?= eth.substreams.pinax.network:443
-ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-SINK_RANGE := ":"
+START_BLOCK ?= 2752123
+PARALLEL_JOBS ?= 500
 
 .PHONY: build
 build:
@@ -12,12 +12,12 @@ pack: build
 
 .PHONY: noop
 noop: build
-	substreams-sink-noop $(ENDPOINT) substreams.yaml map_events -H "X-Sf-Substreams-Parallel-Jobs: 600"
+	substreams-sink-noop $(ENDPOINT) substreams.yaml map_events -H "X-Sf-Substreams-Parallel-Jobs: $(PARALLEL_JOBS)" $(START_BLOCK):
 
 .PHONY: gui
 gui: build
-	substreams gui -e $(ENDPOINT) substreams.yaml map_events -s 21469410
+	substreams gui -e $(ENDPOINT) substreams.yaml map_events -s $(START_BLOCK) --network eth --limit-processed-blocks 0
 
 .PHONY: prod
 prod: build
-	substreams gui -e $(ENDPOINT) substreams.yaml map_events -s 0 -t 0 --limit-processed-blocks 0 --production-mode
+	substreams gui -e $(ENDPOINT) substreams.yaml map_events -s $(START_BLOCK) -t 0 --limit-processed-blocks 0 --production-mode  -H "X-Sf-Substreams-Parallel-Jobs: $(PARALLEL_JOBS)"

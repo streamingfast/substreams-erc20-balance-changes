@@ -16,7 +16,7 @@ noop: build
 
 .PHONY: gui
 gui: build
-	substreams gui -e $(ENDPOINT) substreams.yaml db_out -s $(START_BLOCK) --network solana
+	substreams gui -e $(ENDPOINT) substreams.yaml db_out -s $(START_BLOCK) --network eth
 
 .PHONY: prod
 prod: build
