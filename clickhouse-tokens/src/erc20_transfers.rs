@@ -27,6 +27,7 @@ fn process_erc20_transfer(tables: &mut substreams_database_change::tables::Table
         .set("to", bytes_to_hex(&event.to))
         .set("value", event.value.to_string());
 
+    row.set("log_index", event.log_index.to_string());
     set_log(clock, index, event.tx_hash, event.contract, event.ordinal, event.caller, row);
 }
 
@@ -38,5 +39,6 @@ fn process_erc20_approval(tables: &mut substreams_database_change::tables::Table
         .set("spender", bytes_to_hex(&event.spender))
         .set("value", event.value.to_string());
 
+    row.set("log_index", event.log_index.to_string());
     set_log(clock, index, event.tx_hash, event.contract, event.ordinal, event.caller, row);
 }

@@ -102,6 +102,7 @@ CREATE TABLE IF NOT EXISTS erc20_transfers  (
     -- log --
     contract             FixedString(42),
     ordinal              UInt64, -- log.ordinal
+    log_index            UInt32, -- log.index
 
     -- event --
     `from`               FixedString(42) COMMENT 'sender address',
@@ -141,6 +142,7 @@ CREATE TABLE IF NOT EXISTS erc20_approvals  (
     -- log --
     contract             FixedString(42),
     ordinal              UInt64, -- log.ordinal
+    log_index            UInt32, -- log.index
 
     -- event --
     owner                FixedString(42),
@@ -493,6 +495,8 @@ CREATE TABLE IF NOT EXISTS transfers (
 
     -- log --
     contract			FixedString(42),
+    ordinal             Nullable(UInt64), -- log.ordinal
+    log_index           Nullable(UInt32), -- log.index
 
     -- event --
     `from`				FixedString(42),
@@ -541,6 +545,8 @@ SELECT
 
     -- log --
     contract,
+    ordinal,
+    log_index,
 
     -- event --
     `from`,

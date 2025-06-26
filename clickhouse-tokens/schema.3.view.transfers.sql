@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS transfers (
 
     -- log --
     contract			FixedString(42),
+    ordinal             Nullable(UInt64), -- log.ordinal
+    log_index           Nullable(UInt32), -- log.index
 
     -- event --
     `from`				FixedString(42),
@@ -62,6 +64,8 @@ SELECT
 
     -- log --
     contract,
+    ordinal,
+    log_index,
 
     -- event --
     `from`,

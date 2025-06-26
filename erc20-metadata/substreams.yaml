@@ -9,11 +9,11 @@ package:
 imports:
   erc20_stores: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.1.0/evm-erc20-stores-v0.1.0.spkg
 
-protobuf:
-  files:
-    - erc20-metadata.proto
-  importPaths:
-    - ../proto/v1
+# protobuf:
+#   files:
+#     - erc20-metadata.proto
+#   importPaths:
+#     - ../proto/v1
 
 binaries:
   default:
