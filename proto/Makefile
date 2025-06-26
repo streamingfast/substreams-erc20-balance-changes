@@ -5,3 +5,7 @@ all:
 .PHONY: protogen
 protogen:
 	substreams protogen
+
+.PHONY: pack
+pack:
+	substreams pack

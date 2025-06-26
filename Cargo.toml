@@ -4,7 +4,6 @@ members = [
   "clickhouse-tokens",
   "erc20-transfers",
   "erc20-metadata",
-  "erc20-metadata-functions",
   "erc20-stores",
   "erc20-supply",
   "erc20-balances-rpc",

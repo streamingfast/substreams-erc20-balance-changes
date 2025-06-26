@@ -274,17 +274,6 @@ dependencies = [
 name = "erc20-metadata"
 version = "0.0.0"
 dependencies = [
- "common",
- "proto",
- "substreams",
- "substreams-abis",
- "substreams-ethereum",
-]
-
-[[package]]
-name = "erc20-metadata-functions"
-version = "0.0.0"
-dependencies = [
  "anyhow",
  "common",
  "ethabi 18.0.0",

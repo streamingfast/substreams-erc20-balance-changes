@@ -8,20 +8,25 @@ package:
 
 imports:
   erc20_stores: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.1.0/evm-erc20-stores-v0.1.0.spkg
-  erc20_metadata_functions: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.1.0/evm-erc20-metadata-functions-v0.1.0.spkg
 
 binaries:
   default:
     type: wasm/rust-v1
     file: ../target/wasm32-unknown-unknown/release/erc20_metadata.wasm
 
+protobuf:
+  files:
+    - erc20-metadata.proto
+  importPaths:
+    - ../proto/v1
+
 modules:
   - name: map_events
     kind: map
     inputs:
       - params: string
+      - source: sf.ethereum.type.v2.Block
       - map: erc20_stores:map_events
-      - map: erc20_metadata_functions:map_events
     output:
       type: proto:evm.erc20.metadata.v1.Events
 
