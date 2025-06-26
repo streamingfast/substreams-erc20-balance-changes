@@ -8,12 +8,7 @@ package:
 
 imports:
   erc20_stores: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.1.0/evm-erc20-stores-v0.1.0.spkg
-
-# protobuf:
-#   files:
-#     - erc20-metadata.proto
-#   importPaths:
-#     - ../proto/v1
+  erc20_metadata_functions: https://github.com/pinax-network/substreams-evm-tokens/releases/download/tokens-v0.1.0/evm-erc20-metadata-functions-v0.1.0.spkg
 
 binaries:
   default:
@@ -26,6 +21,7 @@ modules:
     inputs:
       - params: string
       - map: erc20_stores:map_events
+      - map: erc20_metadata_functions:map_events
     output:
       type: proto:evm.erc20.metadata.v1.Events
 

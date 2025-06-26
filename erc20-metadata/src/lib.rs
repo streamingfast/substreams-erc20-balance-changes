@@ -9,8 +9,8 @@ use proto::pb::evm::erc20::stores::v1::Events as ERC20FirstTransfer;
 use crate::calls::{batch_decimals, batch_name, batch_symbol};
 
 #[substreams::handlers::map]
-fn map_events(chunk_size: String, erc20: ERC20FirstTransfer) -> Result<Events, substreams::errors::Error> {
-    let mut events = Events::default();
+fn map_events(chunk_size: String, erc20: ERC20FirstTransfer, erc20_metadata_functions: Events) -> Result<Events, substreams::errors::Error> {
+    let mut events = erc20_metadata_functions;
     let chunk_size = chunk_size.parse::<usize>().expect("Failed to parse chunk_size");
 
     let contracts: Vec<&Address> = erc20
