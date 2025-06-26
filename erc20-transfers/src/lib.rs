@@ -27,6 +27,7 @@ fn map_events(block: Block) -> Result<erc20::Events, substreams::errors::Error> 
                     // -- log --
                     contract: log.address.to_vec(),
                     ordinal: log.ordinal,
+                    log_index: log.index,
 
                     // -- event --
                     from: event.from.to_vec(),
@@ -47,6 +48,7 @@ fn map_events(block: Block) -> Result<erc20::Events, substreams::errors::Error> 
                     // -- log --
                     contract: log.address.to_vec(),
                     ordinal: log.ordinal,
+                    log_index: log.index,
 
                     // -- event --
                     owner: event.owner.to_vec(),
@@ -67,6 +69,7 @@ fn map_events(block: Block) -> Result<erc20::Events, substreams::errors::Error> 
                     // -- log --
                     contract: log.address.to_vec(),
                     ordinal: log.ordinal,
+                    log_index: log.index,
 
                     // -- event --
                     from: NULL_ADDRESS.to_vec(),
@@ -88,6 +91,7 @@ fn map_events(block: Block) -> Result<erc20::Events, substreams::errors::Error> 
                     // -- log --
                     contract: log.address.to_vec(),
                     ordinal: log.ordinal,
+                    log_index: log.index,
 
                     // -- event --
                     from: event.src.to_vec(),

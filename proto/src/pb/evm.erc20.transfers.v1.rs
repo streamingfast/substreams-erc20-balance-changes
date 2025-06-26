@@ -26,6 +26,9 @@ pub struct Transfer {
     /// log.ordinal
     #[prost(uint64, tag="4")]
     pub ordinal: u64,
+    /// log.index
+    #[prost(uint32, tag="5")]
+    pub log_index: u32,
     /// -- event --
     #[prost(bytes="vec", tag="10")]
     pub from: ::prost::alloc::vec::Vec<u8>,
@@ -51,6 +54,9 @@ pub struct Approval {
     /// log.ordinal
     #[prost(uint64, tag="4")]
     pub ordinal: u64,
+    /// log.index
+    #[prost(uint32, tag="5")]
+    pub log_index: u32,
     /// -- event --
     #[prost(bytes="vec", tag="10")]
     pub owner: ::prost::alloc::vec::Vec<u8>,

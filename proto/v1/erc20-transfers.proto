@@ -18,13 +18,13 @@ message Transfer {
   // -- log --
   bytes contract = 3; // log.address
   uint64 ordinal = 4; // log.ordinal
+  uint32 log_index = 5; // log.index
 
   // -- event --
   bytes from = 10;
   bytes to = 11;
   string value = 12;
 }
-
 
 message Approval {
   // -- transaction --
@@ -36,6 +36,7 @@ message Approval {
   // -- log --
   bytes contract = 3; // log.address
   uint64 ordinal = 4; // log.ordinal
+  uint32 log_index = 5; // log.index
 
   // -- event --
   bytes owner = 10;
