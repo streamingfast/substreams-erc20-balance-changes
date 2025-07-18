@@ -10,8 +10,6 @@ LIMIT 10
 
 -- OHLC Prices by Pool --
 WITH (
-      18 AS decimals0, -- JOIN contracts
-      6 AS decimals1, -- JOIN contracts
       pow(10, decimals0) AS scale0,
       pow(10, decimals1) AS scale1,
       pow(10, decimals0 - decimals1) AS scale,
@@ -37,7 +35,7 @@ WITH (
       sum(transactions)       AS transactions
 FROM ohlc_prices
 WHERE pool = lower('0x72331fcb696b0151904c03584b66dc8365bc63f8a144d89a773384e3a579ca73') -- Uniswap V4 WETH/USDT
-GROUP BY pool, timestamp
+GROUP BY pool, timestamp, decimals0, decimals1
 ORDER BY timestamp DESC
 LIMIT 10;
 
