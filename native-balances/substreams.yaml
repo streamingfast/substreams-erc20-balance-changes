@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: evm_native_balances
-  version: v0.1.0
+  version: v0.2.0
   url: https://github.com/pinax-network/substreams-evm-tokens
   description: Extracts Native balances for EVM blockchains.
   image: ../image.png
@@ -21,8 +21,12 @@ modules:
   - name: map_events
     kind: map
     inputs:
+      - params: string
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:evm.native.balances.v1.Events
 
 network: mainnet
+
+params:
+  map_events: 25 # CHUNK_SIZE (Batch RPC Calls)
