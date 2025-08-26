@@ -1,6 +1,6 @@
 ENDPOINT ?= avalanche.substreams.pinax.network:443
 # ENDPOINT ?= avalanche-mainnet.streamingfast.io:443
-START_BLOCK ?= 1000000
+START_BLOCK ?= 4500000
 PARALLEL_JOBS ?= 500
 
 .PHONY: build
