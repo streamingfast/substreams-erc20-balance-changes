@@ -21,4 +21,5 @@ CREATE TABLE IF NOT EXISTS erc20_balance_changes  (
     INDEX idx_balance            (balance)             TYPE minmax GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
-ORDER BY (contract, address, block_num);
+ORDER BY (contract, address, block_num)
+TTL timestamp + INTERVAL 10 MINUTE DELETE;

@@ -36,7 +36,8 @@ CREATE TABLE IF NOT EXISTS erc20_transfers  (
     INDEX idx_value              (value)              TYPE minmax GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
-ORDER BY (timestamp, block_num, `index`);
+ORDER BY (timestamp, block_num, `index`)
+TTL timestamp + INTERVAL 10 MINUTE DELETE;
 
 -- ERC-20 approvals --
 CREATE TABLE IF NOT EXISTS erc20_approvals  (

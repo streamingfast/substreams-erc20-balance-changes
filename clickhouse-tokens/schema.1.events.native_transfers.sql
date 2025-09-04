@@ -26,9 +26,11 @@ CREATE TABLE IF NOT EXISTS native_transfers  (
     INDEX idx_value              (value)              TYPE minmax GRANULARITY 4
 )
 ENGINE = ReplacingMergeTree
-ORDER BY (timestamp, block_num, `index`);
+ORDER BY (timestamp, block_num, `index`)
+TTL timestamp + INTERVAL 10 MINUTE DELETE;
 
 -- Exclude gas fees from primary Clickhouse DB --
 CREATE TABLE IF NOT EXISTS native_transfers_from_fees AS native_transfers
 ENGINE = ReplacingMergeTree
-ORDER BY (timestamp, block_num, `index`);
+ORDER BY (timestamp, block_num, `index`)
+TTL timestamp + INTERVAL 10 MINUTE DELETE;

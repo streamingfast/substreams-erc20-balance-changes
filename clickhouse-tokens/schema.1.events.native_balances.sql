@@ -24,4 +24,5 @@ ORDER BY (address, block_num);
 -- Exclude gas fees from primary Clickhouse DB --
 CREATE TABLE IF NOT EXISTS native_balance_changes_from_gas AS native_balance_changes
 ENGINE = ReplacingMergeTree
-ORDER BY (address, block_num);
+ORDER BY (address, block_num)
+TTL timestamp + INTERVAL 10 MINUTE DELETE;
