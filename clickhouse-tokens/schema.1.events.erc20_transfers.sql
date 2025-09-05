@@ -1,80 +1,25 @@
 -- ERC-20 transfers --
-CREATE TABLE IF NOT EXISTS erc20_transfers  (
-    -- block --
-    block_num            UInt32,
-    block_hash           FixedString(66),
-    timestamp            DateTime(0, 'UTC'),
-
-    -- ordering --
-    `index`              UInt64, -- relative index
-    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
-
-    -- transaction --
-    tx_hash              FixedString(66),
-
-    -- call --
-    caller               FixedString(42),
-
-    -- log --
-    contract             FixedString(42),
-    ordinal              UInt64, -- log.ordinal
-    log_index            UInt32, -- log.index
-
-    -- event --
-    `from`               FixedString(42) COMMENT 'sender address',
-    `to`                 FixedString(42) COMMENT 'recipient address',
-    value                UInt256 COMMENT 'transfer value',
-
-    -- indexes --
-    INDEX idx_tx_hash            (tx_hash)            TYPE bloom_filter GRANULARITY 4,
-    INDEX idx_caller             (caller)             TYPE bloom_filter GRANULARITY 4,
-
-    -- indexes (event) --
-    INDEX idx_contract           (contract)           TYPE set(64) GRANULARITY 4,
-    INDEX idx_from               (`from`)             TYPE bloom_filter GRANULARITY 4,
-    INDEX idx_to                 (`to`)               TYPE bloom_filter GRANULARITY 4,
-    INDEX idx_value              (value)              TYPE minmax GRANULARITY 4
-)
-ENGINE = ReplacingMergeTree
-ORDER BY (timestamp, block_num, `index`)
+CREATE TABLE IF NOT EXISTS erc20_transfers AS log_events
 TTL timestamp + INTERVAL 10 MINUTE DELETE;
 
+ALTER TABLE erc20_transfers
+    ADD COLUMN IF NOT EXISTS `from`               FixedString(42) COMMENT 'sender address',
+    ADD COLUMN IF NOT EXISTS `to`                 FixedString(42) COMMENT 'recipient address',
+    ADD COLUMN IF NOT EXISTS value                UInt256 COMMENT 'transfer value'
+    -- indexes (event) --
+    ADD INDEX IF NOT EXISTS idx_from               (`from`)             TYPE bloom_filter GRANULARITY 4,
+    ADD INDEX IF NOT EXISTS idx_to                 (`to`)               TYPE bloom_filter GRANULARITY 4,
+    ADD INDEX IF NOT EXISTS idx_value              (value)              TYPE minmax GRANULARITY 4;
+
 -- ERC-20 approvals --
-CREATE TABLE IF NOT EXISTS erc20_approvals  (
-    -- block --
-    block_num            UInt32,
-    block_hash           FixedString(66),
-    timestamp            DateTime(0, 'UTC'),
+CREATE TABLE IF NOT EXISTS erc20_approvals AS log_events;
 
-    -- ordering --
-    `index`              UInt64, -- relative index
-    global_sequence      UInt64, -- latest global sequence (block_num << 32 + index)
-
-    -- transaction --
-    tx_hash              FixedString(66),
-
-    -- call --
-    caller               FixedString(42),
-
-    -- log --
-    contract             FixedString(42),
-    ordinal              UInt64, -- log.ordinal
-    log_index            UInt32, -- log.index
-
-    -- event --
-    owner                FixedString(42),
-    spender              FixedString(42),
-    value                UInt256,
-
-    -- indexes --
-    INDEX idx_tx_hash            (tx_hash)            TYPE bloom_filter GRANULARITY 4,
-    INDEX idx_caller             (caller)             TYPE bloom_filter GRANULARITY 4,
+ALTER TABLE erc20_approvals
+    ADD COLUMN IF NOT EXISTS owner               FixedString(42) COMMENT 'owner address',
+    ADD COLUMN IF NOT EXISTS spender             FixedString(42) COMMENT 'spender address',
+    ADD COLUMN IF NOT EXISTS value               UInt256 COMMENT 'approval value'
 
     -- indexes (event) --
-    INDEX idx_contract           (contract)           TYPE set(64) GRANULARITY 4,
-    INDEX idx_owner              (owner)              TYPE bloom_filter GRANULARITY 4,
-    INDEX idx_spender            (spender)            TYPE bloom_filter GRANULARITY 4,
-    INDEX idx_value              (value)              TYPE minmax GRANULARITY 4
-)
-ENGINE = ReplacingMergeTree
-ORDER BY (timestamp, block_num, `index`);
+    ADD INDEX IF NOT EXISTS idx_owner              (owner)              TYPE bloom_filter GRANULARITY 4,
+    ADD INDEX IF NOT EXISTS idx_spender            (spender)            TYPE bloom_filter GRANULARITY 4,
+    ADD INDEX IF NOT EXISTS idx_value              (value)              TYPE minmax GRANULARITY 4;
