@@ -16,7 +16,6 @@ SELECT
     argMaxMerge(close)                     AS close,           -- from AggregateFunction(argMax, UInt256, UInt32)
 
     -- activity finalized
-    uniqMerge(uaw)                         AS uaw,             -- from AggregateFunction(uniq, String)
     sum(transactions)                      AS transactions     -- SimpleAggregateFunction(sum)
 FROM historical_balances_state
 GROUP BY
@@ -39,7 +38,6 @@ SELECT
     argMaxMerge(close)                     AS close,           -- from AggregateFunction(argMax, UInt256, UInt32)
 
     -- activity finalized
-    uniqMerge(uaw)                         AS uaw,             -- from AggregateFunction(uniq, String)
     sum(transactions)                      AS transactions     -- SimpleAggregateFunction(sum)
 FROM historical_balances_state_by_contract
 GROUP BY

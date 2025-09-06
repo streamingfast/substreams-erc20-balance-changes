@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS historical_balances_state (
     high                 SimpleAggregateFunction(max, UInt256),
     low                  SimpleAggregateFunction(min, UInt256),
     close                AggregateFunction(argMax, UInt256, UInt32),
-    uaw                  AggregateFunction(uniq, String) COMMENT 'unique wallet addresses that changed balance in the window',
     transactions         SimpleAggregateFunction(sum, UInt64) COMMENT 'total number of transactions in the window',
 )
 ENGINE = AggregatingMergeTree
@@ -36,7 +35,6 @@ SELECT
     max(balance) AS high,
     min(balance) AS low,
     argMaxState(balance, b.block_num) AS close,
-    uniqState(address) AS uaw,
     count() AS transactions
 FROM balances AS b
 GROUP BY address, contract, timestamp;
