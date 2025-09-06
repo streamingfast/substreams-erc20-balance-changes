@@ -12,6 +12,16 @@ pub fn common_key(clock: &Clock, index: u64) -> [(&'static str, String); 3] {
     ]
 }
 
+pub fn log_key(clock: &Clock, log_index: u32) -> [(&'static str, String); 4] {
+    let seconds = clock.timestamp.as_ref().expect("clock.timestamp is required").seconds;
+    [
+        ("timestamp", seconds.to_string()),
+        ("block_num", clock.number.to_string()),
+        ("block_hash", format!("0x{}", &clock.id)),
+        ("log_index", log_index.to_string()),
+    ]
+}
+
 // Helper function to set clock data in a row
 pub fn set_clock(clock: &Clock, row: &mut Row) {
     row.set("block_num", clock.number.to_string())
@@ -24,6 +34,13 @@ pub fn set_log(clock: &Clock, index: u64, tx_hash: Hash, contract: Address, ordi
     set_bytes(Some(contract), "contract", row);
     set_bytes(caller, "caller", row);
     set_ordering(index, Some(ordinal), clock, row);
+    set_clock(&clock, row);
+}
+
+pub fn set_log_v2(clock: &Clock, tx_hash: Hash, contract: Address, caller: Option<Address>, row: &mut Row) {
+    set_bytes(Some(tx_hash), "tx_hash", row);
+    set_bytes(Some(contract), "contract", row);
+    set_bytes(caller, "caller", row);
     set_clock(&clock, row);
 }
 
