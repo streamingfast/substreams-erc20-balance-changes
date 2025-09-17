@@ -44,6 +44,6 @@ CREATE TABLE IF NOT EXISTS TEMPLATE_LOGS (
 ENGINE = ReplacingMergeTree
 PARTITION BY toYYYYMM(timestamp)
 ORDER BY (
-    timestamp, block_num, block_hash, log_index
+    timestamp, block_num, block_hash, tx_hash, log_index
 )
 COMMENT 'TEMPLATE for event logs';
