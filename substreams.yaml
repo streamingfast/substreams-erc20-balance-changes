@@ -19,8 +19,10 @@ binaries:
 protobuf:
   files:
     - erc20.proto
+    - sf/substreams/sink/entity/v1/entity.proto
   importPaths:
     - ./proto/v1
+    - ./proto
   excludePaths:
     - sf/substreams
     - google

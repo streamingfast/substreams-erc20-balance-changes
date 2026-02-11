@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package sf.substreams.sink.entity.v1;
+
+message EntityChanges {
+  repeated EntityChange entity_changes = 1;
+}
+
+message EntityChange {
+  string entity = 1;
+  string id = 2;
+  uint64 ordinal = 3;
+  Operation operation = 4;
+  repeated Field fields = 5;
+}
+
+enum Operation {
+  OPERATION_UNSPECIFIED = 0;
+  OPERATION_CREATE = 1;
+  OPERATION_UPDATE = 2;
+  OPERATION_DELETE = 3;
+}
+
+message Field {
+  string name = 1;
+  oneof typed_value {
+    string string_value = 2;
+    int64 int64_value = 3;
+    double float64_value = 4;
+    bytes bytes_value = 5;
+    bool bool_value = 6;
+    BigInt bigint_value = 7;
+    BigDecimal bigdecimal_value = 8;
+    Array array_value = 9;
+  }
+}
+
+message BigInt {
+  bytes value = 1;
+}
+
+message BigDecimal {
+  bytes value = 1;
+}
+
+message Array {
+  repeated Value values = 1;
+}
+
+message Value {
+  oneof typed {
+    string string = 1;
+    int64 int64 = 2;
+    double float64 = 3;
+    bytes bytes = 4;
+    bool bool = 5;
+    BigInt bigint = 6;
+    BigDecimal bigdecimal = 7;
+  }
+}
